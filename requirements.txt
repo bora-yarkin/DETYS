@@ -1,0 +1,17 @@
+Flask==2.1.2
+Flask-Login==0.6.2
+Flask-Mail==0.9.1
+Flask-WTF==1.0.1
+Flask-SocketIO==5.3.2
+Flask-Migrate==3.1.0
+Flask-Testing==0.8.1
+SQLAlchemy==1.4.31
+Alembic==1.7.7
+WTForms==3.0.1
+matplotlib==3.5.1
+plotly==5.6.0
+pandas==1.4.2
+requests==2.27.1
+eventlet==0.33.0
+email-validator==1.1.3
+python-socketio==5.6.0
