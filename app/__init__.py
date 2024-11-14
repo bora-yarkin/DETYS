@@ -1,4 +1,3 @@
-# app/__init__.py
 from flask import Flask
 from config import Config
 
@@ -31,5 +30,26 @@ def create_app():
     from app.controllers.main_controller import main_bp
 
     app.register_blueprint(main_bp)
+
+    return app
+
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    # Initialize extensions
+    db.init_app(app)
+    login_manager.init_app(app)
+    mail.init_app(app)
+    socketio.init_app(app)
+    migrate.init_app(app, db)
+
+    # Register blueprints
+    from app.controllers.main_controller import main_bp
+    from app.controllers.auth_controller import auth_bp  # Add this line
+
+    app.register_blueprint(main_bp)
+    app.register_blueprint(auth_bp)  # Add this line
 
     return app
