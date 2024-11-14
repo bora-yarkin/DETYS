@@ -125,14 +125,14 @@ flask db upgrade                Apply migrations to the database
 
 ## Additional Notes
 
-    •Database: The default database is SQLite (sqlite:///detys.db). Configure other databases in config.py.
-    •Environment Variables: For production, set FLASK_ENV=production and adjust the configuration accordingly.
-    •Deactivating the Virtual Environment: Run deactivate to exit the virtual environment.
+    • Database: The default database is SQLite (sqlite:///detys.db). Configure other databases in config.py.
+    • Environment Variables: For production, set FLASK_ENV=production and adjust the configuration accordingly.
+    • Deactivating the Virtual Environment: Run deactivate to exit the virtual environment.
 
 ## Troubleshooting
 
-    1.Flask Not Found: Ensure the virtual environment is activated (source venv/bin/activate).
-    2.No db Command: Confirm that Flask-Migrate is installed and properly set up.
-    3.Database Issues: Delete the migrations folder and detys.db, then re-run the migration steps.
+    1. Flask Not Found: Ensure the virtual environment is activated (source venv/bin/activate).
+    2. No db Command: Confirm that Flask-Migrate is installed and properly set up.
+    3. Database Issues: Delete the migrations folder and detys.db, then re-run the migration steps.
 
 This README provides the essential steps to set up and run the DETYS application. For further development or deployment, consult Flask Documentation or reach out with specific questions.
