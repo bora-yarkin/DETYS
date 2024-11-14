@@ -10,7 +10,7 @@ Alembic==1.7.7
 WTForms==3.0.1
 matplotlib==3.5.1
 plotly==5.6.0
-pandas==1.4.2
+pandas==2.2.3
 requests==2.27.1
 eventlet==0.33.0
 email-validator==1.1.3
