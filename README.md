@@ -116,10 +116,10 @@ DETYS/
 ### Common Commands
 
 ```bash
-flask run\tRun the application
-flask db init\tInitialize database migrations
-flask db migrate -m "Message"\tCreate a new migration
-flask db upgrade\tApply migrations to the database
+flask run                       Run the application
+flask db init                   Initialize database migrations
+flask db migrate -m "Message"   Create a new migration
+flask db upgrade                Apply migrations to the database
 
 ```
 
