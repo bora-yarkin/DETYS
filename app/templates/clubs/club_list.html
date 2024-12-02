@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Clubs{% endblock %}
+{% block content %}
+<h2>Clubs</h2>
+{% if current_user.is_club_manager() %}
+<a href="{{ url_for('club.create_club') }}">Create New Club</a>
+{% endif %}
+<ul>
+    {% for club in clubs %}
+    <li><a href="{{ url_for('club.club_detail', club_id=club.id) }}">{{ club.name }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

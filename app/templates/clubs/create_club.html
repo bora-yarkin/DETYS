@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Create Club{% endblock %}
+{% block content %}
+<h2>Create a New Club</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.name.label }}<br>
+        {{ form.name(size=64) }}<br>
+        {% for error in form.name.errors %}
+        <span style="color: red;">[{{ error }}]</span><br>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.description.label }}<br>
+        {{ form.description(size=128) }}<br>
+        {% for error in form.description.errors %}
+        <span style="color: red;">[{{ error }}]</span><br>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.contact_email.label }}<br>
+        {{ form.contact_email(size=64) }}<br>
+        {% for error in form.contact_email.errors %}
+        <span style="color: red;">[{{ error }}]</span><br>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.submit() }}
+    </div>
+</form>
+{% endblock %}

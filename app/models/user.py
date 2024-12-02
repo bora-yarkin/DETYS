@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(UserMixin, db.Model):
-    __tablename__ = "users"  # Specify table name if desired
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
@@ -12,7 +12,9 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False, default="student")  # Roles: student, club_manager, main_admin
 
-    # Relationships (if any) can be defined here
+    # Relationships
+    memberships = db.relationship("Membership", back_populates="user", cascade="all, delete-orphan")
+    managed_clubs = db.relationship("Club", back_populates="president", foreign_keys="Club.president_id")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -20,7 +22,7 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # Optional: Define user role verification methods
+    # User role verification methods
     def is_student(self):
         return self.role == "student"
 

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}{{ club.name }}{% endblock %}
+{% block content %}
+<h2>{{ club.name }}</h2>
+<p>{{ club.description }}</p>
+<p>Contact Email: {{ club.contact_email }}</p>
+
+{% if current_user.is_authenticated %}
+{% if is_member %}
+{% if membership.is_approved %}
+<p>You are a member of this club.</p>
+{% else %}
+<p>Your membership request is pending approval.</p>
+{% endif %}
+{% else %}
+<a href="{{ url_for('club.join_club', club_id=club.id) }}">Join Club</a>
+{% endif %}
+{% endif %}
+
+{% if club.president_id == current_user.id %}
+<a href="{{ url_for('club.manage_members', club_id=club.id) }}">Manage Members</a>
+{% endif %}
+{% endblock %}

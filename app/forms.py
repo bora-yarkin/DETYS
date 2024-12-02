@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app.models.user import User
+from app.models.club import Club
 
 
 class RegistrationForm(FlaskForm):
@@ -28,3 +29,15 @@ class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Login")
+
+
+class ClubCreationForm(FlaskForm):
+    name = StringField("Club Name", validators=[DataRequired()])
+    description = StringField("Description", validators=[DataRequired()])
+    contact_email = StringField("Contact Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Create Club")
+
+    def validate_name(self, name):
+        club = Club.query.filter_by(name=name.data).first()
+        if club:
+            raise ValidationError("A club with this name already exists. Please choose a different name.")
