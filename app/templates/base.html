@@ -24,7 +24,6 @@
     </nav>
 
     <div class="container">
-        <!-- Flash messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -36,7 +35,6 @@
         {% endblock %}
     </div>
 
-    <!-- Include scripts -->
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
@@ -46,23 +44,35 @@
         $(document).ready(function () {
             var socket = io();
 
-            // Retrieve data attributes from the body tag
             var isAuthenticated = $('body').data('is-authenticated') === 'true' || $('body').data('is-authenticated') === true;
             var userId = $('body').data('user-id');
 
-            // Debugging: Log the retrieved values
-
+            //DEBUG: Log connection TO BE DELETED IN PRODUCTION
             console.log('Authenticated:', isAuthenticated, 'User ID:', userId);
 
-            // Join room specific to the user
             if (isAuthenticated && userId) {
                 socket.emit('join', { room: 'user_' + userId });
             }
 
-            // Listen for notifications
             socket.on('notification', function (data) {
-                alert(data.msg);  // Simple alert; you can enhance this
+                alert(data.msg);
             });
+        });
+    </script>
+
+    <!-- DEBUG: Log connection TO BE DELETED IN PRODUCTION-->
+    <script>
+        var socket = io();
+
+        socket.on('connect', function () {
+            console.log('WebSocket connection established'); // THIS IS WHAT SHOULD LOG
+        });
+
+        socket.on('connect_error', function (error) {
+            console.error('Connection error:', error);
+        });
+        socket.on('disconnect', function () {
+            console.log('Disconnected from server');
         });
     </script>
 </body>
