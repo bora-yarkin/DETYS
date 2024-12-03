@@ -88,7 +88,6 @@ def cancel_registration(event_id):
     db.session.delete(attendance)
     db.session.commit()
     flash("Your registration has been canceled.", "info")
-    # Optionally, move someone from waiting list to confirmed
     update_waiting_list(event)
     return redirect(url_for("event.event_detail", event_id=event_id))
 
@@ -100,7 +99,5 @@ def update_waiting_list(event):
         if next_in_line:
             next_in_line.status = "confirmed"
             db.session.commit()
-            # Send notification to the user
             message = f"You have been moved from the waiting list to confirmed attendees for the event '{event.title}'."
-            # Implement notification logic here (e.g., emit socket event, send email)
             emit("notification", {"msg": message}, room=f"user_{next_in_line.user_id}")

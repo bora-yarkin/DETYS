@@ -41,6 +41,7 @@ def create_app():
 
 
 # User loader callback for Flask-Login
+"""DO NOT MOVE TO TOP OF FILE"""
 from app.models.user import User
 
 
