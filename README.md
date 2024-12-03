@@ -71,7 +71,6 @@ Initialize database migration environment:
 
 ```bash
 flask db init
-
 ```
 
 Generate an initial migration:
@@ -113,6 +112,26 @@ DETYS/
 ├── requirements.txt # List of dependencies
 ├── run.py # Entry point to run the app
 └── .flaskenv # Environment variables
+```
+
+```bash
+# Project Structure
+
+## app/
+- Contains all application logic.
+  - `controllers/`: Flask route handlers.
+  - `models/`: Database models.
+  - `views/`: Templates and static files.
+  - `utils/`: Utility scripts.
+
+## views/templates/
+- Organized templates:
+  - `shared/`: Shared templates like base.html.
+  - `auth/`: Login and registration templates.
+  - `clubs/`: Club management templates.
+  - `events/`: Event-related templates.
+  - `feedback/`: Feedback forms.
+  - `reports/`: Reporting templates.
 ```
 
 ## Common Commands

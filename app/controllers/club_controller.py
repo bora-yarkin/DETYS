@@ -5,6 +5,7 @@ from app.models.club import Club
 from app.models.membership import Membership
 from app.forms import ClubCreationForm
 from app.utils.decorators import club_manager_required
+from app.controllers.notification_controller import send_notification
 
 club_bp = Blueprint("club", __name__, url_prefix="/clubs")
 
@@ -76,6 +77,8 @@ def approve_member(club_id, user_id):
     membership = Membership.query.filter_by(club_id=club_id, user_id=user_id).first_or_404()
     membership.is_approved = True
     db.session.commit()
+    message = f"Your membership request for the club '{club.name}' has been approved!"
+    send_notification(user_id, message)
     flash("Member approved successfully.", "success")
     return redirect(url_for("club.manage_members", club_id=club_id))
 

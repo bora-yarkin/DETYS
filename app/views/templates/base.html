@@ -37,17 +37,17 @@
 
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
 
     <!-- Retrieve and process user data -->
     <script type="text/javascript">
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', function () {
             var socket = io();
 
-            var isAuthenticated = $('body').data('is-authenticated') === 'true' || $('body').data('is-authenticated') === true;
-            var userId = $('body').data('user-id');
+            var isAuthenticated = document.body.getAttribute('data-is-authenticated') === 'true';
+            var userId = document.body.getAttribute('data-user-id');
 
-            //DEBUG: Log connection TO BE DELETED IN PRODUCTION
+            // DEBUG: TO BE DELETED IN PRODUCTION
             console.log('Authenticated:', isAuthenticated, 'User ID:', userId);
 
             if (isAuthenticated && userId) {
