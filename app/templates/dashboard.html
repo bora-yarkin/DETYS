@@ -4,11 +4,11 @@
 <h2>Welcome, {{ user.username }}!</h2>
 <p>Your role: {{ user.role }}</p>
 
-{% if user.is_student() %}
+{% if user.is_student %}
 <p>This is the student dashboard.</p>
-{% elif user.is_club_manager() %}
+{% elif user.is_club_manager %}
 <p>This is the club manager dashboard.</p>
-{% elif user.is_main_admin() %}
+{% elif user.is_main_admin %}
 <p>This is the main admin dashboard.</p>
 {% endif %}
 

@@ -23,6 +23,7 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
     def is_student(self):
         return self.role == "student"
 
@@ -36,6 +37,7 @@ class User(UserMixin, db.Model):
             return self.managed_clubs[0].id
         return None
 
+    @property
     def is_main_admin(self):
         return self.role == "main_admin"
 
