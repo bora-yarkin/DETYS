@@ -115,6 +115,8 @@ DETYS/
 
 ## Common Commands
 
+## FOR THE TIME BEING USE "python(3) run.py"
+
 ```bash
 flask run                       Run the application
 flask db init                   Initialize database migrations
