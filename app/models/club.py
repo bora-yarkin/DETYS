@@ -33,6 +33,7 @@ class Club(db.Model):
     # Relationships
     president = db.relationship("User", back_populates="managed_clubs", foreign_keys=[president_id])
     members = db.relationship("Membership", back_populates="club", cascade="all, delete-orphan")
+    events = db.relationship("Event", back_populates="club", cascade="all, delete-orphan")
 
-    # def __repr__(self):
-    #     return f"<Club {self.name}>"
+    def __repr__(self):
+        return f"<Club {self.name}>"

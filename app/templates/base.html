@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <title>DETYS - {% block title %}{% endblock %}</title>
-    <!-- Include Bootstrap CSS (optional) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
-<body>
+<body data-is-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}"
+    data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}">
+
     <nav>
         <a href="{{ url_for('main.index') }}">Home</a>
         <a href="{{ url_for('club.club_list') }}">Clubs</a>
+        <a href="{{ url_for('event.event_list') }}">Events</a>
         {% if current_user.is_authenticated %}
         <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
         <a href="{{ url_for('auth.logout') }}">Logout</a>
@@ -20,6 +22,7 @@
         <a href="{{ url_for('auth.register') }}">Register</a>
         {% endif %}
     </nav>
+
     <div class="container">
         <!-- Flash messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -32,8 +35,36 @@
         {% block content %}
         {% endblock %}
     </div>
-    <!-- Include jQuery and Bootstrap JS (optional) -->
+
+    <!-- Include scripts -->
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+
+    <!-- Retrieve and process user data -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var socket = io();
+
+            // Retrieve data attributes from the body tag
+            var isAuthenticated = $('body').data('is-authenticated') === 'true' || $('body').data('is-authenticated') === true;
+            var userId = $('body').data('user-id');
+
+            // Debugging: Log the retrieved values
+
+            console.log('Authenticated:', isAuthenticated, 'User ID:', userId);
+
+            // Join room specific to the user
+            if (isAuthenticated && userId) {
+                socket.emit('join', { room: 'user_' + userId });
+            }
+
+            // Listen for notifications
+            socket.on('notification', function (data) {
+                alert(data.msg);  // Simple alert; you can enhance this
+            });
+        });
+    </script>
 </body>
 
 </html>
