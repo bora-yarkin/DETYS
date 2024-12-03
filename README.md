@@ -90,6 +90,8 @@ flask db upgrade
 
 Start the Flask development server:
 
+## FOR THE TIME BEING USE "python(3) run.py"
+
 ```bash
 flask run
 ```
