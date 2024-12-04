@@ -89,8 +89,6 @@ flask db upgrade
 
 Start the Flask development server:
 
-## FOR THE TIME BEING USE "python(3) run.py"
-
 ```bash
 flask run
 ```
@@ -102,13 +100,25 @@ Navigate to http://127.0.0.1:5000/ in your browser to view the app.
 ```bash
 DETYS/
 ├── app/
-│ ├── **init**.py # Application factory
-│ ├── controllers/ # Handles routes and logic
-│ ├── models/ # Database models
-│ ├── templates/ # HTML templates
-│ ├── static/ # Static files (CSS, JS, images)
-│ └── utils/ # Utility functions (email, database, etc.)
-├── config.py # Configuration settings
+│ ├── __init__.py # Application factory
+│ ├── decorators.py # Decorators for Security
+│ ├── extensions.py
+│ ├── forms.py # All forms
+│ ├── models.py # Database Models
+│ ├── auth/
+│ ├── club/
+│ ├── event/
+│ ├── main/
+│ ├── static/
+│ └── templates/
+├── instance/
+│ ├── __init__.py
+│ └── config.py # Configuration settings
+├── migrations/
+│ ├── alembic.ini
+│ ├── env.py
+│ ├── script.py.mako
+│ └── versions/
 ├── requirements.txt # List of dependencies
 ├── run.py # Entry point to run the app
 └── .flaskenv # Environment variables
@@ -119,24 +129,33 @@ DETYS/
 
 ## app/
 - Contains all application logic.
-  - `controllers/`: Flask route handlers.
-  - `models/`: Database models.
-  - `views/`: Templates and static files.
-  - `utils/`: Utility scripts.
+  - `auth/`: Authentication-related logic.
+  - `club/`: Club-related logic.
+  - `event/`: Event-related logic.
+  - `main/`: Main application logic.
+  - `static/`: Static files (CSS, JS, images).
+  - `templates/`: HTML templates.
+  - `decorators.py`: Custom decorators.
+  - `extensions.py`: Flask extensions initialization.
+  - `forms.py`: WTForms definitions.
+  - `models.py`: SQLAlchemy models.
 
-## views/templates/
+## instance/
+- Configuration and instance-specific files.
+
+## migrations/
+- Database migration files.
+
+## templates/
 - Organized templates:
-  - `shared/`: Shared templates like base.html.
   - `auth/`: Login and registration templates.
-  - `clubs/`: Club management templates.
-  - `events/`: Event-related templates.
-  - `feedback/`: Feedback forms.
-  - `reports/`: Reporting templates.
+  - `club/`: Club management templates.
+  - `event/`: Event-related templates.
+  - `main/`: Main application templates.
+  - `shared/`: Shared templates like base.html.
 ```
 
 ## Common Commands
-
-## FOR THE TIME BEING USE "python(3) run.py"
 
 ```bash
 flask run                       Run the application

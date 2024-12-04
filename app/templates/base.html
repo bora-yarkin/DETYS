@@ -56,7 +56,7 @@
     </footer>
 
     <!-- Socket.IO Integration -->
-    <script type="text/javascript">
+    <!-- <script type="text/javascript">
         $(document).ready(function () {
             var socket = io();
 
@@ -77,6 +77,40 @@
             socket.on('notification', function (data) {
                 console.log('Notification received:', data.msg);
                 alert(data.msg); // Replace with a better notification system if desired
+            });
+
+            socket.on('disconnect', function () {
+                console.log('Disconnected from server');
+            });
+
+            socket.on('connect_error', function (error) {
+                console.error('Connection error:', error);
+            });
+        });
+    </script> -->
+    <!-- Socket.IO Integration -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Use the full URL to ensure correct connection
+            var socket = io('http://' + document.domain + ':' + location.port);
+
+            // Retrieve user authentication data
+            var isAuthenticated = $('body').data('is-authenticated') === 'true';
+            var userId = $('body').data('user-id');
+
+            console.log('Authenticated:', isAuthenticated, 'User ID:', userId);
+
+            // Handle WebSocket connections
+            socket.on('connect', function () {
+                console.log('WebSocket connection established');
+                if (isAuthenticated && userId) {
+                    socket.emit('join', { room: 'user_' + userId });
+                }
+            });
+
+            socket.on('notification', function (data) {
+                console.log('Notification received:', data.msg);
+                alert(data.msg);
             });
 
             socket.on('disconnect', function () {

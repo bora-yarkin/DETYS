@@ -6,6 +6,24 @@ from app.extensions import db
 from . import main_bp
 
 
+@main_bp.app_errorhandler(403)
+def forbidden_error(error):
+    background_image = url_for("static", filename="images/error_403.jpg")
+    return render_template("errors/403.html", background_image=background_image), 403
+
+
+@main_bp.app_errorhandler(404)
+def not_found_error(error):
+    background_image = url_for("static", filename="images/error_404.jpg")
+    return render_template("errors/404.html", background_image=background_image), 404
+
+
+@main_bp.app_errorhandler(500)
+def internal_error(error):
+    background_image = url_for("static", filename="images/error_500.jpg")
+    return render_template("errors/500.html", background_image=background_image), 500
+
+
 @main_bp.route("/")
 def index():
     posts = Post.query.order_by(Post.posted_at.desc()).all()
