@@ -16,6 +16,7 @@ class User(UserMixin, db.Model):
     memberships = db.relationship("Membership", back_populates="user", cascade="all, delete-orphan")
     managed_clubs = db.relationship("Club", back_populates="president", foreign_keys="Club.president_id")
     event_attendances = db.relationship("EventAttendance", back_populates="user", cascade="all, delete-orphan")
+    event_feedbacks = db.relationship("EventFeedback", back_populates="user", lazy="dynamic")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

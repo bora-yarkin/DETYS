@@ -15,6 +15,7 @@ class Event(db.Model):
     # Relationships
     club = db.relationship("Club", back_populates="events")
     attendees = db.relationship("EventAttendance", back_populates="event", cascade="all, delete-orphan")
+    feedbacks = db.relationship("EventFeedback", back_populates="event", lazy="dynamic")
 
     def __repr__(self):
         return f"<Event {self.title}>"

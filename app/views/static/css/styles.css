@@ -1,0 +1,175 @@
+/* app/static/css/styles.css */
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+}
+
+.nav-container {
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-logo {
+    font-size: 24px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin-left: 20px;
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Introduction Section */
+.intro-section {
+    background-color: #f4f4f4;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.intro-section h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.intro-section p {
+    font-size: 24px;
+    color: #555;
+}
+
+/* Blog Section */
+.blog-section {
+    width: 80%;
+    margin: 40px auto;
+}
+
+.blog-section h2 {
+    font-size: 36px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.blog-post {
+    border-bottom: 1px solid #ccc;
+    padding: 20px 0;
+}
+
+.blog-post h3 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.blog-post p {
+    font-size: 18px;
+    color: #333;
+}
+
+.blog-post a {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+.blog-post a:hover {
+    text-decoration: underline;
+}
+
+/* Contact Form */
+.contact-form {
+    width: 60%;
+    margin: 40px auto;
+}
+
+.contact-form h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.contact-form .btn {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.contact-form .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 40px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .nav-links li {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .intro-section h1 {
+        font-size: 36px;
+    }
+
+    .intro-section p {
+        font-size: 18px;
+    }
+
+    .contact-form {
+        width: 90%;
+    }
+}

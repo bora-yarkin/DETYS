@@ -1,12 +1,15 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+import os
+from flask import Blueprint, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required, current_user
 from flask_socketio import emit
 from app import db
 from app.models.event import Event
 from app.models.club import Club
 from app.models.event_attendance import EventAttendance
-from app.forms import EventForm
-from app.utils.decorators import club_manager_required
+from app.models.event_feedback import EventFeedback
+from app.forms import EventForm, EventFeedbackForm
+from app.utils.decorators import club_manager_required, student_required
+from app.utils.file_operations import export_event_feedback
 
 event_bp = Blueprint("event", __name__, url_prefix="/events")
 
@@ -34,17 +37,68 @@ def create_event(club_id):
     return render_template("events/create_event.html", form=form, club=club)
 
 
+# @event_bp.route("/<int:event_id>")
+# def event_detail(event_id):
+#     event = Event.query.get_or_404(event_id)
+#     is_registered = False
+#     status = None
+#     if current_user.is_authenticated:
+#         attendance = EventAttendance.query.filter_by(user_id=current_user.id, event_id=event.id).first()
+#         if attendance:
+#             is_registered = True
+#             status = attendance.status
+#     return render_template("events/event_detail.html", event=event, is_registered=is_registered, status=status)
+
+
 @event_bp.route("/<int:event_id>")
 def event_detail(event_id):
     event = Event.query.get_or_404(event_id)
     is_registered = False
     status = None
+    can_provide_feedback = False
+    feedback_submitted = False
+    average_rating = None
+
     if current_user.is_authenticated:
         attendance = EventAttendance.query.filter_by(user_id=current_user.id, event_id=event.id).first()
         if attendance:
             is_registered = True
             status = attendance.status
-    return render_template("events/event_detail.html", event=event, is_registered=is_registered, status=status)
+            if attendance.status == "confirmed":
+                # Check if feedback already submitted
+                existing_feedback = EventFeedback.query.filter_by(user_id=current_user.id, event_id=event.id).first()
+                if existing_feedback:
+                    feedback_submitted = True
+                else:
+                    can_provide_feedback = True
+
+    # Calculate average rating
+    average_rating = db.session.query(db.func.avg(EventFeedback.rating)).filter_by(event_id=event.id).scalar()
+    if average_rating:
+        average_rating = round(average_rating, 1)
+
+    return render_template(
+        "events/event_detail.html",
+        event=event,
+        is_registered=is_registered,
+        status=status,
+        can_provide_feedback=can_provide_feedback,
+        feedback_submitted=feedback_submitted,
+        average_rating=average_rating,
+    )
+
+
+@event_bp.route("/<int:event_id>/export_feedback")
+@login_required
+@club_manager_required
+def export_feedback(event_id):
+    event = Event.query.get_or_404(event_id)
+    if event.club.president_id != current_user.id:
+        abort(403)
+
+    filepath = export_event_feedback(event_id)
+    filename = os.path.basename(filepath)
+    return send_file(filepath, as_attachment=True)
 
 
 @event_bp.route("/<int:event_id>/register")
@@ -66,6 +120,40 @@ def register_event(event_id):
         db.session.add(attendance)
         db.session.commit()
     return redirect(url_for("event.event_detail", event_id=event_id))
+
+
+@event_bp.route("/<int:event_id>/feedback", methods=["GET", "POST"])
+@login_required
+@student_required
+def submit_feedback(event_id):
+    event = Event.query.get_or_404(event_id)
+
+    # Check if the user attended the event
+    attendance = EventAttendance.query.filter_by(user_id=current_user.id, event_id=event.id, status="confirmed").first()
+    if not attendance:
+        flash("You can only provide feedback for events you attended.", "warning")
+        return redirect(url_for("event.event_detail", event_id=event_id))
+
+    # Check if feedback already submitted
+    existing_feedback = EventFeedback.query.filter_by(user_id=current_user.id, event_id=event.id).first()
+    if existing_feedback:
+        flash("You have already submitted feedback for this event.", "info")
+        return redirect(url_for("event.event_detail", event_id=event_id))
+
+    form = EventFeedbackForm(event_id=event_id)
+    if form.validate_on_submit():
+        feedback = EventFeedback(
+            event_id=event.id,
+            user_id=current_user.id,
+            rating=form.rating.data,
+            comment=form.comment.data,
+        )
+        db.session.add(feedback)
+        db.session.commit()
+        flash("Thank you for your feedback!", "success")
+        return redirect(url_for("event.event_detail", event_id=event_id))
+
+    return render_template("events/submit_feedback.html", form=form, event=event)
 
 
 @event_bp.route("/<int:event_id>/manage")

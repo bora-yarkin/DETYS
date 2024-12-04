@@ -41,6 +41,12 @@ def create_app():
     # Import SocketIO event handlers
     from app.sockets import notification_socket
 
+    @app.context_processor
+    def inject_current_year():
+        from datetime import datetime
+
+        return {"current_year": datetime.utcnow().year}
+
     return app
 
 
