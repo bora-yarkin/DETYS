@@ -1,4 +1,4 @@
-from .extensions import db, login_manager
+from app.core.extensions import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -15,7 +15,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    role = db.Column(db.String(20), nullable=False, default="student")  # Roles: 'student', 'club_manager', 'main_admin'
+    role = db.Column(db.String(20), nullable=False, default="student")
 
     # Relationships
     memberships = db.relationship("Membership", back_populates="user", cascade="all, delete-orphan")
@@ -116,7 +116,7 @@ class EventAttendance(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey("events.id"), primary_key=True)
-    status = db.Column(db.String(20), nullable=False, default="pending")  # Statuses: 'confirmed', 'waiting', 'pending'
+    status = db.Column(db.String(20), nullable=False, default="pending")
     registered_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships

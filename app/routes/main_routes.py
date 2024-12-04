@@ -1,9 +1,10 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.models import Post, ContactMessage
 from app.forms import PostForm, ContactForm
-from app.extensions import db
-from . import main_bp
+from app.core.extensions import db
+
+main_bp = Blueprint("main", __name__)
 
 
 @main_bp.app_errorhandler(403)

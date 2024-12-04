@@ -1,11 +1,12 @@
-from flask import render_template, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from flask_wtf.csrf import generate_csrf
 from app.models import Club, Membership
 from app.forms import ClubCreationForm
-from app.extensions import db
-from app.decorators import club_manager_required
-from . import club_bp
+from app.core.extensions import db
+from app.core.decorators import club_manager_required
+
+club_bp = Blueprint("club", __name__)
 
 
 @club_bp.route("/")

@@ -1,11 +1,12 @@
-from flask import render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime
 from app.models import Event, EventAttendance, EventFeedback
 from app.forms import EventForm, EventFeedbackForm
-from app.extensions import db
-from app.decorators import club_manager_required, student_required
-from . import event_bp
+from app.core.extensions import db
+from app.core.decorators import club_manager_required, student_required
+
+event_bp = Blueprint("event", __name__)
 
 
 @event_bp.route("/")

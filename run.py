@@ -1,5 +1,5 @@
 from app import create_app
-from app.extensions import socketio
+from app.core.extensions import socketio
 import eventlet
 import eventlet.wsgi
 
