@@ -4,7 +4,7 @@ from datetime import datetime
 from app.models import Event, EventAttendance, EventFeedback
 from app.forms import EventForm, EventFeedbackForm
 from app.core.extensions import db
-from app.core.decorators import club_manager_required, student_required
+from app.core.decorators import club_manager_required
 
 event_bp = Blueprint("event", __name__)
 

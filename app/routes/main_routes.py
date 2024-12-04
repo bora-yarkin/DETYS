@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.models import Post, ContactMessage
 from app.forms import PostForm, ContactForm
@@ -9,19 +9,19 @@ main_bp = Blueprint("main", __name__)
 
 @main_bp.app_errorhandler(403)
 def forbidden_error(error):
-    background_image = url_for("static", filename="images/error_403.jpg")
+    background_image = url_for("static", filename="images/error.jpg")
     return render_template("errors/403.html", background_image=background_image), 403
 
 
 @main_bp.app_errorhandler(404)
 def not_found_error(error):
-    background_image = url_for("static", filename="images/error_404.jpg")
+    background_image = url_for("static", filename="images/error.jpg")
     return render_template("errors/404.html", background_image=background_image), 404
 
 
 @main_bp.app_errorhandler(500)
 def internal_error(error):
-    background_image = url_for("static", filename="images/error_500.jpg")
+    background_image = url_for("static", filename="images/error.jpg")
     return render_template("errors/500.html", background_image=background_image), 500
 
 
