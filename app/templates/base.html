@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DETYS - {% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.io.min.js') }}"></script>
+</head>
+
+<body data-is-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}"
+    data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('main.index') }}" class="nav-logo">DETYS</a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li><a href="{{ url_for('club.club_list') }}">Clubs</a></li>
+                <li><a href="{{ url_for('event.event_list') }}">Events</a></li>
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; {{ current_year }} DETYS. All rights reserved.</p>
+    </footer>
+
+    <!-- Socket.IO Integration -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var socket = io();
+
+            // Retrieve user authentication data
+            var isAuthenticated = $('body').data('is-authenticated') === 'true';
+            var userId = $('body').data('user-id');
+
+            console.log('Authenticated:', isAuthenticated, 'User ID:', userId);
+
+            // Handle WebSocket connections
+            socket.on('connect', function () {
+                console.log('WebSocket connection established');
+                if (isAuthenticated && userId) {
+                    socket.emit('join', { room: 'user_' + userId });
+                }
+            });
+
+            socket.on('notification', function (data) {
+                console.log('Notification received:', data.msg);
+                alert(data.msg); // Replace with a better notification system if desired
+            });
+
+            socket.on('disconnect', function () {
+                console.log('Disconnected from server');
+            });
+
+            socket.on('connect_error', function (error) {
+                console.error('Connection error:', error);
+            });
+        });
+    </script>
+</body>
+
+</html>

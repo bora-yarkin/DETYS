@@ -12,7 +12,7 @@
 # run.py
 
 from app import create_app
-from app.utils.extensions import socketio
+from app.extensions import socketio
 
 app = create_app()
 

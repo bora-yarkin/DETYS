@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2>Welcome, {{ user.username }}!</h2>
+<p>Your role: {{ user.role }}</p>
+
+{% if user.is_student %}
+<p>This is the student dashboard.</p>
+{% elif user.is_club_manager %}
+<p>This is the club manager dashboard.</p>
+{% elif user.is_main_admin %}
+<p>This is the main admin dashboard.</p>
+{% endif %}
+
+{% if user.is_main_admin or user.is_club_manager %}
+<a href="{{ url_for('main.create_post') }}" class="btn btn-primary">Create New Post</a>
+{% endif %}
+
+<h3>Recent Posts</h3>
+{% if posts %}
+{% for post in posts %}
+<div class="post">
+    <h4>{{ post.title }}</h4>
+    <p><em>Posted by {{ post.author.username }} on {{ post.posted_at.strftime('%Y-%m-%d %H:%M') }}</em></p>
+    <p>{{ post.content }}</p>
+    <hr>
+</div>
+{% endfor %}
+{% else %}
+<p>No posts available.</p>
+{% endif %}
+{% endblock %}

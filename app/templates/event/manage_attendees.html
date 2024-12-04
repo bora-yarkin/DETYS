@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Manage Attendees - {{ event.title }}{% endblock %}
+{% block content %}
+<h2>Manage Attendees - {{ event.title }}</h2>
+
+<h3>Confirmed Attendees</h3>
+{% if confirmed_attendees %}
+<ul>
+    {% for attendance in confirmed_attendees %}
+    <li>{{ attendance.user.username }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No confirmed attendees.</p>
+{% endif %}
+
+<h3>Waiting List</h3>
+{% if waiting_attendees %}
+<ul>
+    {% for attendance in waiting_attendees %}
+    <li>{{ attendance.user.username }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No users on the waiting list.</p>
+{% endif %}
+
+<a href="{{ url_for('event.event_detail', event_id=event.id) }}" class="btn btn-secondary">Back to Event Details</a>
+{% endblock %}

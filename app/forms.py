@@ -1,0 +1,86 @@
+from flask_wtf import FlaskForm
+from wtforms import (
+    StringField,
+    PasswordField,
+    SubmitField,
+    SelectField,
+    TextAreaField,
+    IntegerField,
+    HiddenField,
+)
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange
+from .models import User, Club
+
+
+class RegistrationForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    role = SelectField(
+        "Role",
+        choices=[("student", "Student"), ("club_manager", "Club Manager")],
+        validators=[DataRequired()],
+    )
+    password = PasswordField(
+        "Password",
+        validators=[DataRequired(), EqualTo("confirm", message="Passwords must match")],
+    )
+    confirm = PasswordField("Confirm Password")
+    submit = SubmitField("Register")
+
+    # Custom validators to ensure unique username and email
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError("This username is already taken. Please choose another.")
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("This email is already registered. Please use a different email address.")
+
+
+class LoginForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Login")
+
+
+class ClubCreationForm(FlaskForm):
+    name = StringField("Club Name", validators=[DataRequired()])
+    description = TextAreaField("Description", validators=[DataRequired()])
+    contact_email = StringField("Contact Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Create Club")
+
+    def validate_name(self, name):
+        club = Club.query.filter_by(name=name.data).first()
+        if club:
+            raise ValidationError("A club with this name already exists. Please choose a different name.")
+
+
+class EventForm(FlaskForm):
+    title = StringField("Event Title", validators=[DataRequired()])
+    description = TextAreaField("Description", validators=[DataRequired()])
+    date = StringField("Event Date and Time", validators=[DataRequired()])
+    location = StringField("Location", validators=[DataRequired()])
+    capacity = IntegerField("Capacity", validators=[DataRequired()])
+    submit = SubmitField("Create Event")
+
+
+class EventFeedbackForm(FlaskForm):
+    event_id = HiddenField("Event ID", validators=[DataRequired()])
+    rating = IntegerField("Rating (1-5)", validators=[DataRequired(), NumberRange(min=1, max=5)])
+    comment = TextAreaField("Comment")
+    submit = SubmitField("Submit Feedback")
+
+
+class PostForm(FlaskForm):
+    title = StringField("Title", validators=[DataRequired()])
+    content = TextAreaField("Content", validators=[DataRequired()])
+    submit = SubmitField("Publish")
+
+
+class ContactForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    message = TextAreaField("Message", validators=[DataRequired()])
+    submit = SubmitField("Send")
