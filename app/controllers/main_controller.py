@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.models.post import Post
 from app.models.contact_message import ContactMessage
+from app.forms.contact_form import ContactForm
 from app.forms.post_form import PostForm
 from app.utils.decorators import club_manager_required, main_admin_required
 
@@ -46,21 +47,33 @@ def create_post():
     return render_template("create_post.html", form=form)
 
 
+# @main_bp.route("/contact", methods=["GET", "POST"])
+# def contact():
+#     if request.method == "POST":
+#         name = request.form.get("name")
+#         email = request.form.get("email")
+#         message_text = request.form.get("message")
+
+#         message = ContactMessage(name=name, email=email, message=message_text)
+#         db.session.add(message)
+#         db.session.commit()
+
+#         flash("Your message has been sent!", "success")
+#         return redirect(url_for("main.contact"))
+
+#     return render_template("contact.html")
+
+
 @main_bp.route("/contact", methods=["GET", "POST"])
 def contact():
-    if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        message_text = request.form.get("message")
-
-        message = ContactMessage(name=name, email=email, message=message_text)
+    form = ContactForm()
+    if form.validate_on_submit():
+        message = ContactMessage(name=form.name.data, email=form.email.data, message=form.message.data)
         db.session.add(message)
         db.session.commit()
-
         flash("Your message has been sent!", "success")
         return redirect(url_for("main.contact"))
-
-    return render_template("contact.html")
+    return render_template("contact.html", form=form)
 
 
 @main_bp.route("/dashboard")

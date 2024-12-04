@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
+from flask_wtf import CSRFProtect
 
 from app.utils.extensions import socketio
 from instance.config import Config
@@ -13,6 +14,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
 mail = Mail()
+csrf = CSRFProtect()
 
 
 def create_app():
@@ -25,6 +27,7 @@ def create_app():
     migrate.init_app(app, db)
     mail.init_app(app)
     socketio.init_app(app)  # Initialize SocketIO
+    csrf.init_app(app)
 
     from app.controllers.main_controller import main_bp
     from app.controllers.auth_controller import auth_bp
