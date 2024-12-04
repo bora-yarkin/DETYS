@@ -37,19 +37,6 @@ def create_event(club_id):
     return render_template("events/create_event.html", form=form, club=club)
 
 
-# @event_bp.route("/<int:event_id>")
-# def event_detail(event_id):
-#     event = Event.query.get_or_404(event_id)
-#     is_registered = False
-#     status = None
-#     if current_user.is_authenticated:
-#         attendance = EventAttendance.query.filter_by(user_id=current_user.id, event_id=event.id).first()
-#         if attendance:
-#             is_registered = True
-#             status = attendance.status
-#     return render_template("events/event_detail.html", event=event, is_registered=is_registered, status=status)
-
-
 @event_bp.route("/<int:event_id>")
 def event_detail(event_id):
     event = Event.query.get_or_404(event_id)
@@ -65,14 +52,12 @@ def event_detail(event_id):
             is_registered = True
             status = attendance.status
             if attendance.status == "confirmed":
-                # Check if feedback already submitted
                 existing_feedback = EventFeedback.query.filter_by(user_id=current_user.id, event_id=event.id).first()
                 if existing_feedback:
                     feedback_submitted = True
                 else:
                     can_provide_feedback = True
 
-    # Calculate average rating
     average_rating = db.session.query(db.func.avg(EventFeedback.rating)).filter_by(event_id=event.id).scalar()
     if average_rating:
         average_rating = round(average_rating, 1)

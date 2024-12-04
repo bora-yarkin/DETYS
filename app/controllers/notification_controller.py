@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint
 from flask_socketio import emit, join_room
 from app.utils.extensions import socketio
 from flask_login import current_user, login_required

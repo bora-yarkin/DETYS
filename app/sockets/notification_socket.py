@@ -1,12 +1,3 @@
-# from app.extensions import socketio
-
-
-# @socketio.on("connect")
-# def handle_connect():
-#     print("A client has connected")
-
-# app/sockets/notification_socket.py
-
 from app.utils.extensions import socketio
 from flask_socketio import join_room, leave_room, emit
 from flask_login import current_user
@@ -35,10 +26,3 @@ def send_notification_to_user(user_id, message):
 
 def broadcast_notification(message):
     socketio.emit("notification", {"msg": message}, broadcast=True)
-
-
-# Send a success notification
-# socketio.emit("notification", {"msg": message, "type": "success"}, room=room)
-# socket.on('notification', function (data) {
-#     toastr[data.type](data.msg);
-# });

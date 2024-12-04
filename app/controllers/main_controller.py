@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db
 from app.models.post import Post
@@ -47,23 +47,6 @@ def create_post():
     return render_template("create_post.html", form=form)
 
 
-# @main_bp.route("/contact", methods=["GET", "POST"])
-# def contact():
-#     if request.method == "POST":
-#         name = request.form.get("name")
-#         email = request.form.get("email")
-#         message_text = request.form.get("message")
-
-#         message = ContactMessage(name=name, email=email, message=message_text)
-#         db.session.add(message)
-#         db.session.commit()
-
-#         flash("Your message has been sent!", "success")
-#         return redirect(url_for("main.contact"))
-
-#     return render_template("contact.html")
-
-
 @main_bp.route("/contact", methods=["GET", "POST"])
 def contact():
     form = ContactForm()
@@ -81,8 +64,6 @@ def contact():
 def dashboard():
     posts = Post.query.order_by(Post.posted_at.desc()).all()
     return render_template("dashboard.html", posts=posts, user=current_user)
-
-    # return render_template("dashboard.html", user=current_user)
 
 
 @main_bp.route("/club-manager-only")

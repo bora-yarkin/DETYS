@@ -6,7 +6,7 @@ class EventAttendance(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey("events.id"), primary_key=True)
-    status = db.Column(db.String(20), nullable=False, default="pending")  # statuses: 'confirmed', 'waiting', 'pending'
+    status = db.Column(db.String(20), nullable=False, default="pending")
     registered_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     # Relationships
