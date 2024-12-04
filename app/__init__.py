@@ -4,7 +4,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
 
-from app.extensions import socketio
+from app.utils.extensions import socketio
 from instance.config import Config
 
 

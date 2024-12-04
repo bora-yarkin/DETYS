@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_socketio import emit, join_room
-from app.extensions import socketio
+from app.utils.extensions import socketio
 from flask_login import current_user, login_required
 
 notification_bp = Blueprint("notification_bp", __name__)

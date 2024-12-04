@@ -7,7 +7,7 @@
 
 # app/sockets/notification_socket.py
 
-from app.extensions import socketio
+from app.utils.extensions import socketio
 from flask_socketio import join_room, leave_room, emit
 from flask_login import current_user
 
