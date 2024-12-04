@@ -6,6 +6,10 @@ from datetime import datetime
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
+    __table_args__ = (
+        db.Index("idx_user_username", "username"),
+        db.Index("idx_user_email", "email"),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)

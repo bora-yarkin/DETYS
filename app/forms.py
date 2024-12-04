@@ -1,14 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import (
-    StringField,
-    PasswordField,
-    SubmitField,
-    SelectField,
-    TextAreaField,
-    IntegerField,
-    HiddenField,
-)
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, IntegerField, HiddenField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange, Length, Regexp
 from .models import User, Club
 
 
@@ -24,6 +16,10 @@ class RegistrationForm(FlaskForm):
         "Password",
         validators=[DataRequired(), EqualTo("confirm", message="Passwords must match")],
     )
+    # password = PasswordField(
+    #     "Password",
+    #     validators=[DataRequired(), Length(min=8), Regexp("^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)", message="Password must contain at least one uppercase letter, one lowercase letter, and one digit."), EqualTo("confirm", message="Passwords must match")],
+    # )
     confirm = PasswordField("Confirm Password")
     submit = SubmitField("Register")
 
