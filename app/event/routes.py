@@ -1,9 +1,10 @@
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
+from datetime import datetime
 from app.models import Event, EventAttendance, EventFeedback
 from app.forms import EventForm, EventFeedbackForm
 from app.extensions import db
-from app.decorators import club_manager_required
+from app.decorators import club_manager_required, student_required
 from . import event_bp
 
 
@@ -19,7 +20,8 @@ def event_list():
 def create_event():
     form = EventForm()
     if form.validate_on_submit():
-        event = Event(title=form.title.data, description=form.description.data, date=form.date.data, location=form.location.data, capacity=form.capacity.data, club_id=current_user.managed_club_id)
+        event_date = datetime.strptime(form.date.data, "%Y-%m-%dT%H:%M")
+        event = Event(title=form.title.data, description=form.description.data, date=event_date, location=form.location.data, capacity=form.capacity.data, club_id=current_user.managed_club_id)
         db.session.add(event)
         db.session.commit()
         flash("Event created successfully!", "success")
@@ -52,15 +54,31 @@ def event_detail(event_id):
     if average_rating:
         average_rating = round(average_rating, 1)
 
-    return render_template(
-        "event/event_detail.html",
-        event=event,
-        is_registered=is_registered,
-        status=status,
-        can_provide_feedback=can_provide_feedback,
-        feedback_submitted=feedback_submitted,
-        average_rating=average_rating,
-    )
+    return render_template("event/event_detail.html", event=event, is_registered=is_registered, status=status, can_provide_feedback=can_provide_feedback, feedback_submitted=feedback_submitted, average_rating=average_rating)
+
+
+@event_bp.route("/<int:event_id>/cancel_registration")
+@login_required
+def cancel_registration(event_id):
+    event = Event.query.get_or_404(event_id)
+    attendance = EventAttendance.query.filter_by(user_id=current_user.id, event_id=event.id).first()
+    if attendance:
+        db.session.delete(attendance)
+        db.session.commit()
+        flash("Your registration has been canceled.", "success")
+    else:
+        flash("You are not registered for this event.", "warning")
+    return redirect(url_for("event.event_detail", event_id=event_id))
+
+
+@event_bp.route("/<int:event_id>/manage_attendees")
+@login_required
+@club_manager_required
+def manage_attendees(event_id):
+    event = Event.query.get_or_404(event_id)
+    confirmed_attendees = EventAttendance.query.filter_by(event_id=event.id, status="confirmed").all()
+    waiting_attendees = EventAttendance.query.filter_by(event_id=event.id, status="waiting").all()
+    return render_template("event/manage_attendees.html", event=event, confirmed_attendees=confirmed_attendees, waiting_attendees=waiting_attendees)
 
 
 @event_bp.route("/<int:event_id>/register")

@@ -51,9 +51,13 @@ class ClubCreationForm(FlaskForm):
     contact_email = StringField("Contact Email", validators=[DataRequired(), Email()])
     submit = SubmitField("Create Club")
 
+    def __init__(self, *args, **kwargs):
+        self.club_id = kwargs.pop("club_id", None)
+        super(ClubCreationForm, self).__init__(*args, **kwargs)
+
     def validate_name(self, name):
         club = Club.query.filter_by(name=name.data).first()
-        if club:
+        if club and (self.club_id is None or club.id != self.club_id):
             raise ValidationError("A club with this name already exists. Please choose a different name.")
 
 
