@@ -5,6 +5,7 @@ Flask-WTF
 Flask-SocketIO
 Flask-Migrate
 Flask-Testing
+Flask-SQLAlchemy
 SQLAlchemy
 Alembic
 WTForms
@@ -15,3 +16,4 @@ requests
 eventlet
 email-validator
 python-socketio
+Werkzeug
