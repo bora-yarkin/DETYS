@@ -4,7 +4,7 @@ A Flask-based project for managing users, clubs, events, notifications, and repo
 
 ## Prerequisites
 
-- **Python 3.7+**
+- **Python 3.8+**
 - **Virtual Environment** (recommended)
 - **SQLite** (default database for testing)
 - **Git** (optional, for version control)
