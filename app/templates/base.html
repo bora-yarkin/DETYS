@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/socket.io.min.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='js/socket.io.min.js') }}"></script> -->
 </head>
 
 <body data-is-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}"
@@ -27,6 +27,14 @@
                 <li><a href="{{ url_for('event.event_list') }}">Events</a></li>
                 {% if current_user.is_authenticated %}
                 <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+                <li>
+                    <a href="{{ url_for('main.notifications') }}">
+                        Notifications
+                        {% if current_user.unread_notifications_count > 0 %}
+                        ({{ current_user.unread_notifications_count }})
+                        {% endif %}
+                    </a>
+                </li>
                 <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
                 {% else %}
                 <li><a href="{{ url_for('auth.login') }}">Login</a></li>
@@ -59,7 +67,7 @@
     </footer>
 
     <!-- Socket.IO Integration -->
-    <script type="text/javascript">
+    <!-- <script type="text/javascript">
         $(document).ready(function () {
             // Use the full URL to ensure correct connection
             var socket = io('http://' + document.domain + ':' + location.port);
@@ -91,7 +99,7 @@
                 console.error('Connection error:', error);
             });
         });
-    </script>
+    </script> -->
 </body>
 
 </html>

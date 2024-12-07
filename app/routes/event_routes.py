@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime
+from app.core.notifications import send_notification
 from app.models import Event, EventAttendance, EventFeedback
 from app.forms import EventForm, EventFeedbackForm
 from app.core.extensions import db
@@ -100,6 +101,14 @@ def register_event(event_id):
         attendance = EventAttendance(user_id=current_user.id, event_id=event.id, status=status)
         db.session.add(attendance)
         db.session.commit()
+        if status == "confirmed":
+            message = f"You have been confirmed for the event '{event.title}'."
+            notification_type = "success"
+        else:
+            message = f"The event '{event.title}' is full. You have been added to the waiting list."
+            notification_type = "info"
+
+        send_notification(user_id=current_user.id, message=message, notification_type=notification_type)
     return redirect(url_for("event.event_detail", event_id=event_id))
 
 

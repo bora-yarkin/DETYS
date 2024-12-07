@@ -266,3 +266,59 @@ Nice-to-Have Features (Beyond Course Scope)
 
 These additional features would make the project more comprehensive and suitable for real-world applications, requiring knowledge beyond the current course scope.
 ```
+
+```bash
+Updated Roadmap Completion Status
+
+1. Initiation: Project Definition and Planning
+	•	Define project requirements: Completed
+	•	Identify user roles and permissions: Completed
+	•	Outline core system modules: Completed
+	•	Select technology stack (Flask + SQLite chosen): Completed
+	•	Task allocation and timeline: Completed
+
+2. User Management and Login Panel (Weeks 1-2)
+	•	Develop the user management module (login/registration): Completed
+	•	Database tables for users: Completed
+	•	Roles and authorization system: Completed
+	•	User interface for login and user panels: Completed
+
+3. Club and Membership Management (Weeks 3-4)
+	•	Club information module: Completed
+	•	Membership processes (join/approve/terminate): Completed
+	•	Membership approval notifications (basic notifications in place): Completed
+	•	Simple UI: Completed
+	•	Multithreading (basic use of eventlet and socket.io for concurrency): Completed
+
+4. Event Management Module (Weeks 5-6)
+	•	Event creation and editing by club managers: Completed
+	•	Waiting list system for events: Completed
+	•	Event details page: Completed
+	•	Socket programming for notifications (socket.io integration): Completed
+	•	Multithreading and concurrency (via eventlet): Completed
+
+5. Registration and Notification System (Weeks 7-8)
+	•	Event registration and waiting list: Completed
+	•	Notification system (basic email or SMS not shown, but socket-based notifications implemented): Partially Completed
+	•	Asynchronous notification system using socket programming: Completed
+	•	File operations for registrations (Not fully demonstrated, but database storage is done): Partially Completed
+
+6. Event Feedback and Evaluation (Weeks 9-10)
+	•	Feedback module (short surveys/ratings): Completed
+	•	Data analysis on feedback (basic average rating done): Partially Completed
+	•	File operations and data manipulation (not fully implemented, but DB is used): Partially Completed
+
+7. Reporting and Statistics Panel (Weeks 11-12)
+	•	Participation and popularity statistics: Not Completed
+	•	Graphs and visualization (Matplotlib/Plotly not integrated): Not Completed
+	•	Downloadable reports (PDF/HTML): Not Completed
+
+8. Testing and Final Touches (Week 13)
+	•	Module testing: Partially Completed (basic tests exist)
+	•	Bug fixing and enhancements: Ongoing
+	•	Documentation (some inline doc and README placeholders): Partially Completed
+
+Nice-to-Have Features (Beyond Course Scope)
+	•	Enhanced notifications, AI-based feedback analysis, Blockchain verification, Mobile app integration, Cloud integration: Not Completed
+
+```

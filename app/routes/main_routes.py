@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from app.models import Post, ContactMessage
 from app.forms import PostForm, ContactForm
 from app.core.extensions import db
+from app.core.notifications import send_notification
+from app.models import Notification
 
 main_bp = Blueprint("main", __name__)
 
@@ -67,3 +69,22 @@ def create_post():
         flash("Post created successfully!", "success")
         return redirect(url_for("main.dashboard"))
     return render_template("main/create_post.html", form=form)
+
+
+@main_bp.route("/notifications")
+@login_required
+def notifications():
+    unread = current_user.notifications.filter_by(is_read=False).order_by(Notification.created_at.desc()).all()
+    read = current_user.notifications.filter_by(is_read=True).order_by(Notification.created_at.desc()).all()
+    return render_template("main/notifications.html", unread=unread, read=read)
+
+
+@main_bp.route("/notifications/mark_read/<int:notification_id>", methods=["POST"])
+@login_required
+def mark_notification_read(notification_id):
+    notification = Notification.query.get_or_404(notification_id)
+    if notification.user_id != current_user.id:
+        abort(403)
+    notification.mark_as_read()
+    flash("Notification marked as read.", "success")
+    return redirect(url_for("main.notifications"))

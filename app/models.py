@@ -23,6 +23,7 @@ class User(UserMixin, db.Model):
     event_attendances = db.relationship("EventAttendance", back_populates="user", cascade="all, delete-orphan")
     event_feedbacks = db.relationship("EventFeedback", back_populates="user", lazy="dynamic")
     posts = db.relationship("Post", back_populates="author", lazy="dynamic")
+    notifications = db.relationship("Notification", back_populates="user", cascade="all, delete-orphan", lazy="dynamic")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -47,6 +48,10 @@ class User(UserMixin, db.Model):
         if self.is_club_manager and self.managed_clubs:
             return self.managed_clubs[0].id
         return None
+
+    @property
+    def unread_notifications_count(self):
+        return self.notifications.filter_by(is_read=False).count()
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -172,3 +177,23 @@ class ContactMessage(db.Model):
 
     def __repr__(self):
         return f"<ContactMessage from {self.name}>"
+
+
+class Notification(db.Model):
+    __tablename__ = "notifications"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    message = db.Column(db.String(255), nullable=False)
+    notification_type = db.Column(db.String(50), nullable=False, default="info")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+
+    # Explicit back_populates relationship
+    user = db.relationship("User", back_populates="notifications")
+
+    def mark_as_read(self):
+        self.is_read = True
+        db.session.commit()
+
+    def __repr__(self):
+        return f"<Notification id={self.id}, user_id={self.user_id}, type={self.notification_type}, is_read={self.is_read}>"

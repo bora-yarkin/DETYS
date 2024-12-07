@@ -1,6 +1,6 @@
 from flask import Flask
 from app.core.config import Config
-from app.core.extensions import db, login_manager, migrate, mail, socketio, csrf
+from app.core.extensions import db, login_manager, migrate, mail, csrf
 from app.routes import register_routes
 
 
@@ -13,7 +13,7 @@ def create_app():
     login_manager.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
-    socketio.init_app(app)
+    # socketio.init_app(app)
     csrf.init_app(app)
 
     # Configure Flask-Login
