@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, IntegerField, HiddenField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, IntegerField, HiddenField, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange, Length, Regexp
 from app.models import User, Club
 
@@ -84,3 +84,14 @@ class ContactForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     message = TextAreaField("Message", validators=[DataRequired()])
     submit = SubmitField("Send")
+
+
+class MarkAsReadForm(FlaskForm):
+    submit = SubmitField("Mark as Read")
+
+
+class NotificationPreferencesForm(FlaskForm):
+    receive_event_notifications = BooleanField("Receive Event Notifications")
+    receive_membership_notifications = BooleanField("Receive Membership Notifications")
+    receive_feedback_notifications = BooleanField("Receive Feedback Notifications")
+    submit = SubmitField("Update Preferences")

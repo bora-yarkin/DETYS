@@ -13,7 +13,6 @@ def create_app():
     login_manager.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
-    # socketio.init_app(app)
     csrf.init_app(app)
 
     # Configure Flask-Login

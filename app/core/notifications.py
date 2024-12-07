@@ -1,5 +1,3 @@
-# app/core/notifications.py
-
 from datetime import datetime
 from app.core.extensions import db, mail
 from app.models import Notification, User
@@ -13,6 +11,8 @@ def send_notification(user_id, message, notification_type="info"):
     db.session.add(notification)
     db.session.commit()
 
+
+# TODO: Implement Mail based notifications
 
 # def send_email_notification(user_id, subject, body):
 #     user = User.query.get(user_id)

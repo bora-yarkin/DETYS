@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from app.models import Post, ContactMessage
-from app.forms import PostForm, ContactForm
+from app.forms import PostForm, ContactForm, MarkAsReadForm, NotificationPreferencesForm
 from app.core.extensions import db
 from app.core.notifications import send_notification
 from app.models import Notification
@@ -76,7 +76,11 @@ def create_post():
 def notifications():
     unread = current_user.notifications.filter_by(is_read=False).order_by(Notification.created_at.desc()).all()
     read = current_user.notifications.filter_by(is_read=True).order_by(Notification.created_at.desc()).all()
-    return render_template("main/notifications.html", unread=unread, read=read)
+    forms = {}
+    for notification in unread:
+        forms[notification.id] = MarkAsReadForm()
+
+    return render_template("main/notifications.html", unread=unread, read=read, forms=forms)
 
 
 @main_bp.route("/notifications/mark_read/<int:notification_id>", methods=["POST"])
@@ -85,6 +89,35 @@ def mark_notification_read(notification_id):
     notification = Notification.query.get_or_404(notification_id)
     if notification.user_id != current_user.id:
         abort(403)
-    notification.mark_as_read()
-    flash("Notification marked as read.", "success")
+
+    form = MarkAsReadForm()
+    if form.validate_on_submit():
+        notification.mark_as_read()
+        flash("Notification marked as read.", "success")
+    else:
+        flash("Invalid request.", "danger")
     return redirect(url_for("main.notifications"))
+
+
+@main_bp.route("/notifications/mark_all_read", methods=["POST"])
+@login_required
+def mark_all_notifications_read():
+    unread_notifications = current_user.notifications.filter_by(is_read=False).all()
+    for notification in unread_notifications:
+        notification.mark_as_read()
+    flash("All notifications marked as read.", "success")
+    return redirect(url_for("main.notifications"))
+
+
+@main_bp.route("/preferences", methods=["GET", "POST"])
+@login_required
+def preferences():
+    form = NotificationPreferencesForm(obj=current_user.preferences)
+    if form.validate_on_submit():
+        current_user.preferences.receive_event_notifications = form.receive_event_notifications.data
+        current_user.preferences.receive_membership_notifications = form.receive_membership_notifications.data
+        current_user.preferences.receive_feedback_notifications = form.receive_feedback_notifications.data
+        db.session.commit()
+        flash("Your notification preferences have been updated.", "success")
+        return redirect(url_for("main.preferences"))
+    return render_template("main/preferences.html", form=form)
