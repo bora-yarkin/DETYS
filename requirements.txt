@@ -17,3 +17,4 @@ eventlet
 email-validator
 python-socketio
 Werkzeug
+jinja2
