@@ -26,3 +26,13 @@ def club_manager_required(f):
 
 def main_admin_required(f):
     return role_required("main_admin")(f)
+
+
+def admin_or_manager_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or (not current_user.is_main_admin and not current_user.is_club_manager):
+            abort(403)
+        return f(*args, **kwargs)
+
+    return decorated_function

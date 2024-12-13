@@ -18,3 +18,4 @@ email-validator
 python-socketio
 Werkzeug
 jinja2
+xhtml2pdf

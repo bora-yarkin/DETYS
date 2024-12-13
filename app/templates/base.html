@@ -6,9 +6,9 @@
     <title>DETYS - {% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block styles %}
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    {% endblock %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% endblock %}
     <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
 </head>
@@ -16,6 +16,7 @@
 <body data-is-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}"
     data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}">
 
+    {% block navbar %}
     <nav class="navbar">
         <div class="nav-container">
             <a href="{{ url_for('main.index') }}" class="nav-logo">DETYS</a>
@@ -39,9 +40,13 @@
                 <li><a href="{{ url_for('auth.register') }}">Register</a></li>
                 {% endif %}
                 <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+                {% if current_user.is_main_admin %}
+                <li><a href="{{ url_for('report.reports') }}">Reports</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>
+    {% endblock navbar %}
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
