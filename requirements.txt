@@ -19,3 +19,5 @@ python-socketio
 Werkzeug
 jinja2
 xhtml2pdf
+watchdog
+python-dotenv
