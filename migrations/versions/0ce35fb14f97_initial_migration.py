@@ -1,8 +1,8 @@
-"""empty message
+"""Initial migration.
 
-Revision ID: 8c4b11be3ea8
+Revision ID: 0ce35fb14f97
 Revises: 
-Create Date: 2024-12-04 14:45:40.492984
+Create Date: 2024-12-17 17:00:54.267761
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8c4b11be3ea8'
+revision = '0ce35fb14f97'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,13 +26,6 @@ def upgrade():
     sa.Column('submitted_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('posts',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('title', sa.String(length=150), nullable=False),
-    sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('posted_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=64), nullable=False),
@@ -43,6 +36,10 @@ def upgrade():
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
     )
+    with op.batch_alter_table('users', schema=None) as batch_op:
+        batch_op.create_index('idx_user_email', ['email'], unique=False)
+        batch_op.create_index('idx_user_username', ['username'], unique=False)
+
     op.create_table('clubs',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
@@ -52,6 +49,25 @@ def upgrade():
     sa.ForeignKeyConstraint(['president_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
+    )
+    op.create_table('notifications',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('message', sa.String(length=255), nullable=False),
+    sa.Column('notification_type', sa.String(length=50), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('is_read', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('posts',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('title', sa.String(length=150), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('posted_at', sa.DateTime(), nullable=True),
+    sa.Column('author_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['author_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('events',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -102,8 +118,13 @@ def downgrade():
     op.drop_table('event_attendance')
     op.drop_table('memberships')
     op.drop_table('events')
-    op.drop_table('clubs')
-    op.drop_table('users')
     op.drop_table('posts')
+    op.drop_table('notifications')
+    op.drop_table('clubs')
+    with op.batch_alter_table('users', schema=None) as batch_op:
+        batch_op.drop_index('idx_user_username')
+        batch_op.drop_index('idx_user_email')
+
+    op.drop_table('users')
     op.drop_table('contact_messages')
     # ### end Alembic commands ###
