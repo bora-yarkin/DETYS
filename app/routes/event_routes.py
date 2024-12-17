@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime
 from app.core.notifications import send_notification
-from app.models import Event, EventAttendance, EventFeedback
+from app.models import Club, Event, EventAttendance, EventFeedback
 from app.forms import EventForm, EventFeedbackForm
 from app.core.extensions import db
 from app.core.decorators import club_manager_required
@@ -21,13 +21,16 @@ def event_list():
 @club_manager_required
 def create_event():
     form = EventForm()
+    managed_clubs = Club.query.filter_by(president_id=current_user.id).all()
+    form.club_id.choices = [(club.id, club.name) for club in managed_clubs]
+
     if form.validate_on_submit():
         event_date = datetime.strptime(form.date.data, "%Y-%m-%dT%H:%M")
-        event = Event(title=form.title.data, description=form.description.data, date=event_date, location=form.location.data, capacity=form.capacity.data, club_id=current_user.managed_club_id)
+        event = Event(title=form.title.data, description=form.description.data, date=event_date, location=form.location.data, capacity=form.capacity.data, club_id=form.club_id.data)
         db.session.add(event)
         db.session.commit()
         flash("Event created successfully!", "success")
-        return redirect(url_for("event.event_list"))
+        return redirect(url_for("club.club_detail", club_id=event.club_id))
     return render_template("event/create_event.html", form=form)
 
 

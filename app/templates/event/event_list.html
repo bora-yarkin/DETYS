@@ -11,7 +11,10 @@
     {% for event in events %}
     <li>
         <a href="{{ url_for('event.event_detail', event_id=event.id) }}">{{ event.title }}</a>
-        by {{ event.club.name }} on {{ event.date.strftime('%Y-%m-%d %H:%M') }}
+        <br>
+        <small>Club: {{ event.club.name }}</small>
+        <br>
+        <small>Date: {{ event.date.strftime('%Y-%m-%d %H:%M') }}</small>
     </li>
     {% endfor %}
 </ul>

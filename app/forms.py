@@ -67,6 +67,7 @@ class EventForm(FlaskForm):
     date = StringField("Event Date and Time", validators=[DataRequired()])
     location = StringField("Location", validators=[DataRequired()])
     capacity = IntegerField("Capacity", validators=[DataRequired()])
+    club_id = SelectField("Club", coerce=int, validators=[DataRequired()])
     submit = SubmitField("Create Event")
 
 
@@ -92,6 +93,10 @@ class ContactForm(FlaskForm):
 
 class MarkAsReadForm(FlaskForm):
     submit = SubmitField("Mark as Read")
+
+
+class MarkAllNotificationsReadForm(FlaskForm):
+    submit = SubmitField("Mark All as Read")
 
 
 class NotificationPreferencesForm(FlaskForm):

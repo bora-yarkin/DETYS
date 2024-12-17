@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, render_template, redirect, request, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
 from app.models import Post, ContactMessage
-from app.forms import PostForm, ContactForm, MarkAsReadForm, NotificationPreferencesForm
+from app.forms import PostForm, ContactForm, MarkAsReadForm, NotificationPreferencesForm, MarkAllNotificationsReadForm
 from app.core.extensions import db, csrf
 from app.core.notifications import send_notification
 from app.models import Notification
@@ -109,11 +109,9 @@ def contact():
 def notifications():
     unread = current_user.notifications.filter_by(is_read=False).order_by(Notification.created_at.desc()).all()
     read = current_user.notifications.filter_by(is_read=True).order_by(Notification.created_at.desc()).all()
-    forms = {}
-    for notification in unread:
-        forms[notification.id] = MarkAsReadForm()
-
-    return render_template("main/notifications.html", unread=unread, read=read, forms=forms)
+    forms = {notification.id: MarkAsReadForm() for notification in unread}
+    mark_all_form = MarkAllNotificationsReadForm()
+    return render_template("main/notifications.html", unread=unread, read=read, forms=forms, mark_all_form=mark_all_form)
 
 
 @main_bp.route("/notifications/mark_read/<int:notification_id>", methods=["POST"])

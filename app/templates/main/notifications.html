@@ -19,8 +19,8 @@
     {% endfor %}
 </ul>
 <form action="{{ url_for('main.mark_all_notifications_read') }}" method="post">
-    {{ csrf_token() }}
-    <button type="submit" class="btn btn-sm btn-secondary">Mark All as Read</button>
+    {{ mark_all_form.hidden_tag() }}
+    {{ mark_all_form.submit(class="btn btn-sm btn-secondary") }}
 </form>
 {% else %}
 <p>No unread notifications.</p>
