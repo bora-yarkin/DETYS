@@ -2,22 +2,96 @@
 {% block title %}Create Post{% endblock %}
 {% block content %}
 <h2>Create a New Post</h2>
-<form method="POST">
+
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<form id="create-post-form" method="POST" action="{{ url_for('main.create_post') }}">
     {{ form.hidden_tag() }}
     <div class="form-group">
         {{ form.title.label }}
-        {{ form.title(class="form-control") }}
+        {{ form.title(class="form-control", placeholder="Enter your post title", required=True) }}
         {% for error in form.title.errors %}
         <span class="error">{{ error }}</span>
         {% endfor %}
     </div>
+
+    <!-- Quill Editor Displayed to User -->
     <div class="form-group">
-        {{ form.content.label }}
-        {{ form.content(class="form-control") }}
+        <label>Post Content</label>
+        <div id="editor" style="height:300px; background:#fff;"></div>
         {% for error in form.content.errors %}
         <span class="error">{{ error }}</span>
         {% endfor %}
     </div>
-    {{ form.submit(class="btn btn-success") }}
+
+    <!-- The actual textarea field:
+         Make it tiny, invisible but still focusable.
+         No display:none, no visibility:hidden.
+         Just very small and transparent so the browser can focus it if needed. -->
+    {{ form.content(id="content-textarea",
+    style="position:absolute; top:-1000px; left:-1000px; width:1px; height:1px; opacity:0;",
+    required=True) }}
+
+    {{ form.submit(class="btn btn-success", value="Publish") }}
 </form>
+
+<script>
+    function imageHandler() {
+        let input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = () => {
+            let file = input.files[0];
+            if (file) {
+                let formData = new FormData();
+                formData.append('file', file);
+                fetch("{{ url_for('main.upload_image') }}", {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.url) {
+                            let range = quill.getSelection() || { index: quill.getLength() };
+                            quill.insertEmbed(range.index, 'image', result.url, Quill.sources.USER);
+                            quill.setSelection(range.index + 1);
+                        } else {
+                            alert("Image upload failed: " + (result.error || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Image upload error');
+                    });
+            }
+        };
+    }
+
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: {
+                container: [
+                    [{ 'header': [1, 2, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['link', 'image', 'blockquote', 'code-block'],
+                    ['clean']
+                ],
+                handlers: {
+                    image: imageHandler
+                }
+            }
+        }
+    });
+
+    // Keep textarea in sync with Quill on every change
+    quill.on('text-change', function () {
+        var html = quill.root.innerHTML.trim();
+        document.getElementById('content-textarea').value = html;
+    });
+</script>
 {% endblock %}

@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
-<div class="post">
-    <h1>{{ post.title }}</h1>
-    <p><em>Posted by {{ post.author.username }} on {{ post.posted_at.strftime('%Y-%m-%d %H:%M') }}</em></p>
+<div class="post-detail">
+    <h1 class="post-title">{{ post.title }}</h1>
+    <p class="post-meta">
+        Posted by <strong>{{ post.author.username }}</strong>
+        on {{ post.posted_at.strftime('%B %d, %Y at %H:%M') }}
+    </p>
     <div class="post-content">
         {{ post.content|safe }}
     </div>
-    <a href="{{ url_for('main.index') }}">Back to Home</a>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Back to Home</a>
 </div>
 {% endblock %}
