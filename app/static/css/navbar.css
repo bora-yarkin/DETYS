@@ -1,0 +1,126 @@
+/* Import font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap');
+
+/* Reset and default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Navbar Styles */
+.navigation {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #333; /* Navbar arka plan rengini koyu yapın */
+    overflow: hidden;
+}
+
+.navigation ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 60px; /* Navbar yüksekliği */
+}
+
+.navigation li a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navigation li a .icon {
+    font-size: 1.5rem;
+}
+
+.indicator {
+    position: absolute;
+    bottom: 0;
+    height: 4px;
+    background-color: #fff;
+    transition: left 0.3s ease, width 0.3s ease;
+}
+
+/* Main Content Container */
+.container {
+    padding-top: 60px; /* Navbar yüksekliği ile aynı */
+    background-color: #f5f5dc; /* Farklı arka plan rengi */
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+    margin: 20px auto; /* Container'ı ortalamak için */
+    padding: 20px; /* İç boşluk */
+}
+
+@media (max-width: 768px) {
+    .navigation ul {
+        flex-direction: column;
+        height: auto;
+    }
+    .container {
+        padding-top: 60px;
+        width: 90%;
+    }
+}
+
+.navigation li a .icon {
+    font-size: 1.5rem;
+}
+
+.navigation li a .text {
+    font-size: 0.9rem;
+}
+
+.navigation li a:hover {
+    background-color: #005bb5; /* Hover rengi */
+}
+
+.navigation li a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: #29fd53;
+    border-radius: 2px;
+    transition: left 0.3s ease, width 0.3s ease;
+    z-index: 0;
+}
+
+@media (max-width: 600px) {
+    .navigation ul li {
+        width: 60px;
+        height: 60px;
+    }
+
+    .navigation ul li a .icon {
+        font-size: 1.2rem;
+    }
+
+    .navigation ul li a .text {
+        font-size: 0.7em;
+    }
+
+    .indicator {
+        height: 3px;
+    }
+}
