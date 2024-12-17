@@ -6,6 +6,7 @@ from app.core.extensions import db
 
 auth_bp = Blueprint("auth", __name__)
 
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
@@ -15,9 +16,9 @@ def login():
     registration_form = RegistrationForm()
 
     if request.method == "POST":
-        action = request.form.get('action')
-        if action == 'login' and login_form.validate_on_submit():
-            # Username ile giriş yapılıyor
+        action = request.form.get("action")
+        print(f"Form action: {action}")  # Debugging statement
+        if action == "login" and login_form.validate_on_submit():
             user = User.query.filter_by(username=login_form.username.data).first()
             if user and user.check_password(login_form.password.data):
                 login_user(user)
@@ -26,25 +27,23 @@ def login():
                 return redirect(next_page) if next_page else redirect(url_for("main.dashboard"))
             else:
                 flash("Geçersiz kullanıcı adı veya şifre.", "danger")
-        elif action == 'register' and registration_form.validate_on_submit():
-            user = User(
-                username=registration_form.username.data, 
-                email=registration_form.email.data, 
-                role=registration_form.role.data
-            )
+        elif action == "register" and registration_form.validate_on_submit():
+            print("Registration form validated")  # Debugging statement
+            user = User(username=registration_form.username.data, email=registration_form.email.data, role=registration_form.role.data)
             user.set_password(registration_form.password.data)
             db.session.add(user)
             db.session.commit()
             flash("Kayıt başarılı! Şimdi giriş yapabilirsiniz.", "success")
             return redirect(url_for("auth.login"))
         else:
-            # Form doğrulama hatalarını işleme
-            for form in [login_form, registration_form]:
-                for field, errors in form.errors.items():
-                    for error in errors:
-                        flash(f"Hata: {getattr(form, field).label.text} - {error}", "danger")
+            print("Form validation failed")  # Debugging statement
+            for field, errors in registration_form.errors.items():
+                for error in errors:
+                    print(f"Error in {field}: {error}")  # Detailed debugging statement
+                    flash(f"Hata: {getattr(registration_form, field).label.text} - {error}", "danger")
 
     return render_template("auth/login.html", login_form=login_form, registration_form=registration_form)
+
 
 @auth_bp.route("/logout")
 @login_required

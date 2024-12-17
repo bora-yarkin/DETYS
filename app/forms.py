@@ -14,8 +14,12 @@ class RegistrationForm(FlaskForm):
     )
     password = PasswordField(
         "Password",
-        validators=[DataRequired(), EqualTo("confirm", message="Passwords must match")],
+        validators=[DataRequired()],
     )
+    # password = PasswordField(
+    #     "Password",
+    #     validators=[DataRequired(), EqualTo("confirm", message="Passwords must match")],
+    # )
     # password = PasswordField(
     #     "Password",
     #     validators=[DataRequired(), Length(min=8), Regexp("^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)", message="Password must contain at least one uppercase letter, one lowercase letter, and one digit."), EqualTo("confirm", message="Passwords must match")],
