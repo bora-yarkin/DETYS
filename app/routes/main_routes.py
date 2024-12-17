@@ -10,12 +10,55 @@ from werkzeug.utils import secure_filename
 
 main_bp = Blueprint("main", __name__)
 
+
 UPLOAD_FOLDER = "app/static/uploads"  # adjust if needed
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@main_bp.route("/post/<int:post_id>")
+def view_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template("main/view_post.html", post=post)
+
+
+@main_bp.route("/upload_image", methods=["POST"])
+@login_required
+@csrf.exempt
+def upload_image():
+    if "file" not in request.files:
+        return jsonify({"error": "No file found"}), 400
+
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(filepath)
+        # The URL that the <img> tag will use. Since static is served from /static, adjust accordingly:
+        file_url = url_for("static", filename="uploads/" + filename, _external=False)
+        return jsonify({"url": file_url})
+    else:
+        return jsonify({"error": "File type not allowed"}), 400
+
+
+@main_bp.route("/create_post", methods=["GET", "POST"])
+@login_required
+def create_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        # form.content now contains the HTML from Quill
+        post = Post(title=form.title.data, content=form.content.data, author_id=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        flash("Post created successfully!", "success")
+        return redirect(url_for("main.dashboard"))
+    return render_template("main/create_post.html", form=form)
 
 
 @main_bp.app_errorhandler(403)
@@ -59,48 +102,6 @@ def contact():
         flash("Your message has been sent!", "success")
         return redirect(url_for("main.contact"))
     return render_template("main/contact.html", form=form)
-
-
-@main_bp.route("/post/<int:post_id>")
-def view_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    return render_template("main/view_post.html", post=post)
-
-
-@main_bp.route("/upload_image", methods=["POST"])
-@login_required
-@csrf.exempt
-def upload_image():
-    if "file" not in request.files:
-        return jsonify({"error": "No file found"}), 400
-
-    file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"error": "No selected file"}), 400
-
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(filepath)
-        # The URL that the <img> tag will use. Since static is served from /static, adjust accordingly:
-        file_url = url_for("static", filename="uploads/" + filename, _external=False)
-        return jsonify({"url": file_url})
-    else:
-        return jsonify({"error": "File type not allowed"}), 400
-
-
-@main_bp.route("/create_post", methods=["GET", "POST"])
-@login_required
-def create_post():
-    form = PostForm()
-    if form.validate_on_submit():
-        # form.content now contains the HTML from Quill
-        post = Post(title=form.title.data, content=form.content.data, author_id=current_user.id)
-        db.session.add(post)
-        db.session.commit()
-        flash("Post created successfully!", "success")
-        return redirect(url_for("main.dashboard"))
-    return render_template("main/create_post.html", form=form)
 
 
 @main_bp.route("/notifications")
