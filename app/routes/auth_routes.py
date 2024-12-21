@@ -17,7 +17,7 @@ def login():
 
     if request.method == "POST":
         action = request.form.get("action")
-        print(f"Form action: {action}")  # Debugging statement
+        print(f"Form action: {action}")
         if action == "login" and login_form.validate_on_submit():
             user = User.query.filter_by(username=login_form.username.data).first()
             if user and user.check_password(login_form.password.data):
@@ -28,7 +28,7 @@ def login():
             else:
                 flash("Geçersiz kullanıcı adı veya şifre.", "danger")
         elif action == "register" and registration_form.validate_on_submit():
-            print("Registration form validated")  # Debugging statement
+            print("Registration form validated")
             user = User(username=registration_form.username.data, email=registration_form.email.data, role=registration_form.role.data)
             user.set_password(registration_form.password.data)
             db.session.add(user)
@@ -36,10 +36,10 @@ def login():
             flash("Kayıt başarılı! Şimdi giriş yapabilirsiniz.", "success")
             return redirect(url_for("auth.login"))
         else:
-            print("Form validation failed")  # Debugging statement
+            print("Form validation failed")
             for field, errors in registration_form.errors.items():
                 for error in errors:
-                    print(f"Error in {field}: {error}")  # Detailed debugging statement
+                    print(f"Error in {field}: {error}")
                     flash(f"Hata: {getattr(registration_form, field).label.text} - {error}", "danger")
 
     return render_template("auth/login.html", login_form=login_form, registration_form=registration_form)

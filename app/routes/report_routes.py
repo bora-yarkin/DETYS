@@ -1,15 +1,16 @@
-import base64
-import matplotlib
-import matplotlib.pyplot as plt
 import os
-from flask import Blueprint, render_template, send_file, redirect, url_for, flash
-from flask_login import login_required, current_user
+import base64
 from datetime import datetime
 from io import BytesIO
-from app.core.extensions import db
-from app.models import Event, EventAttendance, EventFeedback, Club, User
-from app.core.decorators import main_admin_required
+
+import matplotlib
+import matplotlib.pyplot as plt
+from flask import Blueprint, render_template, send_file, redirect, url_for, flash
+from flask_login import login_required, current_user
 from xhtml2pdf import pisa
+
+from app.core.extensions import db
+from app.models import Event, EventAttendance, EventFeedback, Club
 from app.core.data_processing import export_event_feedback_to_csv, export_event_attendance_to_csv
 
 matplotlib.use("Agg")
@@ -19,15 +20,12 @@ report_bp = Blueprint("report", __name__)
 
 def get_event_ids_for_current_user():
     if hasattr(current_user, "is_main_admin") and current_user.is_main_admin:
-        # Main admin → no filter
         all_events = Event.query.all()
         return [event.id for event in all_events]
     else:
-        # Club manager → filter by clubs they manage
         clubs_managed = Club.query.filter_by(president_id=current_user.id).all()
         club_ids = [club.id for club in clubs_managed]
 
-        # Gather the events that belong to these clubs
         managed_events = Event.query.filter(Event.club_id.in_(club_ids)).all()
         return [event.id for event in managed_events]
 

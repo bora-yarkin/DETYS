@@ -1,17 +1,15 @@
 import os
 from flask import Blueprint, render_template, redirect, request, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
-from app.models import Post, ContactMessage
+from app.models import Club, Event, EventAttendance, Membership, Post, ContactMessage, User
 from app.forms import PostForm, ContactForm, MarkAsReadForm, NotificationPreferencesForm, MarkAllNotificationsReadForm
 from app.core.extensions import db, csrf
-from app.core.notifications import send_notification
 from app.models import Notification
 from werkzeug.utils import secure_filename
 
 main_bp = Blueprint("main", __name__)
 
-
-UPLOAD_FOLDER = "app/static/uploads"  # adjust if needed
+UPLOAD_FOLDER = "app/static/uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 
@@ -19,10 +17,90 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+@main_bp.route("/")
+def index():
+    all_clubs = Club.query.order_by(Club.name).all()
+    all_events = Event.query.order_by(Event.date.asc()).all()
+    return render_template("main/index.html", clubs=all_clubs, events=all_events)
+
+
+@main_bp.route("/dashboard")
+@login_required
+def dashboard():
+    user = current_user
+
+    if user.is_main_admin:
+        total_users = User.query.count()
+        total_clubs = Club.query.count()
+        total_events = Event.query.count()
+
+        top_events = db.session.query(Event.title, db.func.count(EventAttendance.user_id)).join(EventAttendance, Event.id == EventAttendance.event_id).filter(EventAttendance.status == "confirmed").group_by(Event.id).order_by(db.func.count(EventAttendance.user_id).desc()).limit(5).all()
+
+        dashboard_context = {
+            "dashboard_mode": "admin",
+            "total_users": total_users,
+            "total_clubs": total_clubs,
+            "total_events": total_events,
+            "top_events": top_events,
+        }
+
+    elif user.is_club_manager:
+        clubs_managed = Club.query.filter_by(president_id=user.id).all()
+        club_ids = [club.id for club in clubs_managed]
+
+        pending_membership_requests = Membership.query.filter(Membership.club_id.in_(club_ids), Membership.is_approved == False).count()
+
+        upcoming_events = Event.query.filter(Event.club_id.in_(club_ids), Event.date >= db.func.now()).order_by(Event.date.asc()).limit(5).all()
+
+        manager_top_events = (
+            db.session.query(Event.title, db.func.count(EventAttendance.user_id))
+            .join(EventAttendance, Event.id == EventAttendance.event_id)
+            .filter(Event.club_id.in_(club_ids), EventAttendance.status == "confirmed")
+            .group_by(Event.id)
+            .order_by(db.func.count(EventAttendance.user_id).desc())
+            .limit(5)
+            .all()
+        )
+
+        dashboard_context = {
+            "dashboard_mode": "manager",
+            "clubs_managed": clubs_managed,
+            "pending_membership_requests": pending_membership_requests,
+            "upcoming_events": upcoming_events,
+            "manager_top_events": manager_top_events,
+        }
+
+    else:
+        user_events = EventAttendance.query.join(Event, EventAttendance.event_id == Event.id).filter(EventAttendance.user_id == user.id, EventAttendance.status.in_(["confirmed", "waiting"])).all()
+        joined_clubs = Membership.query.join(Club, Membership.club_id == Club.id).filter(Membership.user_id == user.id, Membership.is_approved == True).all()
+
+        dashboard_context = {
+            "dashboard_mode": "student",
+            "user_events": user_events,
+            "joined_clubs": joined_clubs,
+        }
+
+    return render_template("main/dashboard.html", user=user, **dashboard_context)
+
+
 @main_bp.route("/post/<int:post_id>")
 def view_post(post_id):
     post = Post.query.get_or_404(post_id)
     return render_template("main/view_post.html", post=post)
+
+
+@main_bp.route("/create_post", methods=["GET", "POST"])
+@login_required
+def create_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        # form.content now contains the HTML from Quill
+        post = Post(title=form.title.data, content=form.content.data, author_id=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        flash("Post created successfully!", "success")
+        return redirect(url_for("main.dashboard"))
+    return render_template("main/create_post.html", form=form)
 
 
 @main_bp.route("/upload_image", methods=["POST"])
@@ -40,56 +118,10 @@ def upload_image():
         filename = secure_filename(file.filename)
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
-        # The URL that the <img> tag will use. Since static is served from /static, adjust accordingly:
         file_url = url_for("static", filename="uploads/" + filename, _external=False)
         return jsonify({"url": file_url})
     else:
         return jsonify({"error": "File type not allowed"}), 400
-
-
-@main_bp.route("/create_post", methods=["GET", "POST"])
-@login_required
-def create_post():
-    form = PostForm()
-    if form.validate_on_submit():
-        # form.content now contains the HTML from Quill
-        post = Post(title=form.title.data, content=form.content.data, author_id=current_user.id)
-        db.session.add(post)
-        db.session.commit()
-        flash("Post created successfully!", "success")
-        return redirect(url_for("main.dashboard"))
-    return render_template("main/create_post.html", form=form)
-
-
-@main_bp.app_errorhandler(403)
-def forbidden_error(error):
-    background_image = url_for("static", filename="images/error.jpg")
-    return render_template("errors/403.html", background_image=background_image), 403
-
-
-@main_bp.app_errorhandler(404)
-def not_found_error(error):
-    background_image = url_for("static", filename="images/error.jpg")
-    return render_template("errors/404.html", background_image=background_image), 404
-
-
-@main_bp.app_errorhandler(500)
-def internal_error(error):
-    background_image = url_for("static", filename="images/error.jpg")
-    return render_template("errors/500.html", background_image=background_image), 500
-
-
-@main_bp.route("/")
-def index():
-    posts = Post.query.order_by(Post.posted_at.desc()).all()
-    return render_template("main/index.html", posts=posts)
-
-
-@main_bp.route("/dashboard")
-@login_required
-def dashboard():
-    posts = Post.query.order_by(Post.posted_at.desc()).all()
-    return render_template("main/dashboard.html", posts=posts, user=current_user)
 
 
 @main_bp.route("/contact", methods=["GET", "POST"])
@@ -152,3 +184,12 @@ def preferences():
         flash("Your notification preferences have been updated.", "success")
         return redirect(url_for("main.preferences"))
     return render_template("main/preferences.html", form=form)
+
+
+@main_bp.app_errorhandler(403)
+@main_bp.app_errorhandler(404)
+@main_bp.app_errorhandler(500)
+def handle_errors(error):
+    background_image = url_for("static", filename="images/error.jpg")
+    error_code = error.code if hasattr(error, "code") else 500
+    return render_template(f"errors/{error_code}.html", background_image=background_image), error_code

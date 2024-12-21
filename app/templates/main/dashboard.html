@@ -1,32 +1,105 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
+
 <h2>Welcome, {{ user.username }}!</h2>
 <p>Your role: {{ user.role }}</p>
 
-{% if user.is_student %}
-<p>This is the student dashboard.</p>
-{% elif user.is_club_manager %}
-<p>This is the club manager dashboard.</p>
-{% elif user.is_main_admin %}
-<p>This is the main admin dashboard.</p>
-{% endif %}
+{% if dashboard_mode == 'admin' %}
+<div class="admin-stats">
+    <h3>System Statistics</h3>
+    <ul>
+        <li><strong>Total Users:</strong> {{ total_users }}</li>
+        <li><strong>Total Clubs:</strong> {{ total_clubs }}</li>
+        <li><strong>Total Events:</strong> {{ total_events }}</li>
+    </ul>
 
-{% if user.is_main_admin or user.is_club_manager %}
-<a href="{{ url_for('main.create_post') }}" class="btn btn-primary">Create New Post</a>
-{% endif %}
+    <h3>Top 5 Events by Participation</h3>
+    {% if top_events %}
+    <ol>
+        {% for title, count in top_events %}
+        <li>{{ title }} - {{ count }} attendees</li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p>No events found.</p>
+    {% endif %}
 
-<h3>Recent Posts</h3>
-{% if posts %}
-{% for post in posts %}
-<div class="post">
-    <h4>{{ post.title }}</h4>
-    <p><em>Posted by {{ post.author.username }} on {{ post.posted_at.strftime('%Y-%m-%d %H:%M') }}</em></p>
-    <p>{{ post.content }}</p>
-    <hr>
+    <p>
+        <a href="{{ url_for('report.reports') }}" class="btn btn-info">Full Reports</a>
+    </p>
 </div>
-{% endfor %}
+
+{% elif dashboard_mode == 'manager' %}
+<div class="manager-stats">
+    <h3>My Clubs</h3>
+    {% if clubs_managed %}
+    <ul>
+        {% for club in clubs_managed %}
+        <li>{{ club.name }} ({{ club.members|length }} members)</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>You are not managing any club right now.</p>
+    {% endif %}
+
+    <p><strong>Pending Membership Requests:</strong> {{ pending_membership_requests }}</p>
+
+    <h3>Upcoming Events</h3>
+    {% if upcoming_events %}
+    <ul>
+        {% for event in upcoming_events %}
+        <li>{{ event.title }} on {{ event.date.strftime('%Y-%m-%d %H:%M') }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No upcoming events for your clubs.</p>
+    {% endif %}
+
+    <h3>Top Events by Attendance</h3>
+    {% if manager_top_events %}
+    <ol>
+        {% for title, count in manager_top_events %}
+        <li>{{ title }} - {{ count }} attendees</li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p>No significant attendance data available for your clubs.</p>
+    {% endif %}
+
+    <p>
+        <a href="{{ url_for('report.reports') }}" class="btn btn-info">View My Club Reports</a>
+    </p>
+</div>
+
 {% else %}
-<p>No posts available.</p>
+<div class="student-panel">
+    <h3>My Upcoming Events</h3>
+    {% if user_events %}
+    <ul>
+        {% for attendance in user_events %}
+        <li>
+            {{ attendance.event.title }} on
+            {{ attendance.event.date.strftime('%Y-%m-%d %H:%M') }}
+            (Status: {{ attendance.status }})
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>You haven't registered for any events yet.</p>
+    {% endif %}
+
+    <h3>My Clubs</h3>
+    {% if joined_clubs %}
+    <ul>
+        {% for membership in joined_clubs %}
+        <li>{{ membership.club.name }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>You are not a member of any clubs, or your membership is pending.</p>
+    {% endif %}
+</div>
 {% endif %}
+
 {% endblock %}

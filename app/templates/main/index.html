@@ -1,23 +1,44 @@
 {% extends 'base.html' %}
-{% block title %}Home{% endblock %}
+{% block title %}Welcome to DETYS{% endblock %}
 {% block content %}
-<div class="intro-section">
-    <h1>Welcome to DETYS</h1>
-    <p>Your one-stop solution for event and club management.</p>
-</div>
 
-<div class="blog-section">
-    <h2>Latest Posts</h2>
-    {% if posts %}
-    {% for post in posts %}
-    <div class="blog-post">
-        <h3>{{ post.title }}</h3>
-        <p>{{ post.content[:200]|safe }}...</p>
-        <a href="{{ url_for('main.view_post', post_id=post.id) }}">Read more</a>
-    </div>
-    {% endfor %}
+<div class="home-hero">
+    <h1>DETYS</h1>
+    <p>Your one-stop solution for club & event management at your institution.</p>
+    {% if not current_user.is_authenticated %}
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login</a>
+    <a href="{{ url_for('auth.login') }}#signUp" class="btn btn-success">Register</a>
     {% else %}
-    <p>No posts available.</p>
+    <p>Welcome back, {{ current_user.username }}. Head over to your <a
+            href="{{ url_for('main.dashboard') }}">dashboard</a>.</p>
     {% endif %}
 </div>
+
+<div class="featured-section">
+    <h2>Featured Clubs</h2>
+    {% set featured_clubs = clubs[:3] if clubs|length > 3 else clubs %}
+    <div class="club-grid">
+        {% for club in featured_clubs %}
+        <div class="club-card">
+            <h3>{{ club.name }}</h3>
+            <p>{{ club.description[:100] }}...</p>
+            <a href="{{ url_for('club.club_detail', club_id=club.id) }}">Learn More</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <a href="{{ url_for('club.club_list') }}" class="btn btn-info">View All Clubs</a>
+</div>
+
+<div class="events-section">
+    <h2>Upcoming Events</h2>
+    {% set upcoming_events = events[:5] if events|length > 5 else events %}
+    <ul>
+        {% for event in upcoming_events %}
+        <li>{{ event.title }} - {{ event.date.strftime('%Y-%m-%d %H:%M') }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('event.event_list') }}" class="btn btn-info">See All Events</a>
+</div>
+
 {% endblock %}
