@@ -197,3 +197,66 @@ class Notification(db.Model):
 
     def __repr__(self):
         return f"<Notification id={self.id}, user_id={self.user_id}, type={self.notification_type}, is_read={self.is_read}>"
+
+
+# app/models.py (excerpt)
+
+
+class ForumTopic(db.Model):
+    __tablename__ = "forum_topics"
+
+    id = db.Column(db.Integer, primary_key=True)
+    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    club = db.relationship("Club", backref="forum_topics")
+    posts = db.relationship("ForumPost", backref="topic", cascade="all, delete-orphan")
+    creator = db.relationship("User")
+
+
+class ForumPost(db.Model):
+    __tablename__ = "forum_posts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    topic_id = db.Column(db.Integer, db.ForeignKey("forum_topics.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    posted_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship("User")
+
+
+class EventResource(db.Model):
+    __tablename__ = "event_resources"
+
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    upload_date = db.Column(db.DateTime, default=datetime.utcnow)
+    # optional: store the file path or relative path
+    filepath = db.Column(db.String(255), nullable=False)
+
+    event = db.relationship("Event", backref="resources")
+
+
+class Poll(db.Model):
+    __tablename__ = "polls"
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
+    question = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    choices = db.relationship("PollChoice", backref="poll", cascade="all, delete-orphan")
+    event = db.relationship("Event", backref="polls")
+
+
+class PollChoice(db.Model):
+    __tablename__ = "poll_choices"
+    id = db.Column(db.Integer, primary_key=True)
+    poll_id = db.Column(db.Integer, db.ForeignKey("polls.id"), nullable=False)
+    choice_text = db.Column(db.String(255), nullable=False)
+    votes = db.Column(db.Integer, default=0)

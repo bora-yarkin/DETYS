@@ -107,6 +107,10 @@
                 </a>
             </li>
             {% endif %}
+            <form action="{{ url_for('search.search') }}" method="GET" style="display:inline;">
+                <input type="text" name="q" placeholder="Search clubs & events...">
+                <button type="submit">Search</button>
+            </form>
         </ul>
         <div class="indicator"></div>
     </div>

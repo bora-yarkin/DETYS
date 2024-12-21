@@ -53,5 +53,35 @@
         <a href="{{ url_for('event.manage_attendees', event_id=event.id) }}" class="btn btn-info">Manage Attendees</a>
     </div>
     {% endif %}
+    <!-- In event_detail.html -->
+    {% if current_user.is_authenticated and event.club.president_id == current_user.id %}
+    <form action="{{ url_for('resource.upload_resource', event_id=event.id) }}" method="POST" enctype="multipart/form-data">
+        <label for="file">Upload Resource</label>
+        <input type="file" name="file" id="file">
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+    {% endif %}
+    <!-- if event.club.president_id == current_user.id or user is main admin -->
+    <a href="{{ url_for('poll.create_poll', event_id=event.id) }}">Create Poll</a>
+    
+    <!-- if event.polls exist -->
+    {% for poll in event.polls %}
+    <a href="{{ url_for('poll.view_poll', poll_id=poll.id) }}">{{ poll.question }}</a>
+    {% endfor %}
+    <!-- List of resources -->
+    <h3>Event Resources</h3>
+    {% if event.resources %}
+    <ul>
+        {% for res in event.resources %}
+        <li>
+            {{ res.filename }} (uploaded on {{ res.upload_date.strftime('%Y-%m-%d') }})
+            <a href="{{ url_for('resource.download_resource', resource_id=res.id) }}"
+                class="btn btn-sm btn-success">Download</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No resources yet.</p>
+    {% endif %}
 </div>
 {% endblock %}

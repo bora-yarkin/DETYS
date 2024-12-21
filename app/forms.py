@@ -104,3 +104,13 @@ class NotificationPreferencesForm(FlaskForm):
     receive_membership_notifications = BooleanField("Receive Membership Notifications")
     receive_feedback_notifications = BooleanField("Receive Feedback Notifications")
     submit = SubmitField("Update Preferences")
+
+
+class ForumTopicForm(FlaskForm):
+    title = StringField("Topic Title", validators=[DataRequired()])
+    submit = SubmitField("Create Topic")
+
+
+class ForumPostForm(FlaskForm):
+    content = TextAreaField("Content", validators=[DataRequired()])
+    submit = SubmitField("Post")

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+{% block content %}
+<h2>Search Results for "{{ query }}"</h2>
+
+<h3>Clubs</h3>
+{% if clubs %}
+<ul>
+    {% for club in clubs %}
+    <li>
+        <a href="{{ url_for('club.club_detail', club_id=club.id) }}">{{ club.name }}</a>
+        <p>{{ club.description[:100] }}...</p>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No clubs found.</p>
+{% endif %}
+
+<h3>Events</h3>
+{% if events %}
+<ul>
+    {% for event in events %}
+    <li>
+        <a href="{{ url_for('event.event_detail', event_id=event.id) }}">{{ event.title }}</a>
+        <p>{{ event.description[:100] }}...</p>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No events found.</p>
+{% endif %}
+{% endblock %}
