@@ -97,6 +97,16 @@
                 </a>
             </li>
             {% endif %}
+            {% if current_user.is_club_manager %}
+            <li class="list {% if request.endpoint == 'report.reports' %}active{% endif %}">
+                <a href="{{ url_for('report.reports') }}">
+                    <span class="icon">
+                        <ion-icon name="document-text-outline"></ion-icon>
+                    </span>
+                    <span class="text">Reports</span>
+                </a>
+            </li>
+            {% endif %}
         </ul>
         <div class="indicator"></div>
     </div>

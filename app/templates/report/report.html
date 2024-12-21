@@ -47,6 +47,10 @@
 <p>No feedback data available.</p>
 {% endif %}
 
-<p><a href="{{ url_for('report.download_pdf') }}" class="btn btn-primary">Download PDF</a></p>
+<p>
+    <a href="{{ url_for('report.download_pdf') }}" class="btn btn-primary">Download PDF</a>
+    <a href="{{ url_for('report.export_feedback_csv') }}" class="btn btn-secondary">Export Feedback CSV</a>
+    <a href="{{ url_for('report.export_attendance_csv') }}" class="btn btn-secondary">Export Attendance CSV</a>
+</p>
 
 {% endblock %}
