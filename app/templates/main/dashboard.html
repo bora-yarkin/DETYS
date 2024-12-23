@@ -6,7 +6,10 @@
 <p>Your role: {{ user.role }}</p>
 
 {% if dashboard_mode == 'admin' %}
+<h3>Administrator Dashboard</h3>
+<p>Welcome, {{ user.username }}. Manage the system here.</p>
 <div class="admin-stats">
+    
     <h3>System Statistics</h3>
     <ul>
         <li><strong>Total Users:</strong> {{ total_users }}</li>
@@ -27,10 +30,13 @@
     <h3>Additional Stats</h3>
     <p>Resources Uploaded: {{ resource_count }}</p>
     <p>Polls Created: {{ poll_count }}</p>
-
+        <div class="new-post-section">
+            <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">Create New Post</a>
+        </div>
     <p>
         <a href="{{ url_for('report.reports') }}" class="btn btn-info">Full Reports</a>
     </p>
+    <a href="{{ url_for('category.list_categories') }}" class="btn btn-info">Manage Categories</a>
 </div>
 
 {% elif dashboard_mode == 'manager' %}
@@ -72,6 +78,10 @@
     <h3>Additional Stats</h3>
     <p>Resources Uploaded: {{ resource_count }}</p>
     <p>Polls Created In My Clubs: {{ poll_count }}</p>
+
+    <div class="new-post-section">
+        <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">Create New Post</a>
+    </div>
 
     <p>
         <a href="{{ url_for('report.reports') }}" class="btn btn-info">View My Club Reports</a>

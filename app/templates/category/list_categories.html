@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Manage Categories{% endblock %}
+{% block content %}
+<h2>Categories</h2>
+
+<p>
+    <a href="{{ url_for('category.create_category') }}" class="btn btn-primary">Create New Category</a>
+</p>
+
+{% if categories %}
+<table>
+    <thead>
+        <tr>
+            <th>Category Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cat in categories %}
+        <tr>
+            <td>{{ cat.name }}</td>
+            <td>
+                <a href="{{ url_for('category.edit_category', category_id=cat.id) }}" class="btn btn-warning">Edit</a>
+
+                <form action="{{ url_for('category.delete_category', category_id=cat.id) }}" method="POST"
+                    style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No categories found.</p>
+{% endif %}
+{% endblock %}

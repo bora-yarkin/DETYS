@@ -106,11 +106,13 @@ class Event(db.Model):
     location = db.Column(db.String(150), nullable=False)
     capacity = db.Column(db.Integer, nullable=False)
     club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)
 
     # Relationships
     club = db.relationship("Club", back_populates="events")
     attendees = db.relationship("EventAttendance", back_populates="event", cascade="all, delete-orphan")
     feedbacks = db.relationship("EventFeedback", back_populates="event", lazy="dynamic")
+    category = db.relationship("Category", back_populates="events", lazy="joined")
 
     def __repr__(self):
         return f"<Event {self.title}>"
@@ -199,9 +201,6 @@ class Notification(db.Model):
         return f"<Notification id={self.id}, user_id={self.user_id}, type={self.notification_type}, is_read={self.is_read}>"
 
 
-# app/models.py (excerpt)
-
-
 class ForumTopic(db.Model):
     __tablename__ = "forum_topics"
 
@@ -274,3 +273,14 @@ class Bookmark(db.Model):
     user = db.relationship("User", backref="bookmarks")
     event = db.relationship("Event", backref="bookmarks")
     club = db.relationship("Club", backref="bookmarks")
+
+
+class Category(db.Model):
+    __tablename__ = "categories"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship with Event
+    events = db.relationship("Event", back_populates="category", cascade="all, delete-orphan")

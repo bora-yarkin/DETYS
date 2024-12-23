@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Create Category{% endblock %}
+{% block content %}
+<h2>Create a New Category</h2>
+<form method="POST" action="">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <div class="form-group">
+        <label>Category Name</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Create</button>
+    <a href="{{ url_for('category.list_categories') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

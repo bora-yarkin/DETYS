@@ -3,6 +3,13 @@
 {% block content %}
 <div class="event-details">
     <h2>{{ event.title }}</h2>
+    <p><strong>Category:</strong>
+        {% if event.category %}
+        {{ event.category.name }}
+        {% else %}
+        None
+        {% endif %}
+    </p>
     <p><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') }}</p>
     <p><strong>Location:</strong> {{ event.location }}</p>
     <p><strong>Organized by:</strong> {{ event.club.name }}</p>
@@ -40,8 +47,7 @@
         {% endif %}
     </div>
 
-    {% if current_user.is_authenticated and (event.club.president_id == current_user.id or current_user.is_main_admin)
-    %}
+    {% if current_user.is_authenticated and (event.club.president_id == current_user.id or current_user.is_main_admin)%}
     <a href="{{ url_for('poll.create_poll', event_id=event.id) }}" class="btn btn-sm btn-info">Create Poll</a>
     {% endif %}
 
@@ -86,6 +92,12 @@
         <input type="file" name="file" id="file">
         <button type="submit" class="btn btn-primary">Upload</button>
     </form>
+    {% endif %}
+    {% if current_user.is_authenticated and (current_user.is_main_admin or event.club.president_id == current_user.id) %}
+    <div class="event-manage">
+        <a href="{{ url_for('event.edit_event', event_id=event.id) }}" class="btn btn-warning">Edit Event</a>
+        <a href="{{ url_for('event.confirm_delete_event', event_id=event.id) }}" class="btn btn-danger">Delete Event</a>
+    </div>
     {% endif %}
 
     <h3>Event Resources</h3>

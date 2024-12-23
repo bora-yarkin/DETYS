@@ -5,12 +5,12 @@ from io import BytesIO
 
 import matplotlib
 import matplotlib.pyplot as plt
-from flask import Blueprint, render_template, send_file, redirect, url_for, flash
+from flask import Blueprint, render_template, request, send_file, redirect, url_for, flash
 from flask_login import login_required, current_user
 from xhtml2pdf import pisa
 
 from app.core.extensions import db
-from app.models import Event, EventAttendance, EventFeedback, Club
+from app.models import Category, Event, EventAttendance, EventFeedback, Club
 from app.core.data_processing import export_event_feedback_to_csv, export_event_attendance_to_csv
 
 matplotlib.use("Agg")
@@ -55,25 +55,43 @@ def generate_participation_chart(participation_data):
 @login_required
 def reports():
     allowed_event_ids = get_event_ids_for_current_user()
+    category_id = request.args.get("category_id", type=int)
 
-    participation_data = db.session.query(Event.title, db.func.count(EventAttendance.user_id)).join(EventAttendance, Event.id == EventAttendance.event_id).filter(EventAttendance.status == "confirmed", Event.id.in_(allowed_event_ids)).group_by(Event.id).all()
+    query = db.session.query(Event.title, db.func.count(EventAttendance.user_id)).join(EventAttendance, Event.id == EventAttendance.event_id).filter(EventAttendance.status == "confirmed", Event.id.in_(allowed_event_ids))
+    if category_id:
+        query = query.filter(Event.category_id == category_id)
 
-    feedback_data = db.session.query(Event.title, db.func.avg(EventFeedback.rating)).join(EventFeedback, Event.id == EventFeedback.event_id).filter(Event.id.in_(allowed_event_ids)).group_by(Event.id).all()
+    participation_data = query.group_by(Event.id).all()
+
+    fb_query = db.session.query(Event.title, db.func.avg(EventFeedback.rating)).join(EventFeedback, Event.id == EventFeedback.event_id).filter(Event.id.in_(allowed_event_ids))
+    if category_id:
+        fb_query = fb_query.filter(Event.category_id == category_id)
+
+    feedback_data = fb_query.group_by(Event.id).all()
 
     sorted_by_popularity = sorted(participation_data, key=lambda x: x[1], reverse=True)[:5]
     base64_image = generate_participation_chart(participation_data)
 
-    return render_template("report/report.html", participation_data=participation_data, sorted_by_popularity=sorted_by_popularity, feedback_data=feedback_data, base64_image=base64_image)
+    categories = Category.query.order_by(Category.name.asc()).all()
+
+    return render_template("report/report.html", participation_data=participation_data, sorted_by_popularity=sorted_by_popularity, feedback_data=feedback_data, base64_image=base64_image, categories=categories, selected_category_id=category_id)
 
 
 @report_bp.route("/reports/download_pdf")
 @login_required
 def download_pdf():
     allowed_event_ids = get_event_ids_for_current_user()
+    category_id = request.args.get("category_id", type=int)
 
-    participation_data = db.session.query(Event.title, db.func.count(EventAttendance.user_id)).join(EventAttendance, Event.id == EventAttendance.event_id).filter(EventAttendance.status == "confirmed", Event.id.in_(allowed_event_ids)).group_by(Event.id).all()
+    participation_query = db.session.query(Event.title, db.func.count(EventAttendance.user_id)).join(EventAttendance, Event.id == EventAttendance.event_id).filter(EventAttendance.status == "confirmed", Event.id.in_(allowed_event_ids))
+    if category_id:
+        participation_query = participation_query.filter(Event.category_id == category_id)
+    participation_data = participation_query.group_by(Event.id).all()
 
-    feedback_data = db.session.query(Event.title, db.func.avg(EventFeedback.rating)).join(EventFeedback, Event.id == EventFeedback.event_id).filter(Event.id.in_(allowed_event_ids)).group_by(Event.id).all()
+    feedback_query = db.session.query(Event.title, db.func.avg(EventFeedback.rating)).join(EventFeedback, Event.id == EventFeedback.event_id).filter(Event.id.in_(allowed_event_ids))
+    if category_id:
+        feedback_query = feedback_query.filter(Event.category_id == category_id)
+    feedback_data = feedback_query.group_by(Event.id).all()
 
     base64_image = generate_participation_chart(participation_data)
     html = render_template("report/pdf_template.html", participation_data=participation_data, feedback_data=feedback_data, current_date=datetime.utcnow(), base64_image=base64_image)

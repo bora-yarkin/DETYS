@@ -1,8 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Reports{% endblock %}
-
 {% block content %}
 <h2>Reports & Statistics</h2>
+
+<form method="GET" action="{{ url_for('report.reports') }}">
+    <label for="category_id">Filter by Category:</label>
+    <select name="category_id" id="category_id">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if selected_category_id==cat.id %}selected{% endif %}>
+            {{ cat.name }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+</form>
 
 {% if participation_data %}
 <h3>Event Participation</h3>
@@ -48,9 +60,8 @@
 {% endif %}
 
 <p>
-    <a href="{{ url_for('report.download_pdf') }}" class="btn btn-primary">Download PDF</a>
-    <a href="{{ url_for('report.export_feedback_csv') }}" class="btn btn-secondary">Export Feedback CSV</a>
-    <a href="{{ url_for('report.export_attendance_csv') }}" class="btn btn-secondary">Export Attendance CSV</a>
+    <a href="{{ url_for('report.download_pdf', category_id=selected_category_id) }}" class="btn btn-primary">Download
+        PDF</a>
 </p>
-
+<!-- Adjust CSV routes similarly if you want to pass category_id to them -->
 {% endblock %}

@@ -1,7 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Events{% endblock %}
 {% block content %}
+
 <h2>Upcoming Events</h2>
+
+<form method="GET" action="{{ url_for('event.event_list') }}">
+    <label for="category_id">Filter by Category:</label>
+    <select name="category_id" id="category_id">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if selected_category_id==cat.id %}selected{% endif %}>
+            {{ cat.name }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+</form>
 
 {% if current_user.is_authenticated and current_user.is_club_manager %}
 <a href="{{ url_for('event.create_event') }}" class="btn btn-primary">Create Event</a>
@@ -14,8 +28,19 @@
         <br>
         <small>Club: {{ event.club.name }}</small>
         <br>
-        <small>Date: {{ event.date.strftime('%Y-%m-%d %H:%M') }}</small>
+        <small>
+            Date: {{ event.date.strftime('%Y-%m-%d %H:%M') }}
+            {% if event.category %}
+            | Category: {{ event.category.name }}
+            {% endif %}
+        </small>
+        {% if current_user.is_authenticated and (current_user.is_main_admin or event.club.president_id == current_user.id) %}
+        <br>
+        <a href="{{ url_for('event.edit_event', event_id=event.id) }}" class="btn btn-sm btn-warning">Edit</a>
+        <a href="{{ url_for('event.confirm_delete_event', event_id=event.id) }}" class="btn btn-sm btn-danger">Delete</a>
+        {% endif %}
     </li>
     {% endfor %}
 </ul>
+
 {% endblock %}

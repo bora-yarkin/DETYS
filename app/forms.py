@@ -68,6 +68,7 @@ class EventForm(FlaskForm):
     location = StringField("Location", validators=[DataRequired()])
     capacity = IntegerField("Capacity", validators=[DataRequired()])
     club_id = SelectField("Club", coerce=int, validators=[DataRequired()])
+    category_id = SelectField("Category", coerce=int, validators=[DataRequired()])
     submit = SubmitField("Create Event")
 
 

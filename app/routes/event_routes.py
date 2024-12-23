@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, abort, render_template, redirect, request, url_for, flash
 from flask_login import login_required, current_user
+from flask_wtf.csrf import generate_csrf
 from datetime import datetime
 from app.core.notifications import send_notification
-from app.models import Club, Event, EventAttendance, EventFeedback
+from app.models import Category, Club, Event, EventAttendance, EventFeedback
 from app.forms import EventForm, EventFeedbackForm
 from app.core.extensions import db
 from app.core.decorators import club_manager_required
@@ -12,8 +13,15 @@ event_bp = Blueprint("event", __name__)
 
 @event_bp.route("/")
 def event_list():
-    events = Event.query.order_by(Event.date.asc()).all()
-    return render_template("event/event_list.html", events=events)
+    category_id = request.args.get("category_id", type=int)
+    query = Event.query.order_by(Event.date.asc())
+
+    if category_id:
+        query = query.filter(Event.category_id == category_id)
+
+    events = query.all()
+    categories = Category.query.order_by(Category.name.asc()).all()
+    return render_template("event/event_list.html", events=events, categories=categories, selected_category_id=category_id)
 
 
 @event_bp.route("/create", methods=["GET", "POST"])
@@ -24,9 +32,12 @@ def create_event():
     managed_clubs = Club.query.filter_by(president_id=current_user.id).all()
     form.club_id.choices = [(club.id, club.name) for club in managed_clubs]
 
+    categories = Category.query.order_by(Category.name.asc()).all()
+    form.category_id.choices = [(c.id, c.name) for c in categories]
+
     if form.validate_on_submit():
         event_date = datetime.strptime(form.date.data, "%Y-%m-%dT%H:%M")
-        event = Event(title=form.title.data, description=form.description.data, date=event_date, location=form.location.data, capacity=form.capacity.data, club_id=form.club_id.data)
+        event = Event(title=form.title.data, description=form.description.data, date=event_date, location=form.location.data, capacity=form.capacity.data, club_id=form.club_id.data, category_id=form.category_id.data)
         db.session.add(event)
         db.session.commit()
         flash("Event created successfully!", "success")
@@ -135,3 +146,76 @@ def submit_feedback(event_id):
         flash("Thank you for your feedback!", "success")
         return redirect(url_for("event.event_detail", event_id=event_id))
     return render_template("event/submit_feedback.html", form=form, event=event)
+
+
+def can_edit_or_delete_event(event):
+    return current_user.is_main_admin or (event.club and event.club.president_id == current_user.id)
+
+
+@event_bp.route("/<int:event_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_event(event_id):
+    event = Event.query.get_or_404(event_id)
+    if not can_edit_or_delete_event(event):
+        abort(403)
+
+    form = EventForm(obj=event)
+
+    if current_user.is_main_admin:
+        managed_clubs = Club.query.all()
+    else:
+        managed_clubs = Club.query.filter_by(president_id=current_user.id).all()
+
+    form.club_id.choices = [(club.id, club.name) for club in managed_clubs]
+
+    categories = Category.query.order_by(Category.name.asc()).all()
+    form.category_id.choices = [(c.id, c.name) for c in categories]
+
+    if form.validate_on_submit():
+        event.title = form.title.data
+        event.description = form.description.data
+        event.date = datetime.strptime(form.date.data, "%Y-%m-%dT%H:%M")
+        event.location = form.location.data
+        event.capacity = form.capacity.data
+        event.club_id = form.club_id.data
+        event.category_id = form.category_id.data
+        db.session.commit()
+        flash("Event updated successfully!", "success")
+        return redirect(url_for("event.event_detail", event_id=event.id))
+
+    if event.date:
+        form.date.data = event.date.strftime("%Y-%m-%dT%H:%M")
+    form.club_id.data = event.club_id
+    if event.category_id:
+        form.category_id.data = event.category_id
+
+    return render_template("event/edit_event.html", form=form, event=event)
+
+
+@event_bp.route("/<int:event_id>/delete", methods=["POST"])
+@login_required
+def delete_event(event_id):
+    event = Event.query.get_or_404(event_id)
+    if not can_edit_or_delete_event(event):
+        abort(403)
+    try:
+        db.session.delete(event)
+        db.session.commit()
+        flash("Event deleted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error deleting event: {str(e)}", "danger")
+
+    return redirect(url_for("event.event_list"))
+
+
+@event_bp.route("/<int:event_id>/confirm_delete", methods=["GET", "POST"])
+@login_required
+def confirm_delete_event(event_id):
+    event = Event.query.get_or_404(event_id)
+    if not can_edit_or_delete_event(event):
+        abort(403)
+
+    csrf_token = generate_csrf()
+
+    return render_template("event/confirm_delete.html", event=event, csrf_token=csrf_token)

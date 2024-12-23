@@ -3,14 +3,14 @@ from flask_login import login_required, current_user
 from datetime import datetime
 from app.core.extensions import db
 from app.models import Event, Poll, PollChoice
-from app.core.decorators import club_manager_required
+from app.core.decorators import club_manager_required, main_admin_required, admin_or_manager_required
 
 poll_bp = Blueprint("poll", __name__)
 
 
 @poll_bp.route("/<int:event_id>/create", methods=["GET", "POST"])
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def create_poll(event_id):
     event = Event.query.get_or_404(event_id)
     if event.club.president_id != current_user.id and not current_user.is_main_admin:
