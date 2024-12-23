@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}View Poll{% endblock %}
+{% block content %}
+<h2>Poll: "{{ poll.question }}"</h2>
+<p>Event: <a href="{{ url_for('event.event_detail', event_id=event.id) }}">{{ event.title }}</a></p>
+
+<form action="{{ url_for('poll.vote_poll', poll_id=poll.id) }}" method="POST">
+    <ul>
+        {% for choice in poll.choices %}
+        <li>
+            <label>
+                <input type="radio" name="choice_id" value="{{ choice.id }}">
+                {{ choice.choice_text }}
+                ({{ choice.votes }} votes so far)
+            </label>
+        </li>
+        {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-primary">Vote</button>
+</form>
+{% endblock %}

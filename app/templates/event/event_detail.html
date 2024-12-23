@@ -8,7 +8,17 @@
     <p><strong>Organized by:</strong> {{ event.club.name }}</p>
     <p>{{ event.description }}</p>
 
-    <!-- Registration Section -->
+    {% if current_user.is_authenticated %}
+    {% set event_bookmarked = current_user.bookmarks|selectattr("event_id", "equalto", event.id)|list %}
+    {% if event_bookmarked %}
+    <a href="{{ url_for('bookmark.remove_event_bookmark', event_id=event.id) }}" class="btn btn-sm btn-warning">Remove
+        Bookmark</a>
+    {% else %}
+    <a href="{{ url_for('bookmark.add_event_bookmark', event_id=event.id) }}" class="btn btn-sm btn-info">Bookmark This
+        Event</a>
+    {% endif %}
+    {% endif %}
+
     <div class="event-registration">
         {% if current_user.is_authenticated %}
         {% if is_registered %}
@@ -30,7 +40,23 @@
         {% endif %}
     </div>
 
-    <!-- Feedback Section -->
+    {% if current_user.is_authenticated and (event.club.president_id == current_user.id or current_user.is_main_admin)
+    %}
+    <a href="{{ url_for('poll.create_poll', event_id=event.id) }}" class="btn btn-sm btn-info">Create Poll</a>
+    {% endif %}
+
+    {% if event.polls %}
+    <h3>Polls for this Event</h3>
+    <ul>
+        {% for poll in event.polls %}
+        <li>
+            <a href="{{ url_for('poll.view_poll', poll_id=poll.id) }}">{{ poll.question }}</a>
+            ({{ poll.created_at.strftime('%Y-%m-%d') }})
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     <div class="event-feedback">
         <h3>Feedback</h3>
         {% if average_rating %}
@@ -46,29 +72,22 @@
         {% endif %}
     </div>
 
-    <!-- Manage Attendees (For Club Manager) -->
     {% if current_user.is_authenticated and event.club.president_id == current_user.id %}
     <div class="manage-attendees">
         <h3>Manage Attendees</h3>
         <a href="{{ url_for('event.manage_attendees', event_id=event.id) }}" class="btn btn-info">Manage Attendees</a>
     </div>
     {% endif %}
-    <!-- In event_detail.html -->
+
     {% if current_user.is_authenticated and event.club.president_id == current_user.id %}
-    <form action="{{ url_for('resource.upload_resource', event_id=event.id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ url_for('resource.upload_resource', event_id=event.id) }}" method="POST"
+        enctype="multipart/form-data">
         <label for="file">Upload Resource</label>
         <input type="file" name="file" id="file">
         <button type="submit" class="btn btn-primary">Upload</button>
     </form>
     {% endif %}
-    <!-- if event.club.president_id == current_user.id or user is main admin -->
-    <a href="{{ url_for('poll.create_poll', event_id=event.id) }}">Create Poll</a>
-    
-    <!-- if event.polls exist -->
-    {% for poll in event.polls %}
-    <a href="{{ url_for('poll.view_poll', poll_id=poll.id) }}">{{ poll.question }}</a>
-    {% endfor %}
-    <!-- List of resources -->
+
     <h3>Event Resources</h3>
     {% if event.resources %}
     <ul>

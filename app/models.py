@@ -260,3 +260,17 @@ class PollChoice(db.Model):
     poll_id = db.Column(db.Integer, db.ForeignKey("polls.id"), nullable=False)
     choice_text = db.Column(db.String(255), nullable=False)
     votes = db.Column(db.Integer, default=0)
+
+
+class Bookmark(db.Model):
+    __tablename__ = "bookmarks"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=True)
+    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="bookmarks")
+    event = db.relationship("Event", backref="bookmarks")
+    club = db.relationship("Club", backref="bookmarks")

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Create Poll{% endblock %}
+{% block content %}
+<h2>Create Poll for "{{ event.title }}"</h2>
+<form method="POST">
+    <div class="form-group">
+        <label for="question">Poll Question:</label>
+        <input type="text" name="question" id="question" class="form-control" placeholder="Enter poll question"
+            required>
+    </div>
+
+    <h4>Choices</h4>
+    <div class="choice-inputs">
+        <div>
+            <input type="text" name="choice[]" class="form-control" placeholder="Choice 1" required>
+        </div>
+        <div>
+            <input type="text" name="choice[]" class="form-control" placeholder="Choice 2" required>
+        </div>
+        <div>
+            <input type="text" name="choice[]" class="form-control" placeholder="Choice 3 (optional)">
+        </div>
+        <div>
+            <input type="text" name="choice[]" class="form-control" placeholder="Choice 4 (optional)">
+        </div>
+    </div>
+
+    <br>
+    <button type="submit" class="btn btn-success">Create Poll</button>
+    <a href="{{ url_for('event.event_detail', event_id=event.id) }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

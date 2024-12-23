@@ -24,6 +24,9 @@
     {% else %}
     <p>No events found.</p>
     {% endif %}
+    <h3>Additional Stats</h3>
+    <p>Resources Uploaded: {{ resource_count }}</p>
+    <p>Polls Created: {{ poll_count }}</p>
 
     <p>
         <a href="{{ url_for('report.reports') }}" class="btn btn-info">Full Reports</a>
@@ -66,6 +69,9 @@
     {% else %}
     <p>No significant attendance data available for your clubs.</p>
     {% endif %}
+    <h3>Additional Stats</h3>
+    <p>Resources Uploaded: {{ resource_count }}</p>
+    <p>Polls Created In My Clubs: {{ poll_count }}</p>
 
     <p>
         <a href="{{ url_for('report.reports') }}" class="btn btn-info">View My Club Reports</a>
@@ -98,6 +104,27 @@
     </ul>
     {% else %}
     <p>You are not a member of any clubs, or your membership is pending.</p>
+    {% endif %}
+    <h3>My Bookmarked Events</h3>
+    {% if bookmark_events %}
+    <ul>
+        {% for ev in bookmark_events %}
+        <li><a href="{{ url_for('event.event_detail', event_id=ev.id) }}">{{ ev.title }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>You haven't bookmarked any events.</p>
+    {% endif %}
+    
+    <h3>My Bookmarked Clubs</h3>
+    {% if bookmark_clubs %}
+    <ul>
+        {% for cb in bookmark_clubs %}
+        <li><a href="{{ url_for('club.club_detail', club_id=cb.id) }}">{{ cb.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>You haven't bookmarked any clubs.</p>
     {% endif %}
 </div>
 {% endif %}

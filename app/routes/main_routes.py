@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, render_template, redirect, request, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
-from app.models import Club, Event, EventAttendance, Membership, Post, ContactMessage, User
+from app.models import Club, Event, EventAttendance, EventResource, Membership, Poll, Post, ContactMessage, User
 from app.forms import PostForm, ContactForm, MarkAsReadForm, NotificationPreferencesForm, MarkAllNotificationsReadForm
 from app.core.extensions import db, csrf
 from app.models import Notification
@@ -19,9 +19,10 @@ def allowed_file(filename):
 
 @main_bp.route("/")
 def index():
+    posts = Post.query.order_by(Post.posted_at.desc()).limit(3).all()
     all_clubs = Club.query.order_by(Club.name).all()
     all_events = Event.query.order_by(Event.date.asc()).all()
-    return render_template("main/index.html", clubs=all_clubs, events=all_events)
+    return render_template("main/index.html", posts=posts, clubs=all_clubs, events=all_events)
 
 
 @main_bp.route("/dashboard")
@@ -36,12 +37,17 @@ def dashboard():
 
         top_events = db.session.query(Event.title, db.func.count(EventAttendance.user_id)).join(EventAttendance, Event.id == EventAttendance.event_id).filter(EventAttendance.status == "confirmed").group_by(Event.id).order_by(db.func.count(EventAttendance.user_id).desc()).limit(5).all()
 
+        resource_count = db.session.query(EventResource).join(Event, EventResource.event_id == Event.id).filter(Event.club_id.in_(club_ids)).count()
+
+        poll_count = db.session.query(Poll).join(Event, Poll.event_id == Event.id).filter(Event.club_id.in_(club_ids)).count()
         dashboard_context = {
             "dashboard_mode": "admin",
             "total_users": total_users,
             "total_clubs": total_clubs,
             "total_events": total_events,
             "top_events": top_events,
+            "resource_count": resource_count,
+            "poll_count": poll_count,
         }
 
     elif user.is_club_manager:
@@ -61,6 +67,9 @@ def dashboard():
             .limit(5)
             .all()
         )
+        resource_count = db.session.query(EventResource).join(Event, EventResource.event_id == Event.id).filter(Event.club_id.in_(club_ids)).count()
+
+        poll_count = db.session.query(Poll).join(Event, Poll.event_id == Event.id).filter(Event.club_id.in_(club_ids)).count()
 
         dashboard_context = {
             "dashboard_mode": "manager",
@@ -68,19 +77,37 @@ def dashboard():
             "pending_membership_requests": pending_membership_requests,
             "upcoming_events": upcoming_events,
             "manager_top_events": manager_top_events,
+            "resource_count": resource_count,
+            "poll_count": poll_count,
         }
 
     else:
         user_events = EventAttendance.query.join(Event, EventAttendance.event_id == Event.id).filter(EventAttendance.user_id == user.id, EventAttendance.status.in_(["confirmed", "waiting"])).all()
         joined_clubs = Membership.query.join(Club, Membership.club_id == Club.id).filter(Membership.user_id == user.id, Membership.is_approved == True).all()
 
+        bookmark_events = []
+        bookmark_clubs = []
+        for bm in user.bookmarks:
+            if bm.event:
+                bookmark_events.append(bm.event)
+            elif bm.club:
+                bookmark_clubs.append(bm.club)
+
         dashboard_context = {
             "dashboard_mode": "student",
             "user_events": user_events,
             "joined_clubs": joined_clubs,
+            "bookmark_events": bookmark_events,
+            "bookmark_clubs": bookmark_clubs,
         }
 
     return render_template("main/dashboard.html", user=user, **dashboard_context)
+
+
+@main_bp.route("/posts")
+def posts():
+    all_posts = Post.query.order_by(Post.posted_at.desc()).all()
+    return render_template("main/all_posts.html", posts=all_posts)
 
 
 @main_bp.route("/post/<int:post_id>")
@@ -94,7 +121,6 @@ def view_post(post_id):
 def create_post():
     form = PostForm()
     if form.validate_on_submit():
-        # form.content now contains the HTML from Quill
         post = Post(title=form.title.data, content=form.content.data, author_id=current_user.id)
         db.session.add(post)
         db.session.commit()

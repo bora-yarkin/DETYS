@@ -7,6 +7,7 @@ from .poll_routes import poll_bp
 from .search_routes import search_bp
 from .club_forum_routes import forum_bp
 from .event_resource_routes import resource_bp
+from .bookmark_routes import bookmark_bp
 
 
 def register_routes(app):
@@ -19,3 +20,4 @@ def register_routes(app):
     app.register_blueprint(search_bp, url_prefix="/search")
     app.register_blueprint(forum_bp, url_prefix="/forums")
     app.register_blueprint(resource_bp, url_prefix="/resources")
+    app.register_blueprint(bookmark_bp, url_prefix="/bookmarks")

@@ -6,6 +6,17 @@
 <p>Contact Email: {{ club.contact_email }}</p>
 
 {% if current_user.is_authenticated %}
+{% set club_bookmarked = current_user.bookmarks|selectattr("club_id", "equalto", club.id)|list %}
+{% if club_bookmarked %}
+<a href="{{ url_for('bookmark.remove_club_bookmark', club_id=club.id) }}" class="btn btn-sm btn-warning">Remove
+    Bookmark</a>
+{% else %}
+<a href="{{ url_for('bookmark.add_club_bookmark', club_id=club.id) }}" class="btn btn-sm btn-info">Bookmark This
+    Club</a>
+{% endif %}
+{% endif %}
+
+{% if current_user.is_authenticated %}
 {% if is_member %}
 {% if membership.is_approved %}
 <p>You are a member of this club.</p>
