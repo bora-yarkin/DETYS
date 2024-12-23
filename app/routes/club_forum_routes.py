@@ -18,6 +18,7 @@ def club_forum_topics(club_id):
 
 @forum_bp.route("/<int:club_id>/topics/create", methods=["GET", "POST"])
 @login_required
+@club_manager_required
 def create_forum_topic(club_id):
     club = Club.query.get_or_404(club_id)
     form = ForumTopicForm()
@@ -40,11 +41,15 @@ def view_forum_topic(topic_id):
 
 @forum_bp.route("/topic/<int:topic_id>/post", methods=["POST"])
 @login_required
+@student_required
 def add_forum_post(topic_id):
+    topic = ForumTopic.query.get_or_404(topic_id)
     content = request.form.get("content")
     if content:
         post = ForumPost(topic_id=topic_id, user_id=current_user.id, content=content)
         db.session.add(post)
         db.session.commit()
         flash("Your post has been added.", "success")
+    else:
+        flash("Content cannot be empty.", "danger")
     return redirect(url_for("forum.view_forum_topic", topic_id=topic_id))

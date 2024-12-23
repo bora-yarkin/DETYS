@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, flash, redirect, url_for, send_from_directory
 from flask_login import login_required, current_user
-from app.core.extensions import db, csrf
+from app.core.extensions import db
 from app.models import Event, EventResource
 from werkzeug.utils import secure_filename
 
@@ -19,7 +19,6 @@ def allowed_file(filename):
 @login_required
 def upload_resource(event_id):
     event = Event.query.get_or_404(event_id)
-    # only the club manager who owns this event can upload
     if event.club.president_id != current_user.id and not current_user.is_main_admin:
         flash("You are not authorized to upload resources for this event.", "danger")
         return redirect(url_for("event.event_detail", event_id=event_id))

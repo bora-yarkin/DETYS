@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>DETYS - {% block title %}{% endblock %}</title>
@@ -13,127 +14,22 @@
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
 </head>
+
 <body data-is-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}"
-      data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}">
+    data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}">
 
     {% block navbar %}
-    <!-- Navigation Start -->
-    <div class="navigation">
-        <ul>
-            <li class="list {% if request.endpoint == 'main.index' %}active{% endif %}">
-                <a href="{{ url_for('main.index') }}">
-                    <span class="icon">
-                        <ion-icon name="home-outline"></ion-icon>
-                    </span>
-                    <span class="text">Home</span>
-                </a>
-            </li>
-            <li class="list {% if request.endpoint == 'club.club_list' %}active{% endif %}">
-                <a href="{{ url_for('club.club_list') }}">
-                    <span class="icon">
-                        <ion-icon name="person-outline"></ion-icon>
-                    </span>
-                    <span class="text">Clubs</span>
-                </a>
-            </li>
-            <li class="list {% if request.endpoint == 'event.event_list' %}active{% endif %}">
-                <a href="{{ url_for('event.event_list') }}">
-                    <span class="icon">
-                        <ion-icon name="chatbubble-outline"></ion-icon>
-                    </span>
-                    <span class="text">Events</span>
-                </a>
-            </li>
-            <li class="list {% if request.endpoint.startswith('main.posts') %}active{% endif %}">
-                <a href="{{ url_for('main.posts') }}">
-                    <span class="icon">
-                        <ion-icon name="document-text-outline"></ion-icon>
-                    </span>
-                    <span class="text">Posts</span>
-                </a>
-            </li>
-            {% if current_user.is_authenticated %}
-            <li class="list {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
-                <a href="{{ url_for('main.dashboard') }}">
-                    <span class="icon">
-                        <ion-icon name="settings-outline"></ion-icon>
-                    </span>
-                    <span class="text">Dashboard</span>
-                </a>
-            </li>
-            <li class="list {% if request.endpoint == 'main.notifications' %}active{% endif %}">
-                <a href="{{ url_for('main.notifications') }}">
-                    <span class="icon">
-                        <ion-icon name="notifications-outline"></ion-icon>
-                    </span>
-                    <span class="text">Notifications {% if current_user.unread_notifications_count > 0 %}({{ current_user.unread_notifications_count }}){% endif %}</span>
-                </a>
-            </li>
-            <li class="list">
-                <a href="{{ url_for('auth.logout') }}">
-                    <span class="icon">
-                        <ion-icon name="log-out-outline"></ion-icon>
-                    </span>
-                    <span class="text">Logout</span>
-                </a>
-            </li>
-            {% else %}
-            <li class="list {% if request.endpoint == 'auth.login' %}active{% endif %}">
-                <a href="{{ url_for('auth.login') }}">
-                    <span class="icon">
-                        <ion-icon name="log-in-outline"></ion-icon>
-                    </span>
-                    <span class="text">Login</span>
-                </a>
-            </li>
-            {% endif %}
-            <li class="list {% if request.endpoint == 'main.contact' %}active{% endif %}">
-                <a href="{{ url_for('main.contact') }}">
-                    <span class="icon">
-                        <ion-icon name="call-outline"></ion-icon>
-                    </span>
-                    <span class="text">Contact</span>
-                </a>
-            </li>
-            {% if current_user.is_main_admin %}
-            <li class="list {% if request.endpoint == 'report.reports' %}active{% endif %}">
-                <a href="{{ url_for('report.reports') }}">
-                    <span class="icon">
-                        <ion-icon name="document-text-outline"></ion-icon>
-                    </span>
-                    <span class="text">Reports</span>
-                </a>
-            </li>
-            {% endif %}
-            {% if current_user.is_club_manager %}
-            <li class="list {% if request.endpoint == 'report.reports' %}active{% endif %}">
-                <a href="{{ url_for('report.reports') }}">
-                    <span class="icon">
-                        <ion-icon name="document-text-outline"></ion-icon>
-                    </span>
-                    <span class="text">Reports</span>
-                </a>
-            </li>
-            {% endif %}
-            <form action="{{ url_for('search.search') }}" method="GET" style="display:inline;">
-                <input type="text" name="q" placeholder="Search clubs & events...">
-                <button type="submit">Search</button>
-            </form>
-        </ul>
-        <div class="indicator"></div>
-    </div>
-    <!-- Navigation End -->
+    {% include 'main/navbar.html' %}
     {% endblock %}
 
-    <!-- Main Content -->
     <div class="main-content">
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Footer -->
     <footer>
-        <p>&copy; {{ current_year }} DETYS. All rights reserved.</p>
+        <p>&copy; {{ current_year }} DETYS. No rights Reserved.</p>
     </footer>
 
 </body>
+
 </html>

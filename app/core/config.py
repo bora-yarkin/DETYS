@@ -7,4 +7,4 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     basedir = os.path.abspath(os.path.dirname(__file__))
-    EXPORT_FOLDER = os.path.join(basedir, "exports")
+    EXPORT_FOLDER = os.path.join(basedir, "../static/exports")

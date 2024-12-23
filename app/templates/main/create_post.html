@@ -16,7 +16,6 @@
         {% endfor %}
     </div>
 
-    <!-- Quill Editor Displayed to User -->
     <div class="form-group">
         <label>Post Content</label>
         <div id="editor" style="height:300px; background:#fff;"></div>
@@ -25,10 +24,6 @@
         {% endfor %}
     </div>
 
-    <!-- The actual textarea field:
-         Make it tiny, invisible but still focusable.
-         No display:none, no visibility:hidden.
-         Just very small and transparent so the browser can focus it if needed. -->
     {{ form.content(id="content-textarea",
     style="position:absolute; top:-1000px; left:-1000px; width:1px; height:1px; opacity:0;",
     required=True) }}

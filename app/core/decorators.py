@@ -3,11 +3,11 @@ from flask import abort
 from flask_login import current_user
 
 
-def role_required(role):
+def roles_required(*roles):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if not current_user.is_authenticated or current_user.role != role:
+            if not current_user.is_authenticated or current_user.role not in roles:
                 abort(403)
             return f(*args, **kwargs)
 
@@ -16,23 +16,7 @@ def role_required(role):
     return decorator
 
 
-def student_required(f):
-    return role_required("student")(f)
-
-
-def club_manager_required(f):
-    return role_required("club_manager")(f)
-
-
-def main_admin_required(f):
-    return role_required("main_admin")(f)
-
-
-def admin_or_manager_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or (not current_user.is_main_admin and not current_user.is_club_manager):
-            abort(403)
-        return f(*args, **kwargs)
-
-    return decorated_function
+student_required = roles_required("student")
+club_manager_required = roles_required("club_manager")
+main_admin_required = roles_required("main_admin")
+admin_or_manager_required = roles_required("main_admin", "club_manager")
