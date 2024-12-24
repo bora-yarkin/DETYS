@@ -1,30 +1,37 @@
 {% extends 'base.html' %}
-{% block title %}{{ club.name }} Forum{% endblock %}
+{% block title %}Forum Topics for {{ club.name }}{% endblock %}
 {% block content %}
-<h2>Forum Topics for {{ club.name }}</h2>
+<h2>{{ club.name }} Forum</h2>
 
-{% if current_user.is_club_manager and club.president_id == current_user.id %}
-<a href="{{ url_for('forum.create_forum_topic', club_id=club.id) }}" class="btn btn-sm btn-info">
+<form method="GET" action="">
+    <label for="category_id">Filter by Category:</label>
+    <select name="category_id" id="category_id">
+        <option value="">All</option>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if selected_category_id==cat.id %}selected{% endif %}>
+            {{ cat.name }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+</form>
+
+<a href="{{ url_for('forum.create_forum_topic', club_id=club.id) }}" class="btn btn-primary">
     Create New Topic
 </a>
-{% endif %}
 
 <ul>
     {% for topic in topics %}
     <li>
-        <a href="{{ url_for('forum.view_forum_topic', topic_id=topic.id) }}">
-            {{ topic.title }}
-        </a>
+        <a href="{{ url_for('forum.view_forum_topic', topic_id=topic.id) }}">{{ topic.title }}</a>
         <br>
-        <small>
-            Created {{ topic.created_at.strftime('%Y-%m-%d %H:%M') }}
-            by {{ topic.creator.username if topic.creator else "Unknown" }}
-        </small>
+        <small>Category: {{ topic.forum_category.name if topic.forum_category else "None" }}</small>
+        <small>Created: {{ topic.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
     </li>
     {% endfor %}
 </ul>
 
 {% if not topics %}
-<p>No topics yet. Be the first to create one!</p>
+<p>No topics found.</p>
 {% endif %}
 {% endblock %}
