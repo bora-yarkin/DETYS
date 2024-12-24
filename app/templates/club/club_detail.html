@@ -43,4 +43,8 @@
     </li>
     {% endfor %}
 </ul>
+
+<h3>Club Forum</h3>
+<a href="{{ url_for('forum.club_forum_topics', club_id=club.id) }}" class="btn btn-primary">View Forum</a>
+
 {% endblock %}

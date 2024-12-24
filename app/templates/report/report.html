@@ -60,8 +60,13 @@
 {% endif %}
 
 <p>
-    <a href="{{ url_for('report.download_pdf', category_id=selected_category_id) }}" class="btn btn-primary">Download
-        PDF</a>
+    <a href="{{ url_for('report.download_pdf', category_id=selected_category_id) }}" class="btn btn-primary">Download PDF</a>
+    <hr>
+    <a href="{{ url_for('report.export_feedback_csv') }}" class="btn btn-primary">Export Feedback CSV</a>
+    <hr>
+    <a href="{{ url_for('report.export_attendance_csv') }}" class="btn btn-primary">Export Attendance CSV</a>
 </p>
-<!-- Adjust CSV routes similarly if you want to pass category_id to them -->
+<p>
+    
+</p>
 {% endblock %}

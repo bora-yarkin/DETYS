@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{{ club.name }} Forum{% endblock %}
+{% block content %}
+<h2>Forum Topics for {{ club.name }}</h2>
+
+{% if current_user.is_club_manager and club.president_id == current_user.id %}
+<a href="{{ url_for('forum.create_forum_topic', club_id=club.id) }}" class="btn btn-sm btn-info">
+    Create New Topic
+</a>
+{% endif %}
+
+<ul>
+    {% for topic in topics %}
+    <li>
+        <a href="{{ url_for('forum.view_forum_topic', topic_id=topic.id) }}">
+            {{ topic.title }}
+        </a>
+        <br>
+        <small>
+            Created {{ topic.created_at.strftime('%Y-%m-%d %H:%M') }}
+            by {{ topic.creator.username if topic.creator else "Unknown" }}
+        </small>
+    </li>
+    {% endfor %}
+</ul>
+
+{% if not topics %}
+<p>No topics yet. Be the first to create one!</p>
+{% endif %}
+{% endblock %}

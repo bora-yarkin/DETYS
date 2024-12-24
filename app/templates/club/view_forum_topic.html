@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{{ topic.title }}{% endblock %}
+{% block content %}
+<h2>{{ topic.title }}</h2>
+<p><strong>Club:</strong> {{ topic.club.name }}</p>
+<p><strong>Started by:</strong> {{ topic.creator.username if topic.creator else "Unknown" }}
+    on {{ topic.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+
+<hr>
+
+<h4>Posts</h4>
+{% if posts %}
+<ul>
+    {% for post in posts %}
+    <li style="margin-bottom:10px;">
+        <strong>{{ post.user.username }}:</strong> {{ post.content }}<br>
+        <small>{{ post.posted_at.strftime('%Y-%m-%d %H:%M') }}</small>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No posts yet. Start the conversation!</p>
+{% endif %}
+
+<!-- Add a new post (students only) -->
+<form action="{{ url_for('forum.add_forum_post', topic_id=topic.id) }}" method="POST" style="margin-top:20px;">
+    <div class="form-group">
+        <label for="content">Add a Post:</label>
+        <textarea name="content" id="content" rows="3" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

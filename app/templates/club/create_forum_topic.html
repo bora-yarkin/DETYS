@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Create Forum Topic{% endblock %}
+{% block content %}
+<h2>Create a Forum Topic for {{ club.name }}</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.title.label }}
+        {{ form.title(class="form-control") }}
+        {% for error in form.title.errors %}
+        <span class="error">{{ error }}</span>
+        {% endfor %}
+    </div>
+    {{ form.submit(class="btn btn-success", value="Create Topic") }}
+</form>
+{% endblock %}
