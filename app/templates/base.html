@@ -5,13 +5,25 @@
     <meta charset="UTF-8">
     <title>DETYS - {% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        integrity="sha384-9ND2Oam2VVmaLO1tmdKNRbw5EaDL9H9pY+ZckGFAq87dFYNRp5v1zY5p1EmT7ncl" crossorigin="anonymous">
+
     {% block styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     {% endblock %}
+
     <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+0BfGDe81I4gkc7Z4IoS2q6MG2MWt"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
 </head>
 
@@ -22,14 +34,26 @@
     {% include 'main/navbar.html' %}
     {% endblock %}
 
-    <div class="main-content">
+    <div class="container my-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
         {% block content %}{% endblock %}
     </div>
 
-    <footer>
-        <p>&copy; {{ current_year }} DETYS. No rights Reserved.</p>
+    <footer class="text-center py-4">
+        <p>&copy; {{ current_year }} DETYS. No rights reserved.</p>
     </footer>
-
 </body>
 
 </html>
