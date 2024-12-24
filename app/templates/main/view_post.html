@@ -10,6 +10,13 @@
     <div class="post-content">
         {{ post.content|safe }}
     </div>
-    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Back to Home</a>
+    <hr>
+
+    {% if current_user.is_authenticated and (current_user.is_main_admin or current_user.is_club_manager) %}
+    <a href="{{ url_for('main.edit_post', post_id=post.id) }}" class="btn btn-sm btn-warning">Edit</a>
+    <a href="{{ url_for('main.confirm_delete_post', post_id=post.id) }}" class="btn btn-sm btn-danger">Delete</a>
+    {% endif %}
+
+    <a href="{{ url_for('main.posts') }}" class="btn btn-secondary">Back to All Posts</a>
 </div>
 {% endblock %}
