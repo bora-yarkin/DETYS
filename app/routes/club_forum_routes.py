@@ -4,7 +4,7 @@ from flask_wtf.csrf import generate_csrf
 from app.core.extensions import db
 from app.models import Club, ForumTopic, ForumPost, ForumCategory, ForumPostVote, ForumPoll, ForumPollChoice, Membership
 from app.forms import ForumTopicForm, ForumPostForm, ForumPollForm
-from app.core.decorators import club_member_required, club_member_or_manager_required
+from app.core.decorators import club_member_or_manager_required
 
 forum_bp = Blueprint("forum", __name__)
 
@@ -73,27 +73,22 @@ def view_forum_topic(topic_id):
 @login_required
 def add_forum_post(topic_id):
     topic = ForumTopic.query.get_or_404(topic_id)
-    club_id = topic.club_id
 
-    membership = Membership.query.filter_by(club_id=club_id, user_id=current_user.id, is_approved=True).first()
-    if not membership:
-        abort(403)
+    club = Club.query.get_or_404(topic.club_id)
+    if club.president_id != current_user.id and not current_user.is_main_admin:
+        # Check membership
+        membership = Membership.query.filter_by(club_id=topic.club_id, user_id=current_user.id, is_approved=True).first()
+        if not membership:
+            abort(403)
 
     form = ForumPostForm()
-    csrf_token = generate_csrf()
-
-    if request.method == "POST":
-        form_csrf = request.form.get("csrf_token")
-        if not form_csrf or form_csrf != csrf_token:
-            abort(400, "Invalid or missing CSRF token.")
-
-        if form.validate_on_submit():
-            post = ForumPost(topic_id=topic_id, user_id=current_user.id, content=form.content.data)
-            db.session.add(post)
-            db.session.commit()
-            flash("Your post has been added.", "success")
-        else:
-            flash("Content cannot be empty.", "danger")
+    if form.validate_on_submit():
+        new_post = ForumPost(topic_id=topic_id, user_id=current_user.id, content=form.content.data)
+        db.session.add(new_post)
+        db.session.commit()
+        flash("Reply added!", "success")
+    else:
+        flash("Failed to create reply. Check content or permissions.", "danger")
 
     return redirect(url_for("forum.view_forum_topic", topic_id=topic_id))
 
@@ -129,7 +124,7 @@ def vote_forum_post(post_id):
 
 @forum_bp.route("/topic/<int:topic_id>/poll/create", methods=["GET", "POST"])
 @login_required
-@club_member_required
+@club_member_or_manager_required
 def create_forum_poll(topic_id):
     topic = ForumTopic.query.get_or_404(topic_id)
     form = ForumPollForm()
@@ -154,6 +149,51 @@ def create_forum_poll(topic_id):
             return redirect(url_for("forum.view_forum_topic", topic_id=topic.id))
 
     return render_template("club/create_forum_poll.html", topic=topic, form=form, csrf_token=csrf_token)
+
+
+@forum_bp.route("/topic/<int:topic_id>/delete", methods=["POST"])
+@login_required
+def delete_forum_topic(topic_id):
+    topic = ForumTopic.query.get_or_404(topic_id)
+    club_id = topic.club_id
+
+    from app.models import Club, Membership
+
+    club = Club.query.get_or_404(club_id)
+    membership = Membership.query.filter_by(user_id=current_user.id, club_id=club_id, is_approved=True).first()
+    if not current_user.is_main_admin and club.president_id != current_user.id and not membership:
+        abort(403)
+
+    if topic.created_by != current_user.id and club.president_id != current_user.id and not current_user.is_main_admin:
+        abort(403)
+
+    db.session.delete(topic)
+    db.session.commit()
+    flash("Topic deleted.", "success")
+    return redirect(url_for("forum.club_forum_topics", club_id=club_id))
+
+
+@forum_bp.route("/post/<int:post_id>/delete", methods=["POST"])
+@login_required
+def delete_forum_post(post_id):
+    post = ForumPost.query.get_or_404(post_id)
+    topic = post.topic
+    club_id = topic.club_id
+
+    from app.models import Club, Membership
+
+    club = Club.query.get_or_404(club_id)
+    membership = Membership.query.filter_by(user_id=current_user.id, club_id=club_id, is_approved=True).first()
+    if not current_user.is_main_admin and club.president_id != current_user.id and not membership:
+        abort(403)
+
+    if post.user_id != current_user.id and club.president_id != current_user.id and not current_user.is_main_admin:
+        abort(403)
+
+    db.session.delete(post)
+    db.session.commit()
+    flash("Post deleted.", "success")
+    return redirect(url_for("forum.view_forum_topic", topic_id=topic.id))
 
 
 @forum_bp.route("/poll/<int:poll_id>/vote", methods=["POST"])

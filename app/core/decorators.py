@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import abort
 from flask_login import current_user
-from app.models import Membership
+from app.models import Membership, Club
 
 
 def roles_required(*roles):
@@ -43,9 +43,16 @@ def club_member_or_manager_required(f):
         club_id = kwargs.get("club_id")
         if not current_user.is_authenticated:
             abort(403)
+        if current_user.is_main_admin:
+            return f(*args, **kwargs)
+        club = Club.query.get_or_404(club_id)
+        if club.president_id == current_user.id:
+            return f(*args, **kwargs)
         membership = Membership.query.filter_by(user_id=current_user.id, club_id=club_id, is_approved=True).first()
-        if not membership and current_user.role != "club_manager":
+
+        if not membership:
             abort(403)
+
         return f(*args, **kwargs)
 
     return wrapper

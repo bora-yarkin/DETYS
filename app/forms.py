@@ -109,7 +109,7 @@ class NotificationPreferencesForm(FlaskForm):
 
 class ForumTopicForm(FlaskForm):
     title = StringField("Topic Title", validators=[DataRequired(), Length(min=5, max=200)])
-    category_id = SelectField("Category", coerce=int)  # We'll populate choices dynamically
+    category_id = SelectField("Category", coerce=int)
     content = TextAreaField("Initial Post Content", validators=[DataRequired()])
     submit = SubmitField("Create Topic")
 
@@ -121,7 +121,6 @@ class ForumPostForm(FlaskForm):
 
 class ForumPollForm(FlaskForm):
     question = StringField("Poll Question", validators=[DataRequired()])
-    # We might want to dynamically add multiple choices in front-end JavaScript
     choice1 = StringField("Choice 1", validators=[DataRequired()])
     choice2 = StringField("Choice 2", validators=[DataRequired()])
     choice3 = StringField("Choice 3")
