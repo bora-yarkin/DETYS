@@ -47,10 +47,10 @@
     <div class="blog-post">
         <h3>{{ post.title }}</h3>
         <p>{{ post.content[:200]|safe }}...</p>
-        <a href="{{ url_for('main.view_post', post_id=post.id) }}">Read more</a>
+        <a href="{{ url_for('post.view_post', post_id=post.id) }}">Read more</a>
     </div>
     {% endfor %}
-    <a href="{{ url_for('main.posts') }}" class="btn btn-secondary">Show All Posts</a>
+    <a href="{{ url_for('post.posts') }}" class="btn btn-secondary">Show All Posts</a>
     {% else %}
     <p>No posts available.</p>
     {% endif %}

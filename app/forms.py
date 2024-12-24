@@ -105,24 +105,3 @@ class NotificationPreferencesForm(FlaskForm):
     receive_membership_notifications = BooleanField("Receive Membership Notifications")
     receive_feedback_notifications = BooleanField("Receive Feedback Notifications")
     submit = SubmitField("Update Preferences")
-
-
-class ForumTopicForm(FlaskForm):
-    title = StringField("Topic Title", validators=[DataRequired(), Length(min=5, max=200)])
-    category_id = SelectField("Category", coerce=int)
-    content = TextAreaField("Initial Post Content", validators=[DataRequired()])
-    submit = SubmitField("Create Topic")
-
-
-class ForumPostForm(FlaskForm):
-    content = TextAreaField("Content", validators=[DataRequired()])
-    submit = SubmitField("Post")
-
-
-class ForumPollForm(FlaskForm):
-    question = StringField("Poll Question", validators=[DataRequired()])
-    choice1 = StringField("Choice 1", validators=[DataRequired()])
-    choice2 = StringField("Choice 2", validators=[DataRequired()])
-    choice3 = StringField("Choice 3")
-    choice4 = StringField("Choice 4")
-    submit = SubmitField("Create Poll")

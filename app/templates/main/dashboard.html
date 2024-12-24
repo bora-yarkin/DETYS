@@ -31,7 +31,7 @@
     <p>Resources Uploaded: {{ resource_count }}</p>
     <p>Polls Created: {{ poll_count }}</p>
         <div class="new-post-section">
-            <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">Create New Post</a>
+            <a href="{{ url_for('post.create_post') }}" class="btn btn-primary">Create New Post</a>
         </div>
     <p>
         <a href="{{ url_for('report.reports') }}" class="btn btn-info">Full Reports</a>
@@ -80,7 +80,7 @@
     <p>Polls Created In My Clubs: {{ poll_count }}</p>
 
     <div class="new-post-section">
-        <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">Create New Post</a>
+        <a href="{{ url_for('post.create_post') }}" class="btn btn-primary">Create New Post</a>
     </div>
 
     <p>

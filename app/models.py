@@ -201,98 +201,6 @@ class Notification(db.Model):
         return f"<Notification id={self.id}, user_id={self.user_id}, type={self.notification_type}, is_read={self.is_read}>"
 
 
-class ForumCategory(db.Model):
-    __tablename__ = "forum_categories"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Relationship to topics
-    topics = db.relationship("ForumTopic", back_populates="forum_category", cascade="all, delete-orphan")
-
-    def __repr__(self):
-        return f"<ForumCategory {self.name}>"
-
-
-class ForumTopic(db.Model):
-    __tablename__ = "forum_topics"
-    id = db.Column(db.Integer, primary_key=True)
-    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey("forum_categories.id"), nullable=True)  # new
-    title = db.Column(db.String(200), nullable=False)
-    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Existing relationships
-    club = db.relationship("Club", backref="forum_topics")
-    posts = db.relationship("ForumPost", backref="topic", cascade="all, delete-orphan")
-    forum_category = db.relationship("ForumCategory", back_populates="topics", lazy="joined")
-    forum_polls = db.relationship("ForumPoll", back_populates="topic", cascade="all, delete-orphan")
-    creator = db.relationship("User", backref="topics_created", foreign_keys=[created_by])
-
-    def __repr__(self):
-        return f"<ForumTopic {self.title}>"
-
-
-class ForumPost(db.Model):
-    __tablename__ = "forum_posts"
-    id = db.Column(db.Integer, primary_key=True)
-    topic_id = db.Column(db.Integer, db.ForeignKey("forum_topics.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    posted_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    votes = db.relationship("ForumPostVote", back_populates="post", cascade="all, delete-orphan")
-
-    user = db.relationship("User")
-
-    @property
-    def score(self):
-        up = sum(1 for v in self.votes if v.vote_type == "up")
-        down = sum(1 for v in self.votes if v.vote_type == "down")
-        return up - down
-
-    def __repr__(self):
-        return f"<ForumPost id={self.id} topic_id={self.topic_id}>"
-
-
-class ForumPostVote(db.Model):
-    __tablename__ = "forum_post_votes"
-    id = db.Column(db.Integer, primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey("forum_posts.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-
-    # "up" or "down"
-    vote_type = db.Column(db.String(10), nullable=False, default="up")
-
-    post = db.relationship("ForumPost", back_populates="votes")
-    user = db.relationship("User")
-
-    def __repr__(self):
-        return f"<ForumPostVote post_id={self.post_id}, user_id={self.user_id}, type={self.vote_type}>"
-
-
-class ForumPoll(db.Model):
-    __tablename__ = "forum_polls"
-    id = db.Column(db.Integer, primary_key=True)
-    topic_id = db.Column(db.Integer, db.ForeignKey("forum_topics.id"), nullable=False)
-    question = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    topic = db.relationship("ForumTopic", back_populates="forum_polls")
-    choices = db.relationship("ForumPollChoice", back_populates="poll", cascade="all, delete-orphan")
-
-
-class ForumPollChoice(db.Model):
-    __tablename__ = "forum_poll_choices"
-    id = db.Column(db.Integer, primary_key=True)
-    poll_id = db.Column(db.Integer, db.ForeignKey("forum_polls.id"), nullable=False)
-    choice_text = db.Column(db.String(255), nullable=False)
-    votes = db.Column(db.Integer, default=0)
-
-    poll = db.relationship("ForumPoll", back_populates="choices")
-
-
 class EventResource(db.Model):
     __tablename__ = "event_resources"
 
@@ -300,7 +208,6 @@ class EventResource(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
     filename = db.Column(db.String(255), nullable=False)
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
-    # optional: store the file path or relative path
     filepath = db.Column(db.String(255), nullable=False)
 
     event = db.relationship("Event", backref="resources")

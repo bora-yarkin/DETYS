@@ -1,20 +1,11 @@
 import os
-from flask import Blueprint, render_template, redirect, request, url_for, flash, abort, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
-from flask_wtf.csrf import generate_csrf
 from app.models import Club, Event, EventAttendance, EventResource, Membership, Poll, Post, ContactMessage, User, Notification
-from app.forms import PostForm, ContactForm, MarkAsReadForm, NotificationPreferencesForm, MarkAllNotificationsReadForm
-from app.core.extensions import db, csrf
-from werkzeug.utils import secure_filename
+from app.forms import ContactForm, MarkAsReadForm, MarkAllNotificationsReadForm
+from app.core.extensions import db
 
 main_bp = Blueprint("main", __name__)
-
-UPLOAD_FOLDER = "app/static/uploads"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @main_bp.route("/")
@@ -37,9 +28,10 @@ def dashboard():
 
         top_events = db.session.query(Event.title, db.func.count(EventAttendance.user_id)).join(EventAttendance, Event.id == EventAttendance.event_id).filter(EventAttendance.status == "confirmed").group_by(Event.id).order_by(db.func.count(EventAttendance.user_id).desc()).limit(5).all()
 
-        resource_count = db.session.query(EventResource).join(Event, EventResource.event_id == Event.id).filter(Event.club_id.in_([club.id for club in Club.query.all()])).count()
+        club_ids = [club.id for club in db.session.query(Club.id).all()]
+        resource_count = db.session.query(EventResource).filter(EventResource.event_id.in_(db.session.query(Event.id).filter(Event.club_id.in_(club_ids)))).count()
+        poll_count = db.session.query(Poll).filter(Poll.event_id.in_(db.session.query(Event.id).filter(Event.club_id.in_(club_ids)))).count()
 
-        poll_count = db.session.query(Poll).join(Event, Poll.event_id == Event.id).filter(Event.club_id.in_([club.id for club in Club.query.all()])).count()
         dashboard_context = {
             "dashboard_mode": "admin",
             "total_users": total_users,
@@ -67,9 +59,9 @@ def dashboard():
             .limit(5)
             .all()
         )
-        resource_count = db.session.query(EventResource).join(Event, EventResource.event_id == Event.id).filter(Event.club_id.in_(club_ids)).count()
 
-        poll_count = db.session.query(Poll).join(Event, Poll.event_id == Event.id).filter(Event.club_id.in_(club_ids)).count()
+        resource_count = db.session.query(EventResource).filter(EventResource.event_id.in_(db.session.query(Event.id).filter(Event.club_id.in_(club_ids)))).count()
+        poll_count = db.session.query(Poll).filter(Poll.event_id.in_(db.session.query(Event.id).filter(Event.club_id.in_(club_ids)))).count()
 
         dashboard_context = {
             "dashboard_mode": "manager",
@@ -97,110 +89,6 @@ def dashboard():
         }
 
     return render_template("main/dashboard.html", user=user, **dashboard_context)
-
-
-def can_edit_or_delete_post(post):
-    if current_user.is_main_admin:
-        return True
-
-    if current_user.is_club_manager and post.author_id == current_user.id:
-        return True
-
-    return False
-
-
-@main_bp.route("/posts")
-def posts():
-    all_posts = Post.query.order_by(Post.posted_at.desc()).all()
-    return render_template("main/all_posts.html", posts=all_posts)
-
-
-@main_bp.route("/post/<int:post_id>")
-def view_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    return render_template("main/view_post.html", post=post)
-
-
-@main_bp.route("/create_post", methods=["GET", "POST"])
-@login_required
-def create_post():
-    form = PostForm()
-    if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author_id=current_user.id)
-        db.session.add(post)
-        db.session.commit()
-        flash("Post created successfully!", "success")
-        return redirect(url_for("main.dashboard"))
-    return render_template("main/create_post.html", form=form)
-
-
-@main_bp.route("/post/<int:post_id>/edit", methods=["GET", "POST"])
-@login_required
-def edit_post(post_id):
-    post = Post.query.get_or_404(post_id)
-
-    if not can_edit_or_delete_post(post):
-        abort(403)
-
-    form = PostForm(obj=post)
-    if form.validate_on_submit():
-        post.title = form.title.data
-        post.content = form.content.data
-        db.session.commit()
-        flash("Post updated successfully!", "success")
-        return redirect(url_for("main.view_post", post_id=post.id))
-
-    return render_template("main/edit_post.html", form=form, post=post)
-
-
-@main_bp.route("/post/<int:post_id>/delete", methods=["POST"])
-@login_required
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if not can_edit_or_delete_post(post):
-        abort(403)
-
-    try:
-        db.session.delete(post)
-        db.session.commit()
-        flash("Post deleted successfully!", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Error deleting post: {str(e)}", "danger")
-
-    return redirect(url_for("main.posts"))
-
-
-@main_bp.route("/post/<int:post_id>/confirm_delete", methods=["GET", "POST"])
-@login_required
-def confirm_delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if not can_edit_or_delete_post(post):
-        abort(403)
-
-    csrf_token = generate_csrf()
-    return render_template("main/confirm_delete_post.html", post=post, csrf_token=csrf_token)
-
-
-@main_bp.route("/upload_image", methods=["POST"])
-@login_required
-@csrf.exempt
-def upload_image():
-    if "file" not in request.files:
-        return jsonify({"error": "No file found"}), 400
-
-    file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"error": "No selected file"}), 400
-
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(filepath)
-        file_url = url_for("static", filename="uploads/" + filename, _external=False)
-        return jsonify({"url": file_url})
-    else:
-        return jsonify({"error": "File type not allowed"}), 400
 
 
 @main_bp.route("/contact", methods=["GET", "POST"])
@@ -251,20 +139,6 @@ def mark_all_notifications_read():
     db.session.commit()
     flash("All notifications marked as read.", "success")
     return redirect(url_for("main.notifications"))
-
-
-@main_bp.route("/preferences", methods=["GET", "POST"])
-@login_required
-def preferences():
-    form = NotificationPreferencesForm(obj=current_user.preferences)
-    if form.validate_on_submit():
-        current_user.preferences.receive_event_notifications = form.receive_event_notifications.data
-        current_user.preferences.receive_membership_notifications = form.receive_membership_notifications.data
-        current_user.preferences.receive_feedback_notifications = form.receive_feedback_notifications.data
-        db.session.commit()
-        flash("Your notification preferences have been updated.", "success")
-        return redirect(url_for("main.preferences"))
-    return render_template("main/preferences.html", form=form)
 
 
 @main_bp.app_errorhandler(403)

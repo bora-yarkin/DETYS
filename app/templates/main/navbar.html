@@ -4,7 +4,7 @@
         {'endpoint': 'main.index', 'icon': 'home-outline', 'text': 'Home'},
         {'endpoint': 'club.club_list', 'icon': 'person-outline', 'text': 'Clubs'},
         {'endpoint': 'event.event_list', 'icon': 'chatbubble-outline', 'text': 'Events'},
-        {'endpoint': 'main.posts', 'icon': 'document-text-outline', 'text': 'Posts'}
+        {'endpoint': 'post.posts', 'icon': 'document-text-outline', 'text': 'Posts'}
         ] %}
         {% for item in nav_items %}
         <li class="list {% if request.endpoint == item.endpoint %}active{% endif %}">
