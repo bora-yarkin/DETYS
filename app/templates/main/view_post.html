@@ -12,9 +12,14 @@
     </div>
     <hr>
 
-    {% if current_user.is_authenticated and (current_user.is_main_admin or current_user.is_club_manager) %}
+    {% if current_user.is_authenticated %}
+    {% if current_user.is_main_admin %}
     <a href="{{ url_for('main.edit_post', post_id=post.id) }}" class="btn btn-sm btn-warning">Edit</a>
     <a href="{{ url_for('main.confirm_delete_post', post_id=post.id) }}" class="btn btn-sm btn-danger">Delete</a>
+    {% elif current_user.is_club_manager and post.author_id == current_user.id %}
+    <a href="{{ url_for('main.edit_post', post_id=post.id) }}" class="btn btn-sm btn-warning">Edit</a>
+    <a href="{{ url_for('main.confirm_delete_post', post_id=post.id) }}" class="btn btn-sm btn-danger">Delete</a>
+    {% endif %}
     {% endif %}
 
     <a href="{{ url_for('main.posts') }}" class="btn btn-secondary">Back to All Posts</a>

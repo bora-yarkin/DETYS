@@ -102,10 +102,10 @@ def dashboard():
 def can_edit_or_delete_post(post):
     if current_user.is_main_admin:
         return True
-    if current_user.is_club_manager:
+
+    if current_user.is_club_manager and post.author_id == current_user.id:
         return True
-    if post.author_id == current_user.id:
-        return True
+
     return False
 
 

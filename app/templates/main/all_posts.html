@@ -10,6 +10,16 @@
         <p><em>Posted by {{ post.author.username }} on {{ post.posted_at.strftime('%Y-%m-%d %H:%M') }}</em></p>
         <p>{{ post.content[:200]|safe }}...</p>
         <a href="{{ url_for('main.view_post', post_id=post.id) }}">Read more</a>
+
+            {% if current_user.is_authenticated %}
+            {% if current_user.is_main_admin %}
+            <a href="{{ url_for('main.edit_post', post_id=post.id) }}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{{ url_for('main.confirm_delete_post', post_id=post.id) }}" class="btn btn-sm btn-danger">Delete</a>
+            {% elif current_user.is_club_manager and post.author_id == current_user.id %}
+            <a href="{{ url_for('main.edit_post', post_id=post.id) }}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{{ url_for('main.confirm_delete_post', post_id=post.id) }}" class="btn btn-sm btn-danger">Delete</a>
+            {% endif %}
+            {% endif %}
     </div>
 {% endfor %}
 {% else %}
