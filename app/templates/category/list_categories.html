@@ -24,7 +24,6 @@
 
                 <form action="{{ url_for('category.delete_category', category_id=cat.id) }}" method="POST"
                     style="display:inline;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>

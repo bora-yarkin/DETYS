@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
-from flask_wtf.csrf import generate_csrf
 from app.models import Club, Membership
 from app.forms import ClubCreationForm
 from app.core.extensions import db
@@ -83,8 +82,7 @@ def confirm_delete_club(club_id):
     club = Club.query.get_or_404(club_id)
     if club.president_id != current_user.id:
         abort(403)
-    csrf_token = generate_csrf()
-    return render_template("club/confirm_delete.html", club=club, csrf_token=csrf_token)
+    return render_template("club/confirm_delete.html", club=club)
 
 
 @club_bp.route("/<int:club_id>/join")

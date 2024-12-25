@@ -1,10 +1,9 @@
 import os
 from flask import Blueprint, jsonify, render_template, redirect, url_for, flash, abort, jsonify, request
 from flask_login import login_required, current_user
-from flask_wtf.csrf import generate_csrf
 from app.models import Post
 from app.forms import PostForm
-from app.core.extensions import db, csrf
+from app.core.extensions import db
 from werkzeug.utils import secure_filename
 
 post_bp = Blueprint("post", __name__)
@@ -95,14 +94,11 @@ def confirm_delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     if not can_edit_or_delete_post(post):
         abort(403)
-
-    csrf_token = generate_csrf()
-    return render_template("post/confirm_delete_post.html", post=post, csrf_token=csrf_token)
+    return render_template("post/confirm_delete_post.html", post=post)
 
 
 @post_bp.route("/upload_image", methods=["POST"])
 @login_required
-@csrf.exempt
 def upload_image():
     if "file" not in request.files:
         return jsonify({"error": "No file found"}), 400

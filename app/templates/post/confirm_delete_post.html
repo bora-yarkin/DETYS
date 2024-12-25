@@ -4,7 +4,6 @@
 <h2>Are you sure you want to delete "{{ post.title }}"?</h2>
 <p>This action cannot be undone.</p>
 <form action="{{ url_for('post.delete_post', post_id=post.id) }}" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <button type="submit" class="btn btn-danger">Delete Post</button>
     <a href="{{ url_for('post.view_post', post_id=post.id) }}" class="btn btn-secondary">Cancel</a>
 </form>

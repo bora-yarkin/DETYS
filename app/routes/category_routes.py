@@ -3,7 +3,6 @@ from flask_login import login_required
 from app.core.extensions import db
 from app.models import Category
 from app.core.decorators import main_admin_required
-from flask_wtf.csrf import generate_csrf
 
 category_bp = Blueprint("category", __name__)
 
@@ -13,9 +12,8 @@ category_bp = Blueprint("category", __name__)
 @main_admin_required
 def list_categories():
     categories = Category.query.order_by(Category.name.asc()).all()
-    # We'll generate a CSRF token here if we do any form operations on this page.
-    csrf_token = generate_csrf()
-    return render_template("category/list_categories.html", categories=categories, csrf_token=csrf_token)
+
+    return render_template("category/list_categories.html", categories=categories)
 
 
 @category_bp.route("/categories/create", methods=["GET", "POST"])
@@ -23,7 +21,6 @@ def list_categories():
 @main_admin_required
 def create_category():
     if request.method == "POST":
-        # Since this is a POST route, we must ensure we have a CSRF token in the form.
         name = request.form.get("name", "").strip()
         if not name:
             flash("Category name is required.", "danger")
@@ -40,9 +37,7 @@ def create_category():
         flash("Category created successfully!", "success")
         return redirect(url_for("category.list_categories"))
 
-    # Generate CSRF if we want a hidden field in the template
-    csrf_token = generate_csrf()
-    return render_template("category/create_category.html", csrf_token=csrf_token)
+    return render_template("category/create_category.html")
 
 
 @category_bp.route("/categories/<int:category_id>/edit", methods=["GET", "POST"])
@@ -66,8 +61,7 @@ def edit_category(category_id):
         flash("Category updated successfully!", "success")
         return redirect(url_for("category.list_categories"))
 
-    csrf_token = generate_csrf()
-    return render_template("category/edit_category.html", cat=cat, csrf_token=csrf_token)
+    return render_template("category/edit_category.html", cat=cat)
 
 
 @category_bp.route("/categories/<int:category_id>/delete", methods=["POST"])

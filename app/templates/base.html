@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>DETYS - {% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
         integrity="sha384-9ND2Oam2VVmaLO1tmdKNRbw5EaDL9H9pY+ZckGFAq87dFYNRp5v1zY5p1EmT7ncl" crossorigin="anonymous">
@@ -47,8 +48,10 @@
         </div>
         {% endif %}
         {% endwith %}
-
-        {% block content %}{% endblock %}
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            {% block content %}{% endblock %}
+        </form>
     </div>
 
     <footer class="text-center py-4">

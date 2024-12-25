@@ -1,6 +1,5 @@
 from flask import Blueprint, abort, render_template, redirect, request, url_for, flash
 from flask_login import login_required, current_user
-from flask_wtf.csrf import generate_csrf
 from datetime import datetime
 from app.core.notifications import send_notification
 from app.models import Category, Club, Event, EventAttendance, EventFeedback
@@ -216,6 +215,4 @@ def confirm_delete_event(event_id):
     if not can_edit_or_delete_event(event):
         abort(403)
 
-    csrf_token = generate_csrf()
-
-    return render_template("event/confirm_delete.html", event=event, csrf_token=csrf_token)
+    return render_template("event/confirm_delete.html", event=event)
