@@ -72,7 +72,7 @@ def event_detail(event_id):
     return render_template("event/event_detail.html", event=event, is_registered=is_registered, status=status, can_provide_feedback=can_provide_feedback, feedback_submitted=feedback_submitted, average_rating=average_rating)
 
 
-@event_bp.route("/<int:event_id>/cancel_registration")
+@event_bp.route("/<int:event_id>/cancel_registration", methods=["POST"])
 @login_required
 def cancel_registration(event_id):
     event = Event.query.get_or_404(event_id)
@@ -96,7 +96,7 @@ def manage_attendees(event_id):
     return render_template("event/manage_attendees.html", event=event, confirmed_attendees=confirmed_attendees, waiting_attendees=waiting_attendees)
 
 
-@event_bp.route("/<int:event_id>/register")
+@event_bp.route("/<int:event_id>/register", methods=["POST"])
 @login_required
 def register_event(event_id):
     event = Event.query.get_or_404(event_id)
