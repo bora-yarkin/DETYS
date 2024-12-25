@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, IntegerField, HiddenField, BooleanField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange, Length, Regexp
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange, Length, Regexp, Optional
 from app.models import User, Club
 
 
@@ -105,3 +105,45 @@ class NotificationPreferencesForm(FlaskForm):
     receive_membership_notifications = BooleanField("Receive Membership Notifications")
     receive_feedback_notifications = BooleanField("Receive Feedback Notifications")
     submit = SubmitField("Update Preferences")
+
+
+class UserEditForm(FlaskForm):
+    role = SelectField(
+        "Role",
+        choices=[("student", "Student"), ("club_manager", "Club Manager"), ("main_admin", "Main Admin")],
+        validators=[DataRequired()],
+    )
+    password = PasswordField(
+        "New Password",
+        validators=[
+            Optional(),
+            Length(min=8),
+            Regexp(
+                "^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)",
+                message="Password must contain at least one uppercase letter, one lowercase letter, and one digit.",
+            ),
+            EqualTo("confirm", message="Passwords must match."),
+        ],
+    )
+    confirm = PasswordField("Confirm Password")
+    submit = SubmitField("Update User")
+
+
+class UserProfileForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired(), Length(min=3, max=25)])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField(
+        "New Password",
+        validators=[
+            Optional(),
+            Length(min=8),
+            Regexp(
+                "^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)",
+                message="Password must contain at least one uppercase letter, one lowercase letter, and one digit.",
+            ),
+            EqualTo("confirm", message="Passwords must match."),
+        ],
+    )
+    confirm = PasswordField("Confirm Password")
+    submit = SubmitField("Update Profile")
+    delete = SubmitField("Delete Account")

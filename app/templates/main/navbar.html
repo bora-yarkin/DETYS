@@ -1,80 +1,52 @@
 <div class="navigation">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+
+    {% set nav_items = [
+    {'endpoint': 'main.index', 'icon': 'home-outline', 'text': 'Home'},
+    {'endpoint': 'club.club_list', 'icon': 'person-outline', 'text': 'Clubs'},
+    {'endpoint': 'event.event_list', 'icon': 'chatbubble-outline', 'text': 'Events'},
+    {'endpoint': 'post.posts', 'icon': 'document-text-outline', 'text': 'Posts'},
+    {'endpoint': 'main.contact', 'icon': 'call-outline', 'text': 'Contact'}
+    ] %}
+
+    {% if current_user.is_authenticated %}
+    {% set auth_items = [
+    {'endpoint': 'main.dashboard', 'icon': 'settings-outline', 'text': 'Dashboard'},
+    {'endpoint': 'main.notifications', 'icon': 'notifications-outline', 'text': 'Notifications'},
+    {'endpoint': 'profile.manage_profile', 'icon': 'person-circle-outline', 'text': 'My Account'},
+    {'endpoint': 'auth.logout', 'icon': 'log-out-outline', 'text': 'Logout'}
+    ] %}
+    {% if current_user.is_main_admin or current_user.is_club_manager %}
+    {% set auth_items = auth_items + [{'endpoint': 'report.reports', 'icon': 'document-text-outline', 'text':
+    'Reports'}] %}
+    {% endif %}
+    {% else %}
+    {% set auth_items = [{'endpoint': 'auth.login', 'icon': 'log-in-outline', 'text': 'Login'}] %}
+    {% endif %}
+
     <ul>
-        {% set nav_items = [
-        {'endpoint': 'main.index', 'icon': 'home-outline', 'text': 'Home'},
-        {'endpoint': 'club.club_list', 'icon': 'person-outline', 'text': 'Clubs'},
-        {'endpoint': 'event.event_list', 'icon': 'chatbubble-outline', 'text': 'Events'},
-        {'endpoint': 'post.posts', 'icon': 'document-text-outline', 'text': 'Posts'}
-        ] %}
-        {% for item in nav_items %}
+        {% for item in nav_items + auth_items %}
         <li class="list {% if request.endpoint == item.endpoint %}active{% endif %}">
             <a href="{{ url_for(item.endpoint) }}">
                 <span class="icon">
                     <ion-icon name="{{ item.icon }}"></ion-icon>
                 </span>
-                <span class="text">{{ item.text }}</span>
+                <span class="text">
+                    {{ item.text }}
+                    {% if item.endpoint == 'main.notifications' and current_user.is_authenticated and
+                    current_user.unread_notifications_count > 0 %}
+                    ({{ current_user.unread_notifications_count }})
+                    {% endif %}
+                </span>
             </a>
         </li>
         {% endfor %}
-        {% if current_user.is_authenticated %}
-        <li class="list {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
-            <a href="{{ url_for('main.dashboard') }}">
-                <span class="icon">
-                    <ion-icon name="settings-outline"></ion-icon>
-                </span>
-                <span class="text">Dashboard</span>
-            </a>
+        <li>
+            <form action="{{ url_for('search.search') }}" method="GET" class="search-form">
+                <input type="text" name="q" placeholder="Search clubs & events...">
+                <button type="submit">Search</button>
+            </form>
         </li>
-        <li class="list {% if request.endpoint == 'main.notifications' %}active{% endif %}">
-            <a href="{{ url_for('main.notifications') }}">
-                <span class="icon">
-                    <ion-icon name="notifications-outline"></ion-icon>
-                </span>
-                <span class="text">Notifications {% if current_user.unread_notifications_count > 0 %}({{
-                    current_user.unread_notifications_count }}){% endif %}</span>
-            </a>
-        </li>
-        <li class="list">
-            <a href="{{ url_for('auth.logout') }}">
-                <span class="icon">
-                    <ion-icon name="log-out-outline"></ion-icon>
-                </span>
-                <span class="text">Logout</span>
-            </a>
-        </li>
-        {% else %}
-        <li class="list {% if request.endpoint == 'auth.login' %}active{% endif %}">
-            <a href="{{ url_for('auth.login') }}">
-                <span class="icon">
-                    <ion-icon name="log-in-outline"></ion-icon>
-                </span>
-                <span class="text">Login</span>
-            </a>
-        </li>
-        {% endif %}
-        <li class="list {% if request.endpoint == 'main.contact' %}active{% endif %}">
-            <a href="{{ url_for('main.contact') }}">
-                <span class="icon">
-                    <ion-icon name="call-outline"></ion-icon>
-                </span>
-                <span class="text">Contact</span>
-            </a>
-        </li>
-        {% if current_user.is_main_admin or current_user.is_club_manager %}
-        <li class="list {% if request.endpoint == 'report.reports' %}active{% endif %}">
-            <a href="{{ url_for('report.reports') }}">
-                <span class="icon">
-                    <ion-icon name="document-text-outline"></ion-icon>
-                </span>
-                <span class="text">Reports</span>
-            </a>
-        </li>
-        {% endif %}
-        <form action="{{ url_for('search.search') }}" method="GET" style="display:inline;">
-            <input type="text" name="q" placeholder="Search clubs & events...">
-            <button type="submit">Search</button>
-        </form>
     </ul>
     <div class="indicator"></div>
 </div>

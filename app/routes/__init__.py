@@ -9,6 +9,8 @@ from .event_resource_routes import resource_bp
 from .bookmark_routes import bookmark_bp
 from .category_routes import category_bp
 from .post_routes import post_bp
+from .admin_routes import admin_bp
+from .profile_routes import profile_bp
 
 
 def register_routes(app):
@@ -23,3 +25,5 @@ def register_routes(app):
     app.register_blueprint(resource_bp, url_prefix="/resources")
     app.register_blueprint(bookmark_bp, url_prefix="/bookmarks")
     app.register_blueprint(category_bp, url_prefix="/admin")
+    app.register_blueprint(admin_bp, url_prefix="/admin")
+    app.register_blueprint(profile_bp, url_prefix="/profile")

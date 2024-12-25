@@ -7,14 +7,14 @@
     background: #333;
     z-index: 1000;
     padding: 0.5rem 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .navigation ul {
-    position: relative;
     list-style: none;
-    margin: 0 auto;            /* Center horizontally */
+    margin: 0 auto;
     padding: 0 1rem;
-    max-width: 1200px;        /* Optional width constraint */
+    max-width: 1200px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -23,6 +23,7 @@
 
 .navigation .list {
     position: relative;
+    flex: 0 0 auto;
 }
 
 .navigation .list a {
@@ -32,43 +33,46 @@
     color: #fff;
     text-decoration: none;
     padding: 0.5rem 1rem;
-    transition: 0.3s;
+    transition: color 0.3s, transform 0.3s;
 }
 
 .navigation .list a:hover {
     color: #29fd53;
+    transform: translateY(-2px);
 }
 
 .navigation .list.active a {
     color: #29fd53;
+    font-weight: bold;
 }
 
-.navigation .list .icon {
+.navigation .icon {
     font-size: 1.5rem;
     margin-bottom: 0.2rem;
 }
 
-.navigation .list .text {
+.navigation .text {
     font-size: 0.8rem;
+    white-space: nowrap;
 }
 
+/* Indicator for active links */
 .navigation .indicator {
     position: absolute;
     bottom: 0;
-    left: 0;                  /* Ensure it starts at left of container */
+    left: 0;
     height: 4px;
     background: #29fd53;
-    transition: 0.3s;
+    transition: left 0.3s, width 0.3s;
 }
 
-/* Add to existing navbar.css */
-
+/* Search Form */
 .navigation form {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-left: 0; /* Remove or reduce auto to avoid large gap */
     padding: 0 1rem;
+    margin: 0;
 }
 
 .navigation input[type="text"] {
@@ -109,11 +113,31 @@
     transform: translateY(-1px);
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
+    .navigation ul {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        height: auto;
+        padding: 0.5rem;
+    }
+
+    .navigation .list {
+        flex: 0 0 50%;
+        /* Two items per row */
+        text-align: center;
+        margin: 0.5rem 0;
+    }
+
+    .navigation .list .text {
+        font-size: 0.75rem;
+    }
+
     .navigation form {
-        width: 100%;
+        flex: 1 1 100%;
         padding: 0.5rem;
         order: -1;
+        /* Move form to the top */
     }
 
     .navigation input[type="text"] {
@@ -125,19 +149,17 @@
     }
 }
 
-@media (max-width: 768px) {
-    .navigation ul {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 0.5rem;
-    }
-
+@media (max-width: 480px) {
     .navigation .list {
-        flex: 0 0 25%;
-        margin: 0.25rem 0;
+        flex: 0 0 100%;
+        /* One item per row */
     }
 
     .navigation .list .text {
         font-size: 0.7rem;
+    }
+
+    .navigation ul {
+        padding: 0.5rem;
     }
 }
