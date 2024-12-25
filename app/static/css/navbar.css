@@ -1,4 +1,3 @@
-/* Navbar specific styles - scoped with .navigation class */
 .navigation {
     position: fixed;
     top: 0;
@@ -56,7 +55,6 @@
     white-space: nowrap;
 }
 
-/* Indicator for active links */
 .navigation .indicator {
     position: absolute;
     bottom: 0;
@@ -66,7 +64,6 @@
     transition: left 0.3s, width 0.3s;
 }
 
-/* Search Form */
 .navigation form {
     display: flex;
     align-items: center;
@@ -113,7 +110,6 @@
     transform: translateY(-1px);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .navigation ul {
         flex-wrap: wrap;
@@ -124,7 +120,6 @@
 
     .navigation .list {
         flex: 0 0 50%;
-        /* Two items per row */
         text-align: center;
         margin: 0.5rem 0;
     }
@@ -137,7 +132,6 @@
         flex: 1 1 100%;
         padding: 0.5rem;
         order: -1;
-        /* Move form to the top */
     }
 
     .navigation input[type="text"] {
@@ -152,7 +146,6 @@
 @media (max-width: 480px) {
     .navigation .list {
         flex: 0 0 100%;
-        /* One item per row */
     }
 
     .navigation .list .text {
