@@ -1,0 +1,74 @@
+.error-page {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.error-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.error-page h2 {
+    font-size: 8rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.error-page p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.error-page a {
+    padding: 1rem 2rem;
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.error-page a:hover {
+    background: transparent;
+    border-color: white;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .error-page h2 {
+        font-size: 6rem;
+    }
+
+    .error-page p {
+        font-size: 1.2rem;
+        padding: 0 1rem;
+    }
+}

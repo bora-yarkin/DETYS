@@ -10,6 +10,7 @@
     </div>
 
     <button type="submit" class="btn btn-success">Create</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <a href="{{ url_for('category.list_categories') }}" class="btn btn-secondary">Cancel</a>
 </form>
 {% endblock %}

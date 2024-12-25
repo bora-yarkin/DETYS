@@ -1,47 +1,88 @@
 {% extends "base.html" %}
 {% block title %}Search Results{% endblock %}
 {% block content %}
-<h2>Search Results for "{{ query }}"</h2>
+<div class="container-fluid px-0">
+    <div class="hero-section text-center py-5 bg-primary text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Search Results</h1>
+            <p class="lead mb-0">Results for "{{ query }}"</p>
+        </div>
+    </div>
 
-<h3>Clubs</h3>
-{% if clubs %}
-<ul>
-    {% for club in clubs %}
-    <li>
-        <a href="{{ url_for('club.club_detail', club_id=club.id) }}">{{ club.name }}</a>
-        <p>{{ club.description[:100] }}...</p>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No clubs found.</p>
-{% endif %}
+    <div class="container py-5">
+        <div class="row g-4">
+            <!-- Clubs Section -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h3 class="h5 mb-0"><i class="fas fa-users"></i> Clubs</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if clubs %}
+                        <div class="list-group">
+                            {% for club in clubs %}
+                            <a href="{{ url_for('club.club_detail', club_id=club.id) }}"
+                                class="list-group-item list-group-item-action">
+                                <h6 class="mb-1">{{ club.name }}</h6>
+                                <small class="text-muted">{{ club.description[:100] }}...</small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">No clubs found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
-<h3>Events</h3>
-{% if events %}
-<ul>
-    {% for event in events %}
-    <li>
-        <a href="{{ url_for('event.event_detail', event_id=event.id) }}">{{ event.title }}</a>
-        <p>{{ event.description[:100] }}...</p>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No events found.</p>
-{% endif %}
+            <!-- Events Section -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h3 class="h5 mb-0"><i class="fas fa-calendar"></i> Events</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if events %}
+                        <div class="list-group">
+                            {% for event in events %}
+                            <a href="{{ url_for('event.event_detail', event_id=event.id) }}"
+                                class="list-group-item list-group-item-action">
+                                <h6 class="mb-1">{{ event.title }}</h6>
+                                <small class="text-muted">{{ event.description[:100] }}...</small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">No events found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
-<h3>Posts</h3>
-{% if posts %}
-<ul>
-    {% for post in posts %}
-    <li>
-        <a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a>
-        <p>{{ post.content|striptags|truncate(100) }}</p>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No posts found.</p>
-{% endif %}
+            <!-- Posts Section -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h3 class="h5 mb-0"><i class="fas fa-file-alt"></i> Posts</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if posts %}
+                        <div class="list-group">
+                            {% for post in posts %}
+                            <a href="{{ url_for('post.view_post', post_id=post.id) }}"
+                                class="list-group-item list-group-item-action">
+                                <h6 class="mb-1">{{ post.title }}</h6>
+                                <small class="text-muted">{{ post.content|striptags|truncate(100) }}</small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">No posts found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

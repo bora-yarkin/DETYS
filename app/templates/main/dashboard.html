@@ -2,141 +2,241 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 
-<h2>Welcome, {{ user.username }}!</h2>
-<p>Your role: {{ user.role }}</p>
-
-{% if dashboard_mode == 'admin' %}
-<h3>Administrator Dashboard</h3>
-<p>Welcome, {{ user.username }}. Manage the system here.</p>
-<div class="admin-stats">
-    
-    <h3>System Statistics</h3>
-    <ul>
-        <li><strong>Total Users:</strong> {{ total_users }}</li>
-        <li><strong>Total Clubs:</strong> {{ total_clubs }}</li>
-        <li><strong>Total Events:</strong> {{ total_events }}</li>
-    </ul>
-
-    <h3>Top 5 Events by Participation</h3>
-    {% if top_events %}
-    <ol>
-        {% for title, count in top_events %}
-        <li>{{ title }} - {{ count }} attendees</li>
-        {% endfor %}
-    </ol>
-    {% else %}
-    <p>No events found.</p>
-    {% endif %}
-    <h3>Additional Stats</h3>
-    <p>Resources Uploaded: {{ resource_count }}</p>
-    <p>Polls Created: {{ poll_count }}</p>
-        <div class="new-post-section">
-            <a href="{{ url_for('post.create_post') }}" class="btn btn-primary">Create New Post</a>
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Welcome, {{ user.username }}!</h2>
+                    <p class="card-text text-muted">Role: {{ user.role }}</p>
+                </div>
+            </div>
         </div>
-    <p>
-        <a href="{{ url_for('report.reports') }}" class="btn btn-info">Full Reports</a>
-    </p>
-    <a href="{{ url_for('category.list_categories') }}" class="btn btn-info">Manage Categories</a>
-</div>
-
-{% elif dashboard_mode == 'manager' %}
-<div class="manager-stats">
-    <h3>My Clubs</h3>
-    {% if clubs_managed %}
-    <ul>
-        {% for club in clubs_managed %}
-        <li>{{ club.name }} ({{ club.members|length }} members)</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>You are not managing any club right now.</p>
-    {% endif %}
-
-    <p><strong>Pending Membership Requests:</strong> {{ pending_membership_requests }}</p>
-
-    <h3>Upcoming Events</h3>
-    {% if upcoming_events %}
-    <ul>
-        {% for event in upcoming_events %}
-        <li>{{ event.title }} on {{ event.date.strftime('%Y-%m-%d %H:%M') }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No upcoming events for your clubs.</p>
-    {% endif %}
-
-    <h3>Top Events by Attendance</h3>
-    {% if manager_top_events %}
-    <ol>
-        {% for title, count in manager_top_events %}
-        <li>{{ title }} - {{ count }} attendees</li>
-        {% endfor %}
-    </ol>
-    {% else %}
-    <p>No significant attendance data available for your clubs.</p>
-    {% endif %}
-    <h3>Additional Stats</h3>
-    <p>Resources Uploaded: {{ resource_count }}</p>
-    <p>Polls Created In My Clubs: {{ poll_count }}</p>
-
-    <div class="new-post-section">
-        <a href="{{ url_for('post.create_post') }}" class="btn btn-primary">Create New Post</a>
     </div>
 
-    <p>
-        <a href="{{ url_for('report.reports') }}" class="btn btn-info">View My Club Reports</a>
-    </p>
-</div>
+    {% if dashboard_mode == 'admin' %}
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">System Statistics</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Users <span class="badge bg-primary rounded-pill">{{ total_users }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Clubs <span class="badge bg-primary rounded-pill">{{ total_clubs }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Events <span class="badge bg-primary rounded-pill">{{ total_events }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-{% else %}
-<div class="student-panel">
-    <h3>My Upcoming Events</h3>
-    {% if user_events %}
-    <ul>
-        {% for attendance in user_events %}
-        <li>
-            {{ attendance.event.title }} on
-            {{ attendance.event.date.strftime('%Y-%m-%d %H:%M') }}
-            (Status: {{ attendance.status }})
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>You haven't registered for any events yet.</p>
-    {% endif %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h3 class="h5 mb-0">Top 5 Events</h3>
+                </div>
+                <div class="card-body">
+                    {% if top_events %}
+                    <div class="list-group">
+                        {% for title, count in top_events %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ title }}
+                            <span class="badge bg-info rounded-pill">{{ count }} attendees</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="card-text text-muted">No events found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <h3>My Clubs</h3>
-    {% if joined_clubs %}
-    <ul>
-        {% for membership in joined_clubs %}
-        <li>{{ membership.club.name }}</li>
-        {% endfor %}
-    </ul>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="h5 mb-0">Additional Stats</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="card-text">Resources Uploaded: {{ resource_count }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="card-text">Polls Created: {{ poll_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('post.create_post') }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Create New Post
+                        </a>
+                        <a href="{{ url_for('report.reports') }}" class="btn btn-info">
+                            <i class="fas fa-chart-bar"></i> Full Reports
+                        </a>
+                        <a href="{{ url_for('category.list_categories') }}" class="btn btn-secondary">
+                            <i class="fas fa-tags"></i> Manage Categories
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif dashboard_mode == 'manager' %}
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">My Clubs</h3>
+                </div>
+                <div class="card-body">
+                    {% if clubs_managed %}
+                    <div class="list-group">
+                        {% for club in clubs_managed %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ club.name }}
+                            <span class="badge bg-primary rounded-pill">{{ club.members|length }} members</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="card-text text-muted">You are not managing any club right now.</p>
+                    {% endif %}
+                    <div class="mt-3">
+                        <p class="mb-0">
+                            <span class="badge bg-warning">{{ pending_membership_requests }}</span>
+                            Pending Membership Requests
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h3 class="h5 mb-0">Upcoming Events</h3>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_events %}
+                    <div class="list-group">
+                        {% for event in upcoming_events %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ event.title }}</h6>
+                            <small class="text-muted">{{ event.date.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="card-text text-muted">No upcoming events for your clubs.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% else %}
-    <p>You are not a member of any clubs, or your membership is pending.</p>
-    {% endif %}
-    <h3>My Bookmarked Events</h3>
-    {% if bookmark_events %}
-    <ul>
-        {% for ev in bookmark_events %}
-        <li><a href="{{ url_for('event.event_detail', event_id=ev.id) }}">{{ ev.title }}</a></li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>You haven't bookmarked any events.</p>
-    {% endif %}
-    
-    <h3>My Bookmarked Clubs</h3>
-    {% if bookmark_clubs %}
-    <ul>
-        {% for cb in bookmark_clubs %}
-        <li><a href="{{ url_for('club.club_detail', club_id=cb.id) }}">{{ cb.name }}</a></li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>You haven't bookmarked any clubs.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">My Upcoming Events</h3>
+                </div>
+                <div class="card-body">
+                    {% if user_events %}
+                    <div class="list-group">
+                        {% for attendance in user_events %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ attendance.event.title }}</h6>
+                            <small class="text-muted">{{ attendance.event.date.strftime('%Y-%m-%d %H:%M') }}</small>
+                            <span class="badge bg-info">{{ attendance.status }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="card-text text-muted">You haven't registered for any events yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h3 class="h5 mb-0">My Clubs</h3>
+                </div>
+                <div class="card-body">
+                    {% if joined_clubs %}
+                    <div class="list-group">
+                        {% for membership in joined_clubs %}
+                        <div class="list-group-item">{{ membership.club.name }}</div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="card-text text-muted">You are not a member of any clubs.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="h5 mb-0">Bookmarked Events</h3>
+                </div>
+                <div class="card-body">
+                    {% if bookmark_events %}
+                    <div class="list-group">
+                        {% for ev in bookmark_events %}
+                        <a href="{{ url_for('event.event_detail', event_id=ev.id) }}"
+                            class="list-group-item list-group-item-action">
+                            {{ ev.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="card-text text-muted">You haven't bookmarked any events.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="h5 mb-0">Bookmarked Clubs</h3>
+                </div>
+                <div class="card-body">
+                    {% if bookmark_clubs %}
+                    <div class="list-group">
+                        {% for cb in bookmark_clubs %}
+                        <a href="{{ url_for('club.club_detail', club_id=cb.id) }}"
+                            class="list-group-item list-group-item-action">
+                            {{ cb.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="card-text text-muted">You haven't bookmarked any clubs.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
 </div>
-{% endif %}
 
 {% endblock %}

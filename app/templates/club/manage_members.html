@@ -1,41 +1,90 @@
 {% extends 'base.html' %}
 {% block title %}Manage Members - {{ club.name }}{% endblock %}
 {% block content %}
-<h2>Manage Members - {{ club.name }}</h2>
+<div class="container-fluid px-0">
+    <div class="hero-section text-center py-5 bg-primary text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Manage Members</h1>
+            <p class="lead">{{ club.name }}</p>
+        </div>
+    </div>
 
-<h3>Pending Membership Requests</h3>
-{% if pending_members %}
-<ul>
-    {% for membership in pending_members %}
-    <li>
-        {{ membership.user.username }}
-        <a href="{{ url_for('club.approve_member', club_id=club.id, user_id=membership.user_id) }}"
-            class="btn btn-success">Approve</a>
-        <a href="{{ url_for('club.remove_member', club_id=club.id, user_id=membership.user_id) }}"
-            class="btn btn-danger">Reject</a>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No pending membership requests.</p>
-{% endif %}
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-warning">
+                        <h3 class="h5 mb-0">Pending Requests</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if pending_members %}
+                        <div class="list-group">
+                            {% for membership in pending_members %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ membership.user.username }}</h6>
+                                        <small class="text-muted">Requested: {{
+                                            membership.join_date.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('club.approve_member', club_id=club.id, user_id=membership.user.id) }}"
+                                            class="btn btn-success btn-sm">
+                                            <i class="fas fa-check"></i> Approve
+                                        </a>
+                                        <a href="{{ url_for('club.reject_member', club_id=club.id, user_id=membership.user.id) }}"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i> Reject
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">No pending requests</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
-<h3>Approved Members</h3>
-{% if approved_members %}
-<ul>
-    {% for membership in approved_members %}
-    <li>
-        {{ membership.user.username }}
-        {% if membership.user_id != club.president_id %}
-        <a href="{{ url_for('club.remove_member', club_id=club.id, user_id=membership.user_id) }}"
-            class="btn btn-danger">Remove</a>
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No approved members.</p>
-{% endif %}
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="h5 mb-0">Active Members</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if approved_members %}
+                        <div class="list-group">
+                            {% for membership in approved_members %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ membership.user.username }}</h6>
+                                        <small class="text-muted">Joined: {{ membership.join_date.strftime('%Y-%m-%d')
+                                            }}</small>
+                                    </div>
+                                    <a href="{{ url_for('club.remove_member', club_id=club.id, user_id=membership.user.id) }}"
+                                        class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-user-minus"></i> Remove
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">No active members</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<a href="{{ url_for('club.club_detail', club_id=club.id) }}" class="btn btn-secondary">Back to Club Details</a>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('club.club_detail', club_id=club.id) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Club Details
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

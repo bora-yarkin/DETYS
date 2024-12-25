@@ -1,37 +1,41 @@
 {% extends 'base.html' %}
 {% block title %}Manage Categories{% endblock %}
 {% block content %}
-<h2>Categories</h2>
+<h2 class="mb-4">Categories</h2>
 
-<p>
+<p class="mb-4">
     <a href="{{ url_for('category.create_category') }}" class="btn btn-primary">Create New Category</a>
 </p>
 
 {% if categories %}
-<table>
-    <thead>
-        <tr>
-            <th>Category Name</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for cat in categories %}
-        <tr>
-            <td>{{ cat.name }}</td>
-            <td>
-                <a href="{{ url_for('category.edit_category', category_id=cat.id) }}" class="btn btn-warning">Edit</a>
-
-                <form action="{{ url_for('category.delete_category', category_id=cat.id) }}" method="POST"
-                    style="display:inline;">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Category Name</th>
+                <th scope="col" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cat in categories %}
+            <tr>
+                <td class="align-middle">{{ cat.name }}</td>
+                <td class="text-center">
+                    <a href="{{ url_for('category.edit_category', category_id=cat.id) }}"
+                        class="btn btn-warning btn-sm mx-1">Edit</a>
+                    <form action="{{ url_for('category.delete_category', category_id=cat.id) }}" method="POST"
+                        onsubmit="return confirm('Are you sure you want to delete this category?');"
+                        style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-danger btn-sm mx-1">Delete Category</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
-<p>No categories found.</p>
+<p class="alert alert-info">No categories found.</p>
 {% endif %}
 {% endblock %}

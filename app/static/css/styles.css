@@ -1,233 +1,48 @@
+/* Global styles - for everything except navbar */
+:root {
+    --primary: #0055ff;
+    --secondary: #043873;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --white: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    --transition: all 0.3s ease;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;  /* Yatayda ortalama */
-    justify-content: center; /* Dikeyde ortalama */
-    min-height: calc(100vh - 60px); /* Navbar yüksekliğine göre ayarlayın */
-    padding: 60px 20px 20px 20px; /* Üstten navbar için boşluk bırakın */
-    box-sizing: border-box;
-    background-color: rgb(255, 227, 191);
-}
-
-
-.error-page a:hover {
-    background-color: #0056b3;
-}
-
-.post-detail {
-    max-width: 800px;
-    margin: 40px auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.post-title {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.post-meta {
-    font-size: 0.9em;
-    color: #555;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.post-content {
-    font-size: 1.1em;
+    font-family: 'Poppins', sans-serif;
     line-height: 1.6;
-    color: #444;
+    color: var(--dark);
+    background: #f0f2f5;
+    padding-top: 60px;
+    /* Space for fixed navbar */
 }
 
-.post-content p {
-    margin-bottom: 1em;
-}
+/* Rest of your existing styles.css content */
 
-.post-content h2,
-.post-content h3,
-.post-content h4 {
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-    color: #222;
-}
-
-.error-page {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
+.progress {
+    background-color: #e9ecef;
+    border-radius: 0.25rem;
     overflow: hidden;
 }
 
-body {
-    font-family: Arial, sans-serif;
+.progress-bar {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 60px);
-    padding: 60px 20px 20px 20px;
-    box-sizing: border-box;
-    background-color: rgb(255, 227, 191);
-}
-
-.error-page a:hover {
-    background-color: #0056b3;
-}
-
-/* Post styles */
-.post-detail {
-    max-width: 800px;
-    margin: 40px auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.post-title {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.post-meta {
-    font-size: 0.9em;
-    color: #555;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.post-content {
-    font-size: 1.1em;
-    line-height: 1.6;
-    color: #444;
-}
-
-.post-content p {
-    margin-bottom: 1em;
-}
-
-.post-content h2,
-.post-content h3,
-.post-content h4 {
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-    color: #222;
-}
-
-.error-page {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
     overflow: hidden;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-h1,
-h2,
-h3,
-h4 {
-    margin-bottom: 0.8em;
-}
-
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1em;
-}
-
-body {
-    line-height: 1.6;
-    color: #333;
-}
-
-.btn {
-    display: inline-block;
-    padding: 0.6em 1em;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
     color: #fff;
-    background-color: #0055ff;
+    text-align: center;
+    white-space: nowrap;
+    background-color: var(--primary);
+    transition: width .6s ease;
 }
 
-.btn:hover {
-    background-color: #003da8;
-}
-
-.alert {
-    padding: 1em;
-    border-radius: 4px;
-    margin-bottom: 1em;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-.form-group {
-    margin-bottom: 1em;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.6em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-top: 0.2em;
-}
-
-.navigation {
-    background-color: #333;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-}
-
-.navigation ul {
-    list-style: none;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 0.5em;
-}
-
-.navigation li a {
-    color: #fff;
-    text-decoration: none;
-    padding: 0.8em 1em;
-}
-
-.navigation li a:hover {
-    background-color: #0055ff;
-    border-radius: 4px;
+.list-group-item .progress {
+    height: 5px !important;
+    margin-top: 0.5rem;
 }

@@ -1,126 +1,143 @@
-/* Import font */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap');
-
-/* Reset and default styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-/* Navbar Styles */
+/* Navbar specific styles - scoped with .navigation class */
 .navigation {
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
+    background: #333;
     z-index: 1000;
-    background-color: #333; /* Navbar arka plan rengini koyu yapın */
-    overflow: hidden;
+    padding: 0.5rem 0;
 }
 
 .navigation ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+    position: relative;
+    list-style: none;
+    margin: 0 auto;            /* Center horizontally */
+    padding: 0 1rem;
+    max-width: 1200px;        /* Optional width constraint */
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    height: 60px; /* Navbar yüksekliği */
+    height: 60px;
 }
 
-.navigation li a {
+.navigation .list {
+    position: relative;
+}
+
+.navigation .list a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
+    color: #fff;
     text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: 0.3s;
 }
 
-.navigation li a .icon {
+.navigation .list a:hover {
+    color: #29fd53;
+}
+
+.navigation .list.active a {
+    color: #29fd53;
+}
+
+.navigation .list .icon {
     font-size: 1.5rem;
+    margin-bottom: 0.2rem;
 }
 
-.indicator {
+.navigation .list .text {
+    font-size: 0.8rem;
+}
+
+.navigation .indicator {
     position: absolute;
     bottom: 0;
+    left: 0;                  /* Ensure it starts at left of container */
     height: 4px;
-    background-color: #fff;
-    transition: left 0.3s ease, width 0.3s ease;
+    background: #29fd53;
+    transition: 0.3s;
 }
 
-/* Main Content Container */
-.container {
-    padding-top: 60px; /* Navbar yüksekliği ile aynı */
-    background-color: #f5f5dc; /* Farklı arka plan rengi */
-    border-radius: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
-    position: relative;
-    overflow: hidden;
-    width: 768px;
-    max-width: 100%;
-    min-height: 480px;
-    margin: 20px auto; /* Container'ı ortalamak için */
-    padding: 20px; /* İç boşluk */
+/* Add to existing navbar.css */
+
+.navigation form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0; /* Remove or reduce auto to avoid large gap */
+    padding: 0 1rem;
+}
+
+.navigation input[type="text"] {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    width: 200px;
+    transition: all 0.3s ease;
+}
+
+.navigation input[type="text"]::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.navigation input[type="text"]:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #29fd53;
+    width: 250px;
+}
+
+.navigation button[type="submit"] {
+    background: #29fd53;
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.navigation button[type="submit"]:hover {
+    background: #20c842;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .navigation form {
+        width: 100%;
+        padding: 0.5rem;
+        order: -1;
+    }
+
+    .navigation input[type="text"] {
+        width: 100%;
+    }
+
+    .navigation input[type="text"]:focus {
+        width: 100%;
+    }
 }
 
 @media (max-width: 768px) {
     .navigation ul {
-        flex-direction: column;
+        flex-wrap: wrap;
         height: auto;
-    }
-    .container {
-        padding-top: 60px;
-        width: 90%;
-    }
-}
-
-.navigation li a .icon {
-    font-size: 1.5rem;
-}
-
-.navigation li a .text {
-    font-size: 0.9rem;
-}
-
-.navigation li a:hover {
-    background-color: #005bb5; /* Hover rengi */
-}
-
-.navigation li a.active {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.indicator {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    background: #29fd53;
-    border-radius: 2px;
-    transition: left 0.3s ease, width 0.3s ease;
-    z-index: 0;
-}
-
-@media (max-width: 600px) {
-    .navigation ul li {
-        width: 60px;
-        height: 60px;
+        padding: 0.5rem;
     }
 
-    .navigation ul li a .icon {
-        font-size: 1.2rem;
+    .navigation .list {
+        flex: 0 0 25%;
+        margin: 0.25rem 0;
     }
 
-    .navigation ul li a .text {
-        font-size: 0.7em;
-    }
-
-    .indicator {
-        height: 3px;
+    .navigation .list .text {
+        font-size: 0.7rem;
     }
 }

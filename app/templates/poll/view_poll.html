@@ -1,21 +1,63 @@
 {% extends 'base.html' %}
 {% block title %}View Poll{% endblock %}
 {% block content %}
-<h2>Poll: "{{ poll.question }}"</h2>
-<p>Event: <a href="{{ url_for('event.event_detail', event_id=event.id) }}">{{ event.title }}</a></p>
+<div class="container-fluid px-0">
+    <div class="hero-section text-center py-5 bg-primary text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">{{ poll.question }}</h1>
+            <p class="lead mb-0">
+                Event: <a href="{{ url_for('event.event_detail', event_id=event.id) }}"
+                    class="text-white text-decoration-underline">{{ event.title }}</a>
+            </p>
+        </div>
+    </div>
 
-<form action="{{ url_for('poll.vote_poll', poll_id=poll.id) }}" method="POST">
-    <ul>
-        {% for choice in poll.choices %}
-        <li>
-            <label>
-                <input type="radio" name="choice_id" value="{{ choice.id }}">
-                {{ choice.choice_text }}
-                ({{ choice.votes }} votes so far)
-            </label>
-        </li>
-        {% endfor %}
-    </ul>
-    <button type="submit" class="btn btn-primary">Vote</button>
-</form>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <form action="{{ url_for('poll.vote_poll', poll_id=poll.id) }}" method="POST">
+                            {{ form.hidden_tag() }}
+
+                            <div class="list-group mb-4">
+                                {% for choice in poll.choices %}
+                                <label class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <input type="radio" name="choice_id" value="{{ choice.id }}"
+                                                class="form-check-input me-2">
+                                            {{ choice.choice_text }}
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">
+                                            {{ choice.votes }} votes
+                                        </span>
+                                    </div>
+                                    <div class="progress mt-2" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" {% set percentage=(choice.votes / total_votes * 100)|round|int if
+                                            total_votes> 0 else 0 %}
+                                            style="width: {{ percentage }}%"
+                                            aria-valuenow="{{ percentage }}"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-vote-yea"></i> Vote
+                                </button>
+                                <a href="{{ url_for('event.event_detail', event_id=event.id) }}"
+                                    class="btn btn-outline-secondary btn-lg">Back to Event</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

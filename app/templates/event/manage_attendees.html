@@ -1,29 +1,101 @@
 {% extends 'base.html' %}
 {% block title %}Manage Attendees - {{ event.title }}{% endblock %}
 {% block content %}
-<h2>Manage Attendees - {{ event.title }}</h2>
+<div class="container-fluid px-0">
+    <div class="hero-section text-center py-5 bg-primary text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Manage Attendees</h1>
+            <p class="lead mb-0">{{ event.title }}</p>
+        </div>
+    </div>
 
-<h3>Confirmed Attendees</h3>
-{% if confirmed_attendees %}
-<ul>
-    {% for attendance in confirmed_attendees %}
-    <li>{{ attendance.user.username }}</li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No confirmed attendees.</p>
-{% endif %}
+    <div class="container py-5">
+        <div class="row g-4">
+            <!-- Confirmed Attendees -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="h5 mb-0">Confirmed Attendees</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if confirmed_attendees %}
+                        <div class="list-group">
+                            {% for attendance in confirmed_attendees %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">{{ attendance.user.username }}</h6>
+                                    <small class="text-muted">Joined: {{
+                                        attendance.registration_date.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                <form
+                                    action="{{ url_for('event.remove_attendee', event_id=event.id, user_id=attendance.user.id) }}"
+                                    method="POST" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Are you sure you want to remove this attendee?');">
+                                        <i class="fas fa-user-minus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">No confirmed attendees.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
-<h3>Waiting List</h3>
-{% if waiting_attendees %}
-<ul>
-    {% for attendance in waiting_attendees %}
-    <li>{{ attendance.user.username }}</li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No users on the waiting list.</p>
-{% endif %}
+            <!-- Waiting List -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-warning">
+                        <h3 class="h5 mb-0">Waiting List</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if waiting_attendees %}
+                        <div class="list-group">
+                            {% for attendance in waiting_attendees %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">{{ attendance.user.username }}</h6>
+                                    <small class="text-muted">Requested: {{
+                                        attendance.registration_date.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                <div class="btn-group">
+                                    <form
+                                        action="{{ url_for('event.confirm_attendee', event_id=event.id, user_id=attendance.user.id) }}"
+                                        method="POST" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form
+                                        action="{{ url_for('event.remove_attendee', event_id=event.id, user_id=attendance.user.id) }}"
+                                        method="POST" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">No users on the waiting list.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<a href="{{ url_for('event.event_detail', event_id=event.id) }}" class="btn btn-secondary">Back to Event Details</a>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('event.event_detail', event_id=event.id) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Event Details
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}
