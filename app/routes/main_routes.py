@@ -150,6 +150,13 @@ def mark_all_notifications_read():
 @main_bp.app_errorhandler(405)
 @main_bp.app_errorhandler(406)
 @main_bp.app_errorhandler(409)
+@main_bp.app_errorhandler(418)
+@main_bp.app_errorhandler(423)
+@main_bp.app_errorhandler(425)
+@main_bp.app_errorhandler(426)
+@main_bp.app_errorhandler(428)
+@main_bp.app_errorhandler(431)
+@main_bp.app_errorhandler(451)
 @main_bp.app_errorhandler(429)
 @main_bp.app_errorhandler(500)
 @main_bp.app_errorhandler(502)
@@ -161,18 +168,25 @@ def handle_errors(error):
         message = "The CSRF token is missing or invalid."
     else:
         error_code = error.code if hasattr(error, "code") else 500
-        error_messages = {
-            400: "Bad Request.",
-            401: "Unauthorized access.",
-            403: "You do not have permission to access this resource.",
-            404: "The page you are looking for does not exist.",
-            405: "Method Not Allowed.",
-            406: "Not Acceptable.",
-            409: "Conflict occurred.",
-            429: "Too Many Requests. Please try again later.",
-            500: "An unexpected error has occurred. Please try again later.",
-            502: "Bad Gateway.",
-            503: "Service Unavailable. Please try again later.",
-        }
-        message = error_messages.get(error_code, "An error has occurred.")
+    error_messages = {
+        400: "Bad Request.",
+        401: "Unauthorized access.",
+        403: "You do not have permission to access this resource.",
+        404: "The page you are looking for does not exist.",
+        405: "Method Not Allowed.",
+        406: "Not Acceptable.",
+        409: "Conflict occurred.",
+        418: "I'm a teapot.",
+        423: "Locked.",
+        425: "Too Early.",
+        426: "Upgrade Required.",
+        428: "Precondition Required.",
+        431: "Request Header Fields Too Large.",
+        451: "Unavailable For Legal Reasons.",
+        429: "Too Many Requests. Please try again later.",
+        500: "An unexpected error has occurred. Please try again later.",
+        502: "Bad Gateway.",
+        503: "Service Unavailable. Please try again later.",
+    }
+    message = error_messages.get(error_code, "An error has occurred.")
     return render_template("main/error.html", background_image=background_image, error_code=error_code, message=message), error_code
