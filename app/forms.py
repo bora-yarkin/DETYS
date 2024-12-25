@@ -7,11 +7,6 @@ from app.models import User, Club
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
-    role = SelectField(
-        "Role",
-        choices=[("student", "Student"), ("club_manager", "Club Manager")],
-        validators=[DataRequired()],
-    )
     password = PasswordField(
         "Password",
         validators=[DataRequired()],

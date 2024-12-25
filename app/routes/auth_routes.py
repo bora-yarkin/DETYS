@@ -27,7 +27,7 @@ def login():
             else:
                 flash("Wrong username or password.", "danger")
         elif action == "register" and registration_form.validate_on_submit():
-            user = User(username=registration_form.username.data, email=registration_form.email.data, role=registration_form.role.data)
+            user = User(username=registration_form.username.data, email=registration_form.email.data, role="student")
             user.set_password(registration_form.password.data)
             db.session.add(user)
             db.session.commit()
