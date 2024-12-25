@@ -75,16 +75,6 @@ def delete_club(club_id):
     return redirect(url_for("club.club_list"))
 
 
-@club_bp.route("/<int:club_id>/confirm_delete", methods=["GET", "POST"])
-@login_required
-@club_manager_required
-def confirm_delete_club(club_id):
-    club = Club.query.get_or_404(club_id)
-    if club.president_id != current_user.id:
-        abort(403)
-    return render_template("club/confirm_delete.html", club=club)
-
-
 @club_bp.route("/<int:club_id>/join")
 @login_required
 def join_club(club_id):

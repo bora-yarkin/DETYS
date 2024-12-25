@@ -206,13 +206,3 @@ def delete_event(event_id):
         flash(f"Error deleting event: {str(e)}", "danger")
 
     return redirect(url_for("event.event_list"))
-
-
-@event_bp.route("/<int:event_id>/confirm_delete", methods=["GET", "POST"])
-@login_required
-def confirm_delete_event(event_id):
-    event = Event.query.get_or_404(event_id)
-    if not can_edit_or_delete_event(event):
-        abort(403)
-
-    return render_template("event/confirm_delete.html", event=event)

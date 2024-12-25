@@ -88,15 +88,6 @@ def delete_post(post_id):
     return redirect(url_for("post.posts"))
 
 
-@post_bp.route("/post/<int:post_id>/confirm_delete", methods=["GET", "POST"])
-@login_required
-def confirm_delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if not can_edit_or_delete_post(post):
-        abort(403)
-    return render_template("post/confirm_delete_post.html", post=post)
-
-
 @post_bp.route("/upload_image", methods=["POST"])
 @login_required
 def upload_image():
