@@ -10,15 +10,26 @@
     --white: #ffffff;
     --shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     --transition: all 0.3s ease;
+    /* Dark Theme Variables */
+    --background: #ffffff;
+    --text-color: #343a40;
+}
+
+.dark-theme {
+    --background: #121212;
+    --text-color: #e0e0e0;
+    --primary: #bb86fc;
+    --secondary: #03dac6;
+    --shadow: rgba(255, 255, 255, 0.1) 0px 4px 12px;
 }
 
 body {
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
-    color: var(--dark);
-    background: #f0f2f5;
+    color: var(--text-color);
+    background-color: var(--background);
     padding-top: 60px;
-
+    transition: var(--transition);
 }
 
 .progress {
@@ -96,4 +107,9 @@ body {
 .post-preview-card:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow);
+}
+
+.navbar {
+    background-color: var(--background);
+    color: var(--text-color);
 }
