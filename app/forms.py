@@ -146,4 +146,3 @@ class UserProfileForm(FlaskForm):
     )
     confirm = PasswordField("Confirm Password")
     submit = SubmitField("Update Profile")
-    delete = SubmitField("Delete Account")

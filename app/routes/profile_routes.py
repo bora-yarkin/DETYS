@@ -6,7 +6,7 @@ from app.core.extensions import db
 profile_bp = Blueprint("profile", __name__, url_prefix="/profile")
 
 
-@profile_bp.route("/", methods=["GET", "POST"])
+@profile_bp.route("/edit", methods=["GET", "POST"])
 @login_required
 def manage_profile():
     form = UserProfileForm(obj=current_user)
@@ -24,7 +24,7 @@ def manage_profile():
 @profile_bp.route("/delete", methods=["POST"])
 @login_required
 def delete_account():
-    user = current_user
+    user = current_user._get_current_object()
     logout_user()
     db.session.delete(user)
     db.session.commit()

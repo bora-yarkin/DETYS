@@ -147,4 +147,6 @@ def mark_all_notifications_read():
 def handle_errors(error):
     background_image = url_for("static", filename="images/error.jpg")
     error_code = error.code if hasattr(error, "code") else 500
-    return render_template(f"errors/{error_code}.html", background_image=background_image), error_code
+    error_messages = {403: "You do not have permission to access this resource.", 404: "The page you are looking for does not exist.", 500: "An unexpected error has occurred. Please try again later."}
+    message = error_messages.get(error_code, "An error has occurred.")
+    return render_template("main/error.html", background_image=background_image, error_code=error_code, message=message), error_code

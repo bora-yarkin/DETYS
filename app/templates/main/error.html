@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}Server Error{% endblock %}
+{% block title %}Error {{ error_code }}{% endblock %}
 {% block content %}
 <div class="error-page" style="background-image: url('{{ background_image }}');">
-    <h2>500</h2>
-    <p>An unexpected error has occurred. Please try again later.</p>
+    <h2>{{ error_code }}</h2>
+    <p>{{ message }}</p>
     <a href="{{ url_for('main.index') }}">Return to Home</a>
 </div>
 {% endblock %}
