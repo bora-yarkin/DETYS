@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from datetime import datetime
 from app.core.extensions import db
 from app.models import Event, Poll, PollChoice
-from app.core.decorators import club_manager_required, main_admin_required, admin_or_manager_required
+from app.core.decorators import admin_or_manager_required
 
 poll_bp = Blueprint("poll", __name__)
 
