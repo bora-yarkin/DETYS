@@ -42,11 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const signInButton = document.getElementById('signIn');
     const container = document.getElementById('container');
 
-    signUpButton.addEventListener('click', () => {
-        container.classList.add('active');
-    });
+    if (signUpButton && signInButton && container) {
+        signUpButton.addEventListener('click', () => {
+            container.classList.add('active');
+        });
 
-    signInButton.addEventListener('click', () => {
-        container.classList.remove('active');
-    });
+        signInButton.addEventListener('click', () => {
+            container.classList.remove('active');
+        });
+    }
 });
