@@ -35,7 +35,7 @@
                         </a>
                         {% endif %}
 
-                        {% if club.president_id == current_user.id %}
+                        {% if club.president_id == current_user.id or current_user.is_main_admin %}
                         <a href="{{ url_for('club.manage_members', club_id=club.id) }}" class="btn btn-secondary">
                             <i class="fas fa-users-cog"></i> Manage Members
                         </a>

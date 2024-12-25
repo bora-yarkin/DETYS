@@ -1,6 +1,7 @@
 import os
 from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
+from flask_wtf.csrf import CSRFError
 from app.models import Club, Event, EventAttendance, EventResource, Membership, Poll, Post, ContactMessage, User, Notification
 from app.forms import ContactForm, MarkAsReadForm, MarkAllNotificationsReadForm
 from app.core.extensions import db
@@ -141,12 +142,37 @@ def mark_all_notifications_read():
     return redirect(url_for("main.notifications"))
 
 
+@main_bp.app_errorhandler(CSRFError)
+@main_bp.app_errorhandler(400)
+@main_bp.app_errorhandler(401)
 @main_bp.app_errorhandler(403)
 @main_bp.app_errorhandler(404)
+@main_bp.app_errorhandler(405)
+@main_bp.app_errorhandler(406)
+@main_bp.app_errorhandler(409)
+@main_bp.app_errorhandler(429)
 @main_bp.app_errorhandler(500)
+@main_bp.app_errorhandler(502)
+@main_bp.app_errorhandler(503)
 def handle_errors(error):
     background_image = url_for("static", filename="images/error.jpg")
-    error_code = error.code if hasattr(error, "code") else 500
-    error_messages = {403: "You do not have permission to access this resource.", 404: "The page you are looking for does not exist.", 500: "An unexpected error has occurred. Please try again later."}
-    message = error_messages.get(error_code, "An error has occurred.")
+    if isinstance(error, CSRFError):
+        error_code = " 400 Bad Request"
+        message = "The CSRF token is missing or invalid."
+    else:
+        error_code = error.code if hasattr(error, "code") else 500
+        error_messages = {
+            400: "Bad Request.",
+            401: "Unauthorized access.",
+            403: "You do not have permission to access this resource.",
+            404: "The page you are looking for does not exist.",
+            405: "Method Not Allowed.",
+            406: "Not Acceptable.",
+            409: "Conflict occurred.",
+            429: "Too Many Requests. Please try again later.",
+            500: "An unexpected error has occurred. Please try again later.",
+            502: "Bad Gateway.",
+            503: "Service Unavailable. Please try again later.",
+        }
+        message = error_messages.get(error_code, "An error has occurred.")
     return render_template("main/error.html", background_image=background_image, error_code=error_code, message=message), error_code

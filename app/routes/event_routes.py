@@ -5,7 +5,7 @@ from app.core.notifications import send_notification
 from app.models import Category, Club, Event, EventAttendance, EventFeedback
 from app.forms import EventForm, EventFeedbackForm
 from app.core.extensions import db
-from app.core.decorators import club_manager_required
+from app.core.decorators import admin_or_manager_required
 
 event_bp = Blueprint("event", __name__)
 
@@ -25,7 +25,7 @@ def event_list():
 
 @event_bp.route("/create", methods=["GET", "POST"])
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def create_event():
     form = EventForm()
     managed_clubs = Club.query.filter_by(president_id=current_user.id).all()
@@ -88,7 +88,7 @@ def cancel_registration(event_id):
 
 @event_bp.route("/<int:event_id>/manage_attendees")
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def manage_attendees(event_id):
     event = Event.query.get_or_404(event_id)
     confirmed_attendees = EventAttendance.query.filter_by(event_id=event.id, status="confirmed").all()

@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app.models import Club, ClubMessage, Membership
 from app.forms import ClubCreationForm, ClubMessageForm
 from app.core.extensions import db
-from app.core.decorators import club_manager_required
+from app.core.decorators import club_manager_required, main_admin_required, admin_or_manager_required
 from app.core.notifications import send_notification
 
 club_bp = Blueprint("club", __name__)
@@ -29,7 +29,7 @@ def club_detail(club_id):
     # Messaging
     form = ClubMessageForm()
     if form.validate_on_submit():
-        if not is_member and not current_user.is_club_manager:
+        if club.president_id != current_user.id and not current_user.is_main_admin:
             abort(403)
         message = ClubMessage(club_id=club.id, user_id=current_user.id, content=form.content.data)
         db.session.add(message)
@@ -45,7 +45,7 @@ def club_detail(club_id):
 
 @club_bp.route("/create", methods=["GET", "POST"])
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def create_club():
     form = ClubCreationForm()
     if form.validate_on_submit():
@@ -59,10 +59,10 @@ def create_club():
 
 @club_bp.route("/<int:club_id>/edit", methods=["GET", "POST"])
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def edit_club(club_id):
     club = Club.query.get_or_404(club_id)
-    if club.president_id != current_user.id:
+    if club.president_id != current_user.id and not current_user.is_main_admin:
         abort(403)
     form = ClubCreationForm(obj=club, club_id=club_id)
     if form.validate_on_submit():
@@ -75,10 +75,10 @@ def edit_club(club_id):
 
 @club_bp.route("/<int:club_id>/delete", methods=["POST"])
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def delete_club(club_id):
     club = Club.query.get_or_404(club_id)
-    if club.president_id != current_user.id:
+    if club.president_id != current_user.id and not current_user.is_main_admin:
         abort(403)
     try:
         db.session.delete(club)
@@ -107,10 +107,10 @@ def join_club(club_id):
 
 @club_bp.route("/<int:club_id>/members")
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def manage_members(club_id):
     club = Club.query.get_or_404(club_id)
-    if club.president_id != current_user.id:
+    if club.president_id != current_user.id and not current_user.is_main_admin:
         abort(403)
     pending_members = Membership.query.filter_by(club_id=club_id, is_approved=False).all()
     approved_members = Membership.query.filter_by(club_id=club_id, is_approved=True).all()
@@ -119,10 +119,10 @@ def manage_members(club_id):
 
 @club_bp.route("/<int:club_id>/approve/<int:user_id>")
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def approve_member(club_id, user_id):
     club = Club.query.get_or_404(club_id)
-    if club.president_id != current_user.id:
+    if club.president_id != current_user.id and not current_user.is_main_admin:
         abort(403)
     membership = Membership.query.filter_by(club_id=club_id, user_id=user_id).first_or_404()
     membership.is_approved = True
@@ -134,10 +134,10 @@ def approve_member(club_id, user_id):
 
 @club_bp.route("/<int:club_id>/remove/<int:user_id>")
 @login_required
-@club_manager_required
+@admin_or_manager_required
 def remove_member(club_id, user_id):
     club = Club.query.get_or_404(club_id)
-    if club.president_id != current_user.id:
+    if club.president_id != current_user.id and not current_user.is_main_admin:
         abort(403)
     membership = Membership.query.filter_by(club_id=club_id, user_id=user_id).first_or_404()
     db.session.delete(membership)
