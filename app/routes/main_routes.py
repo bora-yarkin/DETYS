@@ -152,8 +152,6 @@ def mark_all_notifications_read():
 @main_bp.app_errorhandler(409)
 @main_bp.app_errorhandler(418)
 @main_bp.app_errorhandler(423)
-@main_bp.app_errorhandler(425)
-@main_bp.app_errorhandler(426)
 @main_bp.app_errorhandler(428)
 @main_bp.app_errorhandler(431)
 @main_bp.app_errorhandler(451)
@@ -178,8 +176,6 @@ def handle_errors(error):
         409: "Conflict occurred.",
         418: "I'm a teapot.",
         423: "Locked.",
-        425: "Too Early.",
-        426: "Upgrade Required.",
         428: "Precondition Required.",
         431: "Request Header Fields Too Large.",
         451: "Unavailable For Legal Reasons.",
