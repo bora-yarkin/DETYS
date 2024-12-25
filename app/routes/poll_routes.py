@@ -43,8 +43,10 @@ def create_poll(event_id):
 @login_required
 def view_poll(poll_id):
     poll = Poll.query.get_or_404(poll_id)
-    event = poll.event
-    return render_template("poll/view_poll.html", poll=poll, event=event)
+    event = Event.query.get_or_404(poll.event_id)
+    total_votes = sum(choice.votes for choice in poll.choices)
+
+    return render_template("poll/view_poll.html", poll=poll, event=event, total_votes=total_votes)
 
 
 @poll_bp.route("/<int:poll_id>/vote", methods=["POST"])

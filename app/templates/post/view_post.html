@@ -18,7 +18,11 @@
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
                         <div class="post-content mb-4">
-                            {{ post.content|safe }}
+                            {% if '<img' in post.content %}
+                                {{ post.content|replace('<img', '<div class="image-container"><img')|replace('</img>', '</img></div>')|safe }}
+                            {% else %}
+                                {{ post.content|safe }}
+                            {% endif %}
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
