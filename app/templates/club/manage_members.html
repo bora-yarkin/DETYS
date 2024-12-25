@@ -25,14 +25,14 @@
                                     <div>
                                         <h6 class="mb-0">{{ membership.user.username }}</h6>
                                         <small class="text-muted">Requested: {{
-                                            membership.join_date.strftime('%Y-%m-%d') }}</small>
+                                            membership.joined_at.strftime('%Y-%m-%d') }}</small>
                                     </div>
                                     <div class="btn-group">
                                         <a href="{{ url_for('club.approve_member', club_id=club.id, user_id=membership.user.id) }}"
                                             class="btn btn-success btn-sm">
                                             <i class="fas fa-check"></i> Approve
                                         </a>
-                                        <a href="{{ url_for('club.reject_member', club_id=club.id, user_id=membership.user.id) }}"
+                                        <a href="{{ url_for('club.remove_member', club_id=club.id, user_id=membership.user.id) }}"
                                             class="btn btn-danger btn-sm">
                                             <i class="fas fa-times"></i> Reject
                                         </a>
@@ -61,7 +61,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="mb-0">{{ membership.user.username }}</h6>
-                                        <small class="text-muted">Joined: {{ membership.join_date.strftime('%Y-%m-%d')
+                                        <small class="text-muted">Joined: {{ membership.joined_at.strftime('%Y-%m-%d')
                                             }}</small>
                                     </div>
                                     <a href="{{ url_for('club.remove_member', club_id=club.id, user_id=membership.user.id) }}"
