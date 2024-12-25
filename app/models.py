@@ -255,3 +255,14 @@ class Category(db.Model):
 
     # Relationship with Event
     events = db.relationship("Event", back_populates="category", cascade="all, delete-orphan")
+
+
+class ClubMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    club = db.relationship("Club", backref=db.backref("messages", lazy="dynamic"))
+    user = db.relationship("User", backref=db.backref("club_messages", lazy="dynamic"))

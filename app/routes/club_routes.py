@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, redirect, request, url_for, flash, abort
 from flask_login import login_required, current_user
-from app.models import Club, Membership
-from app.forms import ClubCreationForm
+from app.models import Club, ClubMessage, Membership
+from app.forms import ClubCreationForm, ClubMessageForm
 from app.core.extensions import db
 from app.core.decorators import club_manager_required
 from app.core.notifications import send_notification
@@ -16,7 +16,7 @@ def club_list():
     return render_template("club/club_list.html", clubs=clubs)
 
 
-@club_bp.route("/<int:club_id>")
+@club_bp.route("/<int:club_id>", methods=["GET", "POST"])
 @login_required
 def club_detail(club_id):
     club = Club.query.get_or_404(club_id)
@@ -25,7 +25,22 @@ def club_detail(club_id):
     if current_user.is_authenticated:
         membership = Membership.query.filter_by(user_id=current_user.id, club_id=club.id).first()
         is_member = membership is not None and membership.is_approved
-    return render_template("club/club_detail.html", club=club, is_member=is_member, membership=membership)
+
+    # Messaging
+    form = ClubMessageForm()
+    if form.validate_on_submit():
+        if not is_member and not current_user.is_club_manager:
+            abort(403)
+        message = ClubMessage(club_id=club.id, user_id=current_user.id, content=form.content.data)
+        db.session.add(message)
+        db.session.commit()
+        flash("Message posted successfully.", "success")
+        return redirect(url_for("club.club_detail", club_id=club.id))
+
+    page = request.args.get("page", 1, type=int)
+    messages = ClubMessage.query.filter_by(club_id=club.id).order_by(ClubMessage.timestamp.desc()).paginate(page=page, per_page=10)
+
+    return render_template("club/club_detail.html", club=club, is_member=is_member, membership=membership, form=form, messages=messages)
 
 
 @club_bp.route("/create", methods=["GET", "POST"])

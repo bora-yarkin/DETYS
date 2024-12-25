@@ -56,6 +56,87 @@
             </div>
         </div>
 
+        <!-- Messaging Section -->
+        {% if is_member or current_user.is_club_manager %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h3 class="h5 mb-0">Club Messages</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('club.club_detail', club_id=club.id) }}">
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                {{ form.content.label(class="form-label") }}
+                                {{ form.content(class="form-control", rows="3") }}
+                                {% for error in form.content.errors %}
+                                <div class="text-danger mt-1"><small>{{ error }}</small></div>
+                                {% endfor %}
+                            </div>
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        {% for message in messages.items %}
+                        <div class="mb-3">
+                            <h5>{{ message.user.username }}</h5>
+                            <p>{{ message.content }}</p>
+                            <small class="text-muted">{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                            <hr>
+                        </div>
+                        {% endfor %}
+
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                {% if messages.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('club.club_detail', club_id=club.id, page=messages.prev_num) }}">Previous</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                                {% endif %}
+
+                                {% for page_num in messages.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                                    {% if page_num %}
+                                        {% if page_num == messages.page %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('club.club_detail', club_id=club.id, page=page_num) }}">{{ page_num }}</a>
+                                        </li>
+                                        {% endif %}
+                                    {% else %}
+                                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if messages.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('club.club_detail', club_id=club.id, page=messages.next_num) }}">Next</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="row">
             <div class="col-12">
                 <div class="card">

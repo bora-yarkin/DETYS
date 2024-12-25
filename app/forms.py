@@ -56,6 +56,11 @@ class ClubCreationForm(FlaskForm):
             raise ValidationError("A club with this name already exists. Please choose a different name.")
 
 
+class ClubMessageForm(FlaskForm):
+    content = TextAreaField("Message", validators=[DataRequired(), Length(min=1, max=500)])
+    submit = SubmitField("Post Message")
+
+
 class EventForm(FlaskForm):
     title = StringField("Event Title", validators=[DataRequired()])
     description = TextAreaField("Description", validators=[DataRequired()])
