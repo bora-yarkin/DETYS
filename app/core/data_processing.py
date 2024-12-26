@@ -49,3 +49,24 @@ def export_event_attendance_to_csv(allowed_event_ids=None):
     row_formatter = lambda row: [row[1], row[3], row[2], row[0].status, row[0].registered_at.isoformat() if row[0].registered_at else ""]
 
     return export_to_csv("event_attendance", headers, query, row_formatter)
+
+
+def export_event_stats_to_csv(event_stats):
+    headers = ["Metric", "Value"]
+    rows = [["Total Events", event_stats["total_events"]], ["Average Attendance", f"{event_stats['average_attendance']:.2f}"]] + [["Category: " + cat, count] for cat, count in event_stats["event_by_category"]]
+
+    return export_to_csv("event_stats", headers, rows, lambda x: x)
+
+
+def export_user_stats_to_csv(user_stats):
+    headers = ["Metric", "Value"]
+    rows = [["Total Users", user_stats["total_users"]], ["Active Users (30 days)", user_stats["active_users"]], ["New Users (30 days)", user_stats["new_users"]], ["Average Events per User", f"{user_stats['average_events_per_user']:.2f}"]]
+
+    return export_to_csv("user_stats", headers, rows, lambda x: x)
+
+
+def export_club_stats_to_csv(club_stats):
+    headers = ["Metric", "Value"]
+    rows = [["Total Clubs", club_stats["total_clubs"]], ["Average Members per Club", f"{club_stats['avg_members']:.2f}"]] + [["Most Active: " + club, count] for club, count in club_stats["most_active_clubs"]]
+
+    return export_to_csv("club_stats", headers, rows, lambda x: x)

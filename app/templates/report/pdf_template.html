@@ -139,6 +139,50 @@
     <div class="no-data">No feedback data available.</div>
     {% endif %}
 </section>
+
+<section class="stats-section">
+    <h3>Event Statistics</h3>
+    <table>
+        <tbody>
+            <tr>
+                <td>Total Events:</td>
+                <td>{{ event_stats.total_events }}</td>
+            </tr>
+            <tr>
+                <td>Average Attendance:</td>
+                <td>{{ "%.2f"|format(event_stats.average_attendance) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Category Distribution</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category, count in event_stats.event_by_category %}
+            <tr>
+                <td>{{ category }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="user-section">
+    <h3>User Statistics</h3>
+    <!-- Add user stats tables -->
+</section>
+
+<section class="club-section">
+    <h3>Club Statistics</h3>
+    <!-- Add club stats tables -->
+</section>
 {% endblock content %}
 
 {% block footer %}

@@ -2,16 +2,19 @@ import os
 import base64
 from datetime import datetime
 from io import BytesIO
+from zipfile import ZipFile
 
 import matplotlib
 import matplotlib.pyplot as plt
 from flask import Blueprint, render_template, request, send_file, redirect, url_for, flash
 from flask_login import login_required, current_user
+from sqlalchemy import func
 from xhtml2pdf import pisa
 
 from app.core.extensions import db
+from app.core.analytics import Analytics
 from app.models import Category, Event, EventAttendance, EventFeedback, Club
-from app.core.data_processing import export_event_feedback_to_csv, export_event_attendance_to_csv
+from app.core.data_processing import export_event_feedback_to_csv, export_event_attendance_to_csv, export_event_stats_to_csv, export_user_stats_to_csv, export_club_stats_to_csv
 
 matplotlib.use("Agg")
 
@@ -51,30 +54,70 @@ def generate_participation_chart(participation_data):
     return "data:image/png;base64," + base64.b64encode(img_buffer.read()).decode("utf-8")
 
 
+def generate_category_chart(data):
+    plt.figure(figsize=(8, 4))
+    plt.pie([x[1] for x in data], labels=[x[0] for x in data], autopct="%1.1f%%")
+    plt.title("Events by Category")
+
+    return convert_plot_to_base64()
+
+
+def generate_rating_chart(data):
+    plt.figure(figsize=(8, 4))
+    plt.bar([str(x[0]) for x in data], [x[1] for x in data])
+    plt.title("Rating Distribution")
+    plt.xlabel("Rating")
+    plt.ylabel("Count")
+
+    return convert_plot_to_base64()
+
+
+def generate_club_chart(data):
+    plt.figure(figsize=(8, 4))
+    plt.bar([x[0] for x in data], [x[1] for x in data])
+    plt.title("Most Active Clubs")
+    plt.xticks(rotation=45)
+
+    return convert_plot_to_base64()
+
+
+def convert_plot_to_base64():
+    img_buffer = BytesIO()
+    plt.savefig(img_buffer, format="png", bbox_inches="tight")
+    plt.close()
+    img_buffer.seek(0)
+    return "data:image/png;base64," + base64.b64encode(img_buffer.read()).decode("utf-8")
+
+
 @report_bp.route("/reports")
 @login_required
 def reports():
     allowed_event_ids = get_event_ids_for_current_user()
     category_id = request.args.get("category_id", type=int)
 
-    query = db.session.query(Event.title, db.func.count(EventAttendance.user_id)).join(EventAttendance, Event.id == EventAttendance.event_id).filter(EventAttendance.status == "confirmed", Event.id.in_(allowed_event_ids))
+    query = db.session.query(Event.title, func.count(EventAttendance.user_id)).join(EventAttendance).filter(EventAttendance.status == "confirmed", Event.id.in_(allowed_event_ids))
+
     if category_id:
         query = query.filter(Event.category_id == category_id)
 
-    participation_data = query.group_by(Event.id).all()
+    participation_data = query.group_by(Event.id, Event.title).all()
 
-    fb_query = db.session.query(Event.title, db.func.avg(EventFeedback.rating)).join(EventFeedback, Event.id == EventFeedback.event_id).filter(Event.id.in_(allowed_event_ids))
-    if category_id:
-        fb_query = fb_query.filter(Event.category_id == category_id)
+    analytics = Analytics()
+    event_stats = analytics.get_event_stats()
+    user_stats = analytics.get_user_stats()
+    club_stats = analytics.get_club_stats()
+    feedback_stats = analytics.get_feedback_stats()
 
-    feedback_data = fb_query.group_by(Event.id).all()
+    base64_charts = {
+        "participation": generate_participation_chart(participation_data),
+        "categories": generate_category_chart(event_stats["event_by_category"]),
+        "ratings": generate_rating_chart(feedback_stats["rating_distribution"]),
+        "club_activity": generate_club_chart(club_stats["most_active_clubs"]),
+    }
 
-    sorted_by_popularity = sorted(participation_data, key=lambda x: x[1], reverse=True)[:5]
-    base64_image = generate_participation_chart(participation_data)
-
-    categories = Category.query.order_by(Category.name.asc()).all()
-
-    return render_template("report/report.html", participation_data=participation_data, sorted_by_popularity=sorted_by_popularity, feedback_data=feedback_data, base64_image=base64_image, categories=categories, selected_category_id=category_id)
+    return render_template(
+        "report/report.html", participation_data=participation_data, event_stats=event_stats, user_stats=user_stats, club_stats=club_stats, feedback_stats=feedback_stats, charts=base64_charts, categories=Category.query.order_by(Category.name.asc()).all(), selected_category_id=category_id
+    )
 
 
 @report_bp.route("/reports/download_pdf")
@@ -132,3 +175,31 @@ def export_attendance_csv():
     else:
         flash("Failed to generate attendance CSV.", "danger")
         return redirect(url_for("report.reports"))
+
+
+@report_bp.route("/reports/export_stats_csv")
+@login_required
+def export_stats_csv():
+    analytics = Analytics()
+    event_stats = analytics.get_event_stats()
+    user_stats = analytics.get_user_stats()
+    club_stats = analytics.get_club_stats()
+
+    # Export each stat type
+    event_filepath = export_event_stats_to_csv(event_stats)
+    user_filepath = export_user_stats_to_csv(user_stats)
+    club_filepath = export_club_stats_to_csv(club_stats)
+
+    if event_filepath and user_filepath and club_filepath:
+        # Create zip file containing all stats
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, "w") as zip_file:
+            zip_file.write(event_filepath, os.path.basename(event_filepath))
+            zip_file.write(user_filepath, os.path.basename(user_filepath))
+            zip_file.write(club_filepath, os.path.basename(club_filepath))
+
+        zip_buffer.seek(0)
+        return send_file(zip_buffer, as_attachment=True, download_name=f"all_stats_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip", mimetype="application/zip")
+
+    flash("Failed to generate statistics files.", "danger")
+    return redirect(url_for("report.reports"))

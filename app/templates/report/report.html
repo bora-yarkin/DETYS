@@ -48,6 +48,101 @@
             </div>
         </div>
 
+        <!-- Event Statistics -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h3 class="h5 mb-0">Event Statistics</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Events by Category</h6>
+                        <img src="{{ charts.categories }}" alt="Category Chart" class="img-fluid mb-3">
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Events
+                                <span class="badge bg-primary rounded-pill">{{ event_stats.total_events }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Average Attendance
+                                <span class="badge bg-info rounded-pill">{{ "%.1f"|format(event_stats.average_attendance) }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Statistics -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h3 class="h5 mb-0">User Engagement</h3>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Active Users (30 days)</h6>
+                                <h2 class="card-text">{{ user_stats.active_users }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">New Users (30 days)</h6>
+                                <h2 class="card-text">{{ user_stats.new_users }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Club Statistics -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h3 class="h5 mb-0">Club Performance</h3>
+            </div>
+            <div class="card-body">
+                <img src="{{ charts.club_activity }}" alt="Club Activity Chart" class="img-fluid mb-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Average Members per Club: {{ "%.1f"|format(club_stats.avg_members) }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Analysis -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h3 class="h5 mb-0">Feedback Analysis</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Rating Distribution</h6>
+                        <img src="{{ charts.ratings }}" alt="Ratings Chart" class="img-fluid mb-3">
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Top Rated Events</h6>
+                        <ul class="list-group">
+                            {% for event in feedback_stats.top_rated_events %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ event[0] }}
+                                <span class="badge bg-success">{{ "%.1f"|format(event[1]) }}/5</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Popular Events -->
         <div class="card shadow-sm mb-4">
             <div class="card-header">
@@ -111,6 +206,45 @@
             <a href="{{ url_for('report.export_attendance_csv') }}" class="btn btn-info">
                 <i class="fas fa-file-csv"></i> Export Attendance CSV
             </a>
+        </div>
+
+        <!-- At the bottom of the page, add new export options -->
+        <div class="d-flex gap-2 flex-wrap mb-4">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                    Export Reports
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="{{ url_for('report.export_feedback_csv') }}">
+                            Export Feedback Data
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ url_for('report.export_attendance_csv') }}">
+                            Export Attendance Data
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ url_for('report.export_stats_csv') }}">
+                            Export All Statistics
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    Download PDF Reports
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="{{ url_for('report.download_pdf') }}">
+                            Complete Report
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
