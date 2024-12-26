@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Reports{% endblock %}
 {% block content %}
-<div class="container-fluid px-0">
-    <div class="hero-section text-center py-5 bg-primary text-white">
+<div class="""container-fluid px-0"></div>
+    <div class="""hero-section text-center py-5 bg-primary text-white">
         <div class="container">
             <h1 class="display-4 fw-bold mb-4">Reports & Statistics</h1>
         </div>
@@ -13,25 +13,39 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <form method="GET" action="{{ url_for('report.reports') }}" class="row align-items-end g-3">
-                    <div class="col-md-9">
-                        <label for="category_id" class="form-label">Filter by Category:</label>
-                        <select name="category_id" id="category_id" class="form-select">
-                            <option value="">All Categories</option>
-                            {% for cat in categories %}
-                            <option value="{{ cat.id }}" {% if selected_category_id==cat.id %}selected{% endif %}>
-                                {{ cat.name }}
-                            </option>
+                    <div class="col-md-3">
+                        <label for="from_date" class="form-label">From Date:</label>
+                        <input type="date" class="form-control" name="from_date" id="from_date" value="{{ from_date if from_date else '' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="to_date" class="form-label">To Date:</label>
+                        <input type="date" class="form-control" name="to_date" id="to_date" value="{{ to_date if to_date else '' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="club_id" class="form-label">Filter by Club:</label>
+                        <select name="club_id" id="club_id" class="form-select">
+                            <option value="">All Clubs</option>
+                            {% for c in clubs %}
+                            <option value="{{ c.id }}" {% if selected_club == c.id %}selected{% endif %}>{{ c.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-3">
+                        <label for="category_ids" class="form-label">Filter by Categories:</label>
+                        <select name="category_ids" id="category_ids" class="form-select" multiple>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if cat.id in selected_categories %} selected {% endif %}>{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mt-2">
                         <button type="submit" class="btn btn-primary w-100">Filter</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Participation Data -->
+        <!-- Participation -->
         <div class="card shadow-sm mb-4">
             <div class="card-header">
                 <h3 class="h5 mb-0">Event Participation</h3>
@@ -39,9 +53,17 @@
             <div class="card-body">
                 {% if participation_data %}
                 <p class="mb-4">Number of participants by event:</p>
-                {% if base64_image %}
-                <img src="{{ base64_image }}" alt="Participation Chart" class="img-fluid">
+                {% if charts.participation %}
+                <img src="{{ charts.participation }}" alt="Participation Chart" class="img-fluid">
                 {% endif %}
+                <ul class="list-group mt-3">
+                    {% for event_title, count in participation_data %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ event_title }}
+                        <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
                 {% else %}
                 <p class="text-muted mb-0">No participation data available.</p>
                 {% endif %}
@@ -54,24 +76,18 @@
                 <h3 class="h5 mb-0">Event Statistics</h3>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Events by Category</h6>
-                        <img src="{{ charts.categories }}" alt="Category Chart" class="img-fluid mb-3">
-                    </div>
-                    <div class="col-md-6">
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Total Events
-                                <span class="badge bg-primary rounded-pill">{{ event_stats.total_events }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Average Attendance
-                                <span class="badge bg-info rounded-pill">{{ "%.1f"|format(event_stats.average_attendance) }}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <p>Total Events: {{ event_stats.total_events }}</p>
+                <p>Average Attendance: {{ "%.2f"|format(event_stats.average_attendance) }}</p>
+                <h6>By Category</h6>
+                <ul class="list-group">
+                    {% for category, count in event_stats.event_by_category %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ category }}
+                        <span class="badge bg-info rounded-pill">{{ count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <img src="{{ charts.categories }}" alt="Events by Category" class="img-fluid mt-3">
             </div>
         </div>
 
@@ -85,16 +101,34 @@
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">Active Users (30 days)</h6>
-                                <h2 class="card-text">{{ user_stats.active_users }}</h2>
+                                <h6>Total Users</h6>
+                                <h2>{{ user_stats.total_users }}</h2>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">New Users (30 days)</h6>
-                                <h2 class="card-text">{{ user_stats.new_users }}</h2>
+                                <h6>Active Users (30 days)</h6>
+                                <h2>{{ user_stats.active_users }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-4 mt-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>New Users (30 days)</h6>
+                                <h2>{{ user_stats.new_users }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>Avg Events/User</h6>
+                                <h2>{{ "%.2f"|format(user_stats.average_events_per_user) }}</h2>
                             </div>
                         </div>
                     </div>
@@ -109,11 +143,17 @@
             </div>
             <div class="card-body">
                 <img src="{{ charts.club_activity }}" alt="Club Activity Chart" class="img-fluid mb-3">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p>Average Members per Club: {{ "%.1f"|format(club_stats.avg_members) }}</p>
-                    </div>
-                </div>
+                <p>Total Clubs: {{ club_stats.total_clubs }}</p>
+                <p>Average Members per Club: {{ "%.2f"|format(club_stats.avg_members) }}</p>
+                <h6>Most Active Clubs</h6>
+                <ul class="list-group">
+                    {% for club, count in club_stats.most_active_clubs %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ club }}
+                        <span class="badge bg-success rounded-pill">{{ count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
 
@@ -123,27 +163,13 @@
                 <h3 class="h5 mb-0">Feedback Analysis</h3>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Rating Distribution</h6>
-                        <img src="{{ charts.ratings }}" alt="Ratings Chart" class="img-fluid mb-3">
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Top Rated Events</h6>
-                        <ul class="list-group">
-                            {% for event in feedback_stats.top_rated_events %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {{ event[0] }}
-                                <span class="badge bg-success">{{ "%.1f"|format(event[1]) }}/5</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
+                <h6>Rating Distribution</h6>
+                <img src="{{ charts.ratings }}" alt="Ratings Chart" class="img-fluid mb-3">
+                <p>Average Rating: {{ "%.2f"|format(feedback_stats.avg_rating) }}/5.00</p>
             </div>
         </div>
 
-        <!-- Popular Events -->
+        <!-- Most Popular Events -->
         <div class="card shadow-sm mb-4">
             <div class="card-header">
                 <h3 class="h5 mb-0">Most Popular Events</h3>
@@ -154,7 +180,7 @@
                     {% for event_title, count in sorted_by_popularity %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         {{ event_title }}
-                        <span class="badge bg-primary rounded-pill">{{ count }} participants</span>
+                        <span class="badge bg-primary rounded-pill">{{ count }}</span>
                     </li>
                     {% endfor %}
                 </ol>
@@ -176,13 +202,13 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Event</th>
-                                <th>Average Rating</th>
+                                <th>Avg Rating</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for event_title, avg_rating in feedback_data %}
+                            {% for e_title, avg_rating in feedback_data %}
                             <tr>
-                                <td>{{ event_title }}</td>
+                                <td>{{ e_title }}</td>
                                 <td>{{ "%.2f"|format(avg_rating if avg_rating else 0) }}/5.00</td>
                             </tr>
                             {% endfor %}
@@ -196,53 +222,33 @@
         </div>
 
         <!-- Export Buttons -->
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="{{ url_for('report.download_pdf', category_id=selected_category_id) }}" class="btn btn-primary">
-                <i class="fas fa-file-pdf"></i> Download PDF
-            </a>
-            <a href="{{ url_for('report.export_feedback_csv') }}" class="btn btn-success">
-                <i class="fas fa-file-csv"></i> Export Feedback CSV
-            </a>
-            <a href="{{ url_for('report.export_attendance_csv') }}" class="btn btn-info">
-                <i class="fas fa-file-csv"></i> Export Attendance CSV
-            </a>
-        </div>
-
-        <!-- At the bottom of the page, add new export options -->
-        <div class="d-flex gap-2 flex-wrap mb-4">
+        <div class="d-flex gap-2 flex-wrap mt-4">
             <div class="btn-group">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
-                    Export Reports
+                    Export
                 </button>
                 <ul class="dropdown-menu">
                     <li>
-                        <a class="dropdown-item" href="{{ url_for('report.export_feedback_csv') }}">
-                            Export Feedback Data
+                        <a class="dropdown-item" href="{{ url_for('report.download_pdf', category_id=selected_category_id) }}">
+                            Export PDF
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="{{ url_for('report.export_attendance_csv') }}">
-                            Export Attendance Data
+                            Attendance CSV
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ url_for('report.export_feedback_csv') }}">
+                            Feedback CSV
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="{{ url_for('report.export_stats_csv') }}">
-                            Export All Statistics
+                            All Stats (ZIP)
                         </a>
                     </li>
-                </ul>
-            </div>
-            
-            <div class="btn-group">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                    Download PDF Reports
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a class="dropdown-item" href="{{ url_for('report.download_pdf') }}">
-                            Complete Report
-                        </a>
-                    </li>
+                    <!-- Optionally add more CSV exports -->
                 </ul>
             </div>
         </div>

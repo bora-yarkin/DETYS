@@ -4,189 +4,190 @@
 
 {% block navbar %}{% endblock navbar %}
 {% block styles %}
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        margin: 40px;
-    }
-
-    h2,
-    h3 {
-        color: #2c3e50;
-        margin-bottom: 20px;
-    }
-
-    h2 {
-        border-bottom: 2px solid #3498db;
-        padding-bottom: 10px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    th {
-        background: #3498db;
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-
-    td {
-        padding: 12px;
-        border: 1px solid #ddd;
-    }
-
-    tr:nth-child(even) {
-        background: #f8f9fa;
-    }
-
-    img {
-        max-width: 100%;
-        height: auto;
-        margin: 20px 0;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-
-    .report-date {
-        color: #666;
-        font-size: 0.9em;
-        margin-bottom: 30px;
-    }
-
-    .no-data {
-        color: #666;
-        font-style: italic;
-        padding: 20px;
-        text-align: center;
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-
-    .footer {
-        margin-top: 40px;
-        padding-top: 20px;
-        border-top: 1px solid #ddd;
-        text-align: center;
-        color: #666;
-        font-size: 12px;
-    }
-</style>
+{{ super() }}
+<!-- Removed inline custom styles to use standard site styling -->
 {% endblock styles %}
 
 {% block content %}
-<div class="report-date">
+<div class="container my-5">
     <h2>System Report - {{ current_date.strftime("%B %d, %Y") }}</h2>
-</div>
 
-{% if base64_image %}
-<div class="chart-section">
-    <img src="{{ base64_image }}" alt="Participation Chart">
-</div>
-{% endif %}
-
-<section class="participation-section">
-    <h3>Event Participation</h3>
-    {% if participation_data %}
-    <table>
-        <thead>
-            <tr>
-                <th>Event</th>
-                <th>Confirmed Participants</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for event_title, count in participation_data %}
-            <tr>
-                <td>{{ event_title }}</td>
-                <td>{{ count }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <div class="no-data">No participation data available.</div>
+    {% if base64_image %}
+    <div class="text-center my-4">
+        <img src="{{ base64_image }}" alt="Participation Chart" class="img-fluid rounded">
+    </div>
     {% endif %}
-</section>
 
-<section class="feedback-section">
-    <h3>Event Feedback (Average Rating)</h3>
-    {% if feedback_data %}
-    <table>
-        <thead>
-            <tr>
-                <th>Event</th>
-                <th>Average Rating</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for event_title, avg_rating in feedback_data %}
-            <tr>
-                <td>{{ event_title }}</td>
-                <td>{{ "%.2f"|format(avg_rating if avg_rating else 0) }}/5.00</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <div class="no-data">No feedback data available.</div>
+    {% if base64_rating_chart %}
+    <div class="text-center my-4">
+        <h4>Rating Distribution</h4>
+        <img src="{{ base64_rating_chart }}" alt="Rating Distribution" class="img-fluid rounded">
+    </div>
     {% endif %}
-</section>
 
-<section class="stats-section">
-    <h3>Event Statistics</h3>
-    <table>
-        <tbody>
-            <tr>
-                <td>Total Events:</td>
-                <td>{{ event_stats.total_events }}</td>
-            </tr>
-            <tr>
-                <td>Average Attendance:</td>
-                <td>{{ "%.2f"|format(event_stats.average_attendance) }}</td>
-            </tr>
-        </tbody>
-    </table>
+    {% if base64_category_chart %}
+    <div class="text-center my-4">
+        <h4>Category Distribution</h4>
+        <img src="{{ base64_category_chart }}" alt="Category Distribution" class="img-fluid rounded">
+    </div>
+    {% endif %}
 
-    <h4>Category Distribution</h4>
-    <table>
-        <thead>
-            <tr>
-                <th>Category</th>
-                <th>Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for category, count in event_stats.event_by_category %}
-            <tr>
-                <td>{{ category }}</td>
-                <td>{{ count }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</section>
+    {% if base64_club_chart %}
+    <div class="text-center my-4">
+        <h4>Most Active Clubs</h4>
+        <img src="{{ base64_club_chart }}" alt="Club Activity" class="img-fluid rounded">
+    </div>
+    {% endif %}
 
-<section class="user-section">
-    <h3>User Statistics</h3>
-    <!-- Add user stats tables -->
-</section>
+    <section class="my-4">
+        <h3>Event Participation</h3>
+        {% if participation_data %}
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Confirmed Participants</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event_title, count in participation_data %}
+                <tr>
+                    <td>{{ event_title }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-secondary text-center">No participation data available.</div>
+        {% endif %}
+    </section>
 
-<section class="club-section">
-    <h3>Club Statistics</h3>
-    <!-- Add club stats tables -->
-</section>
+    <section class="mb-4">
+        <h3>Event Feedback (Average Rating)</h3>
+        {% if feedback_data %}
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Average Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for title, avg_rating in feedback_data %}
+                <tr>
+                    <td>{{ title }}</td>
+                    <td>{{ "%.2f"|format(avg_rating if avg_rating else 0) }}/5.00</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-secondary text-center">No feedback data available.</div>
+        {% endif %}
+    </section>
+
+    <section class="mb-4">
+        <h3>Event Statistics</h3>
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td>Total Events:</td>
+                    <td>{{ event_stats.total_events }}</td>
+                </tr>
+                <tr>
+                    <td>Average Attendance:</td>
+                    <td>{{ "%.2f"|format(event_stats.average_attendance) }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Category Distribution</h4>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, count in event_stats.event_by_category %}
+                <tr>
+                    <td>{{ category }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="mb-4">
+        <h3>User Statistics</h3>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Total Users</td>
+                    <td>{{ user_stats.total_users }}</td>
+                </tr>
+                <tr>
+                    <td>Active Users (30 days)</td>
+                    <td>{{ user_stats.active_users }}</td>
+                </tr>
+                <tr>
+                    <td>New Users (30 days)</td>
+                    <td>{{ user_stats.new_users }}</td>
+                </tr>
+                <tr>
+                    <td>Avg Events/User</td>
+                    <td>{{ "%.2f"|format(user_stats.average_events_per_user) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="mb-4">
+        <h3>Club Statistics</h3>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Total Clubs</td>
+                    <td>{{ club_stats.total_clubs }}</td>
+                </tr>
+                <tr>
+                    <td>Average Members</td>
+                    <td>{{ "%.2f"|format(club_stats.avg_members) }}</td>
+                </tr>
+                {% for club, count in club_stats.most_active_clubs %}
+                <tr>
+                    <td>Most Active: {{ club }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="mb-5">
+        <h3>Feedback Analysis</h3>
+        <p>Average Rating: {{ "%.2f"|format(feedback_stats.avg_rating) }}/5.00</p>
+    </section>
+</div>
 {% endblock content %}
 
 {% block footer %}
-<div class="footer">
-    <p>Generated by DETYS System - {{ current_date.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+<div class="text-center text-muted py-3">
+    <small>Generated by DETYS System - {{ current_date.strftime("%Y-%m-%d %H:%M:%S") }}</small>
 </div>
 {% endblock %}
