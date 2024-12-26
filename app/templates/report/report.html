@@ -31,10 +31,11 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="category_ids" class="form-label">Filter by Categories:</label>
-                        <select name="category_ids" id="category_ids" class="form-select" multiple>
+                        <label for="category_ids" class="form-label">Filter by Category:</label>
+                        <select name="category_ids" id="category_ids" class="form-select">
+                            <option value="">All Categories</option>
                             {% for cat in categories %}
-                            <option value="{{ cat.id }}" {% if cat.id in selected_categories %} selected {% endif %}>{{ cat.name }}</option>
+                            <option value="{{ cat.id }}" {% if selected_categories and cat.id == selected_categories[0] %}selected{% endif %}>{{ cat.name }}</option>
                             {% endfor %}
                         </select>
                     </div>

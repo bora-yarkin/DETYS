@@ -15,8 +15,8 @@ from .profile_routes import profile_bp
 
 def register_routes(app):
     app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(post_bp, url_prefix="/posts")
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(post_bp)
     app.register_blueprint(club_bp, url_prefix="/clubs")
     app.register_blueprint(event_bp, url_prefix="/events")
     app.register_blueprint(report_bp, url_prefix="/dashboard")
