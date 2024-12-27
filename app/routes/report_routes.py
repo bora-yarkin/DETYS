@@ -93,23 +93,19 @@ def reports():
 
     query = db.session.query(Event.title, func.count(EventAttendance.user_id)).join(EventAttendance).filter(EventAttendance.status == "confirmed", Event.id.in_(allowed_event_ids))
 
-    # Filter by date
     if from_date:
         query = query.filter(Event.date >= from_date)
     if to_date:
         query = query.filter(Event.date <= to_date)
 
-    # Filter by category
     if category_ids:
         query = query.filter(Event.category_id.in_(category_ids))
 
-    # Filter by club
     if club_id:
         query = query.filter(Event.club_id == club_id)
 
     participation_data = query.group_by(Event.id, Event.title).all()
 
-    # Calculate most popular events (by participant count)
     popular_query = db.session.query(Event.title, func.count(EventAttendance.user_id).label("cnt")).join(EventAttendance).filter(EventAttendance.status == "confirmed", Event.id.in_(allowed_event_ids))
     if category_id:
         popular_query = popular_query.filter(Event.category_id == category_id)

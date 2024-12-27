@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app.models import Club, ClubMessage, Membership
 from app.forms import ClubCreationForm, ClubMessageForm
 from app.core.extensions import db
-from app.core.decorators import club_manager_required, main_admin_required, admin_or_manager_required
+from app.core.decorators import admin_or_manager_required
 from app.core.notifications import send_notification
 
 club_bp = Blueprint("club", __name__)
@@ -26,7 +26,6 @@ def club_detail(club_id):
         membership = Membership.query.filter_by(user_id=current_user.id, club_id=club.id).first()
         is_member = membership is not None and membership.is_approved
 
-    # Messaging
     form = ClubMessageForm()
     if form.validate_on_submit():
         if club.president_id != current_user.id and not current_user.is_main_admin:

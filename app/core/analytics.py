@@ -7,10 +7,8 @@ from app.models import Event, EventAttendance, EventFeedback, User, Club, Catego
 class Analytics:
     @staticmethod
     def get_event_stats():
-        # First get attendance counts per event
         attendance_subquery = db.session.query(EventAttendance.event_id, func.count(EventAttendance.user_id).label("attendee_count")).group_by(EventAttendance.event_id).subquery()
 
-        # Then calculate average
         average_attendance = db.session.query(func.avg(attendance_subquery.c.attendee_count)).scalar() or 0
 
         return {
@@ -24,10 +22,8 @@ class Analytics:
     def get_user_stats():
         thirty_days = datetime.now() - timedelta(days=30)
 
-        # First get event count per user
         events_per_user = db.session.query(EventAttendance.user_id, func.count(EventAttendance.event_id).label("event_count")).group_by(EventAttendance.user_id).subquery()
 
-        # Then calculate average
         avg_events = db.session.query(func.avg(events_per_user.c.event_count)).scalar() or 0
 
         return {
@@ -39,10 +35,8 @@ class Analytics:
 
     @staticmethod
     def get_club_stats():
-        # First get member counts per club
         members_subquery = db.session.query(Membership.club_id, func.count(Membership.user_id).label("member_count")).group_by(Membership.club_id).subquery()
 
-        # Then calculate average
         average_members = db.session.query(func.avg(members_subquery.c.member_count)).scalar() or 0
 
         return {
