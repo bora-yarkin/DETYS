@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Reports{% endblock %}
 {% block content %}
-<div class="""container-fluid px-0"></div>
-    <div class="""hero-section text-center py-5 bg-primary text-white">
+<div class="container-fluid px-0">
+    <!-- Hero Section -->
+    <div class="hero-section text-center py-5 bg-primary text-white">
         <div class="container">
             <h1 class="display-4 fw-bold mb-4">Reports & Statistics</h1>
         </div>
@@ -13,32 +14,41 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <form method="GET" action="{{ url_for('report.reports') }}" class="row align-items-end g-3">
+                    <!-- Date Range Filters -->
                     <div class="col-md-3">
                         <label for="from_date" class="form-label">From Date:</label>
-                        <input type="date" class="form-control" name="from_date" id="from_date" value="{{ from_date if from_date else '' }}">
+                        <input type="date" class="form-control" name="from_date" id="from_date"
+                            value="{{ from_date if from_date else '' }}">
                     </div>
                     <div class="col-md-3">
                         <label for="to_date" class="form-label">To Date:</label>
-                        <input type="date" class="form-control" name="to_date" id="to_date" value="{{ to_date if to_date else '' }}">
+                        <input type="date" class="form-control" name="to_date" id="to_date"
+                            value="{{ to_date if to_date else '' }}">
                     </div>
+                    <!-- Club Filter -->
                     <div class="col-md-3">
                         <label for="club_id" class="form-label">Filter by Club:</label>
                         <select name="club_id" id="club_id" class="form-select">
                             <option value="">All Clubs</option>
                             {% for c in clubs %}
-                            <option value="{{ c.id }}" {% if selected_club == c.id %}selected{% endif %}>{{ c.name }}</option>
+                            <option value="{{ c.id }}" {% if selected_club==c.id %}selected{% endif %}>{{ c.name }}
+                            </option>
                             {% endfor %}
                         </select>
                     </div>
+                    <!-- Category Filter (Multi-select) -->
                     <div class="col-md-3">
                         <label for="category_ids" class="form-label">Filter by Category:</label>
-                        <select name="category_ids" id="category_ids" class="form-select">
-                            <option value="">All Categories</option>
+                        <select name="category_ids" id="category_ids" class="form-select" multiple>
                             {% for cat in categories %}
-                            <option value="{{ cat.id }}" {% if selected_categories and cat.id == selected_categories[0] %}selected{% endif %}>{{ cat.name }}</option>
+                            <option value="{{ cat.id }}" {% if selected_categories and cat.id in selected_categories
+                                %}selected{% endif %}>{{ cat.name }}</option>
                             {% endfor %}
                         </select>
+                        <small class="form-text text-muted">Hold down the Ctrl (Windows) or Command (Mac) button to
+                            select multiple options.</small>
                     </div>
+                    <!-- Submit Button -->
                     <div class="col-md-2 mt-2">
                         <button type="submit" class="btn btn-primary w-100">Filter</button>
                     </div>
@@ -46,7 +56,47 @@
             </div>
         </div>
 
-        <!-- Participation -->
+        <!-- Statistics Overview -->
+        <div class="row mb-4">
+            <!-- Total Events -->
+            <div class="col-md-3">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Events</h5>
+                        <p class="card-text display-4">{{ event_stats.total_events }}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Average Attendance -->
+            <div class="col-md-3">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Average Attendance</h5>
+                        <p class="card-text display-4">{{ "%.2f"|format(event_stats.average_attendance) }}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Capacity Utilization -->
+            <div class="col-md-3">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Capacity Utilization</h5>
+                        <p class="card-text display-4">{{ "%.2f"|format(event_stats.capacity_utilization) }}%</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Total Memberships -->
+            <div class="col-md-3">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Memberships</h5>
+                        <p class="card-text display-4">{{ user_stats.total_memberships }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Participation -->
         <div class="card shadow-sm mb-4">
             <div class="card-header">
                 <h3 class="h5 mb-0">Event Participation</h3>
@@ -55,9 +105,9 @@
                 {% if participation_data %}
                 <p class="mb-4">Number of participants by event:</p>
                 {% if charts.participation %}
-                <img src="{{ charts.participation }}" alt="Participation Chart" class="img-fluid">
+                <img src="{{ charts.participation }}" alt="Participation Chart" class="img-fluid mb-3">
                 {% endif %}
-                <ul class="list-group mt-3">
+                <ul class="list-group">
                     {% for event_title, count in participation_data %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         {{ event_title }}
@@ -79,8 +129,9 @@
             <div class="card-body">
                 <p>Total Events: {{ event_stats.total_events }}</p>
                 <p>Average Attendance: {{ "%.2f"|format(event_stats.average_attendance) }}</p>
-                <h6>By Category</h6>
-                <ul class="list-group">
+                <p>Capacity Utilization: {{ "%.2f"|format(event_stats.capacity_utilization) }}%</p>
+                <h6 class="mt-4">By Category</h6>
+                <ul class="list-group mb-3">
                     {% for category, count in event_stats.event_by_category %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         {{ category }}
@@ -88,7 +139,9 @@
                     </li>
                     {% endfor %}
                 </ul>
-                <img src="{{ charts.categories }}" alt="Events by Category" class="img-fluid mt-3">
+                {% if charts.categories %}
+                <img src="{{ charts.categories }}" alt="Events by Category" class="img-fluid mb-3">
+                {% endif %}
             </div>
         </div>
 
@@ -99,40 +152,50 @@
             </div>
             <div class="card-body">
                 <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="card">
+                    <!-- Total Users -->
+                    <div class="col-md-3">
+                        <div class="card text-white bg-primary">
                             <div class="card-body">
-                                <h6>Total Users</h6>
-                                <h2>{{ user_stats.total_users }}</h2>
+                                <h6 class="card-title">Total Users</h6>
+                                <h2 class="card-text">{{ user_stats.total_users }}</h2>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="card">
+                    <!-- Active Users -->
+                    <div class="col-md-3">
+                        <div class="card text-white bg-secondary">
                             <div class="card-body">
-                                <h6>Active Users (30 days)</h6>
-                                <h2>{{ user_stats.active_users }}</h2>
+                                <h6 class="card-title">Active Users (30 days)</h6>
+                                <h2 class="card-text">{{ user_stats.active_users }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- New Users -->
+                    <div class="col-md-3">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h6 class="card-title">New Users (30 days)</h6>
+                                <h2 class="card-text">{{ user_stats.new_users }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Avg Events/User -->
+                    <div class="col-md-3">
+                        <div class="card text-white bg-danger">
+                            <div class="card-body">
+                                <h6 class="card-title">Avg Events/User</h6>
+                                <h2 class="card-text">{{ "%.2f"|format(user_stats.average_events_per_user) }}</h2>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row g-4 mt-3">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6>New Users (30 days)</h6>
-                                <h2>{{ user_stats.new_users }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6>Avg Events/User</h6>
-                                <h2>{{ "%.2f"|format(user_stats.average_events_per_user) }}</h2>
-                            </div>
-                        </div>
-                    </div>
+
+                <!-- User Engagement Chart -->
+                <div class="mt-4">
+                    <h6>User Engagement Scatter Plot</h6>
+                    {% if charts.user_engagement %}
+                    <img src="{{ charts.user_engagement }}" alt="User Engagement Chart" class="img-fluid mb-3">
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -143,11 +206,10 @@
                 <h3 class="h5 mb-0">Club Performance</h3>
             </div>
             <div class="card-body">
-                <img src="{{ charts.club_activity }}" alt="Club Activity Chart" class="img-fluid mb-3">
                 <p>Total Clubs: {{ club_stats.total_clubs }}</p>
                 <p>Average Members per Club: {{ "%.2f"|format(club_stats.avg_members) }}</p>
-                <h6>Most Active Clubs</h6>
-                <ul class="list-group">
+                <h6 class="mt-4">Most Active Clubs</h6>
+                <ul class="list-group mb-3">
                     {% for club, count in club_stats.most_active_clubs %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         {{ club }}
@@ -155,6 +217,9 @@
                     </li>
                     {% endfor %}
                 </ul>
+                {% if charts.club_activity %}
+                <img src="{{ charts.club_activity }}" alt="Club Activity Chart" class="img-fluid mb-3">
+                {% endif %}
             </div>
         </div>
 
@@ -165,8 +230,14 @@
             </div>
             <div class="card-body">
                 <h6>Rating Distribution</h6>
+                {% if charts.ratings %}
                 <img src="{{ charts.ratings }}" alt="Ratings Chart" class="img-fluid mb-3">
+                {% endif %}
                 <p>Average Rating: {{ "%.2f"|format(feedback_stats.avg_rating) }}/5.00</p>
+                <h6 class="mt-4">Feedback Ratings Histogram</h6>
+                {% if charts.feedback_histogram %}
+                <img src="{{ charts.feedback_histogram }}" alt="Feedback Ratings Histogram" class="img-fluid mb-3">
+                {% endif %}
             </div>
         </div>
 
@@ -222,6 +293,27 @@
             </div>
         </div>
 
+        <!-- Additional Charts Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h3 class="h5 mb-0">Additional Insights</h3>
+            </div>
+            <div class="card-body">
+                <!-- Feedback Trends Line Chart -->
+                <h6>Feedback Submission Trends</h6>
+                {% if charts.feedback_trends %}
+                <img src="{{ charts.feedback_trends }}" alt="Feedback Trends Chart" class="img-fluid mb-3">
+                {% endif %}
+
+                <!-- User Registration Trends Line Chart -->
+                <h6>User Registration Trends</h6>
+                {% if charts.user_registration_trends %}
+                <img src="{{ charts.user_registration_trends }}" alt="User Registration Trends Chart"
+                    class="img-fluid mb-3">
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Export Buttons -->
         <div class="d-flex gap-2 flex-wrap mt-4">
             <div class="btn-group">
@@ -230,7 +322,8 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li>
-                        <a class="dropdown-item" href="{{ url_for('report.download_pdf', category_id=selected_category_id) }}">
+                        <a class="dropdown-item"
+                            href="{{ url_for('report.download_pdf', category_id=selected_category_id) }}">
                             Export PDF
                         </a>
                     </li>

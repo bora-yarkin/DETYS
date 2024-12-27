@@ -11,16 +11,19 @@ class Analytics:
 
         average_attendance = db.session.query(func.avg(attendance_subquery.c.attendee_count)).scalar() or 0
 
+        capacity_utilization = db.session.query(func.avg(Event.capacity * 1.0 / func.coalesce(attendance_subquery.c.attendee_count, 1))).scalar() or 0
+
         return {
             "total_events": Event.query.count(),
             "event_by_category": db.session.query(Category.name, func.count(Event.id)).join(Event).group_by(Category.name).all(),
             "average_attendance": float(average_attendance),
             "popular_days": db.session.query(func.extract("dow", Event.date), func.count(Event.id)).group_by(func.extract("dow", Event.date)).all(),
+            "capacity_utilization": float(capacity_utilization),
         }
 
     @staticmethod
     def get_user_stats():
-        thirty_days = datetime.now() - timedelta(days=30)
+        thirty_days = datetime.utcnow() - timedelta(days=30)
 
         events_per_user = db.session.query(EventAttendance.user_id, func.count(EventAttendance.event_id).label("event_count")).group_by(EventAttendance.user_id).subquery()
 
@@ -29,8 +32,9 @@ class Analytics:
         return {
             "total_users": User.query.count(),
             "active_users": db.session.query(func.count(distinct(EventAttendance.user_id))).filter(EventAttendance.registered_at >= thirty_days).scalar() or 0,
-            "new_users": User.query.filter(User.created_at.isnot(None), User.created_at >= thirty_days).count(),
+            "new_users": User.query.filter(User.created_at >= thirty_days).count(),
             "average_events_per_user": float(avg_events),
+            "total_memberships": Membership.query.count(),  # New Statistic
         }
 
     @staticmethod
@@ -47,8 +51,13 @@ class Analytics:
 
     @staticmethod
     def get_feedback_stats():
+        feedback_count_subquery = db.session.query(EventFeedback.event_id, func.count(EventFeedback.id).label("feedback_count")).group_by(EventFeedback.event_id).subquery()
+
+        average_feedback_volume = db.session.query(func.avg(feedback_count_subquery.c.feedback_count)).scalar() or 0
+
         return {
             "avg_rating": db.session.query(func.avg(EventFeedback.rating)).scalar() or 0,
             "rating_distribution": db.session.query(EventFeedback.rating, func.count(EventFeedback.event_id)).group_by(EventFeedback.rating).all(),
             "top_rated_events": db.session.query(Event.title, func.avg(EventFeedback.rating).label("avg_rating")).join(EventFeedback).group_by(Event.title).order_by(func.avg(EventFeedback.rating).desc()).limit(5).all(),
+            "average_feedback_volume": float(average_feedback_volume),  # New Statistic
         }

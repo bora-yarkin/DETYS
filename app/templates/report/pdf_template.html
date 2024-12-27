@@ -3,46 +3,141 @@
 {% block title %}System Report{% endblock %}
 
 {% block navbar %}{% endblock navbar %}
+
 {% block styles %}
 {{ super() }}
-<!-- Removed inline custom styles to use standard site styling -->
+<style>
+    /* Basic Reset */
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    table {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        font-size: 12px;
+        color: #333;
+        line-height: 1.5;
+    }
+
+    .container {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Header Section */
+    .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 2px solid #444;
+    }
+
+    .header h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .header p {
+        font-size: 14px;
+        color: #666;
+    }
+
+    /* Section Titles */
+    .section-title {
+        background-color: #f2f2f2;
+        padding: 10px;
+        border-left: 5px solid #007BFF;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+
+    .section-title h2 {
+        font-size: 18px;
+        color: #007BFF;
+    }
+
+    /* Charts */
+    .chart {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .chart img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ddd;
+        padding: 5px;
+        background-color: #fff;
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    table th,
+    table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    table th {
+        background-color: #007BFF;
+        color: #fff;
+    }
+
+    table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        font-size: 10px;
+        color: #999;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        margin-top: 30px;
+    }
+
+    /* Highlight Rows */
+    .highlight {
+        background-color: #e9f7fe;
+    }
+</style>
 {% endblock styles %}
 
 {% block content %}
-<div class="container my-5">
-    <h2>System Report - {{ current_date.strftime("%B %d, %Y") }}</h2>
-
-    {% if base64_image %}
-    <div class="text-center my-4">
-        <img src="{{ base64_image }}" alt="Participation Chart" class="img-fluid rounded">
+<div class="container">
+    <!-- Header Section -->
+    <div class="header">
+        <h1>DETYS System Report</h1>
+        <p>Generated on {{ current_date.strftime("%B %d, %Y at %H:%M:%S") }}</p>
     </div>
-    {% endif %}
 
-    {% if base64_rating_chart %}
-    <div class="text-center my-4">
-        <h4>Rating Distribution</h4>
-        <img src="{{ base64_rating_chart }}" alt="Rating Distribution" class="img-fluid rounded">
-    </div>
-    {% endif %}
-
-    {% if base64_category_chart %}
-    <div class="text-center my-4">
-        <h4>Category Distribution</h4>
-        <img src="{{ base64_category_chart }}" alt="Category Distribution" class="img-fluid rounded">
-    </div>
-    {% endif %}
-
-    {% if base64_club_chart %}
-    <div class="text-center my-4">
-        <h4>Most Active Clubs</h4>
-        <img src="{{ base64_club_chart }}" alt="Club Activity" class="img-fluid rounded">
-    </div>
-    {% endif %}
-
-    <section class="my-4">
-        <h3>Event Participation</h3>
+    <!-- Event Participation Section -->
+    <div class="section">
+        <div class="section-title">
+            <h2>Event Participation</h2>
+        </div>
+        {% if base64_participation_chart %}
+        <div class="chart">
+            <img src="{{ base64_participation_chart }}" alt="Participation Chart">
+        </div>
+        {% endif %}
         {% if participation_data %}
-        <table class="table table-bordered table-striped">
+        <table>
             <thead>
                 <tr>
                     <th>Event</th>
@@ -59,14 +154,228 @@
             </tbody>
         </table>
         {% else %}
-        <div class="alert alert-secondary text-center">No participation data available.</div>
+        <p>No participation data available.</p>
         {% endif %}
-    </section>
+    </div>
 
-    <section class="mb-4">
-        <h3>Event Feedback (Average Rating)</h3>
+    <!-- Event Statistics Section -->
+    <div class="section">
+        <div class="section-title">
+            <h2>Event Statistics</h2>
+        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Total Events</td>
+                    <td>{{ event_stats.total_events }}</td>
+                </tr>
+                <tr>
+                    <td>Average Attendance</td>
+                    <td>{{ "%.2f"|format(event_stats.average_attendance) }}</td>
+                </tr>
+                <tr>
+                    <td>Capacity Utilization</td>
+                    <td>{{ "%.2f"|format(event_stats.capacity_utilization) }}%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>By Category</h3>
+        {% if base64_category_chart %}
+        <div class="chart">
+            <img src="{{ base64_category_chart }}" alt="Category Distribution Chart">
+        </div>
+        {% endif %}
+        {% if event_stats.event_by_category %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Number of Events</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, count in event_stats.event_by_category %}
+                <tr>
+                    <td>{{ category }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No category data available.</p>
+        {% endif %}
+    </div>
+
+    <!-- User Engagement Section -->
+    <div class="section">
+        <div class="section-title">
+            <h2>User Engagement</h2>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Total Users</td>
+                    <td>{{ user_stats.total_users }}</td>
+                </tr>
+                <tr>
+                    <td>Active Users (Last 30 Days)</td>
+                    <td>{{ user_stats.active_users }}</td>
+                </tr>
+                <tr>
+                    <td>New Users (Last 30 Days)</td>
+                    <td>{{ user_stats.new_users }}</td>
+                </tr>
+                <tr>
+                    <td>Average Events per User</td>
+                    <td>{{ "%.2f"|format(user_stats.average_events_per_user) }}</td>
+                </tr>
+                <tr>
+                    <td>Total Memberships</td>
+                    <td>{{ user_stats.total_memberships }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {% if base64_user_engagement_chart %}
+        <div class="chart">
+            <h3>User Engagement Scatter Plot</h3>
+            <img src="{{ base64_user_engagement_chart }}" alt="User Engagement Chart">
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Club Performance Section -->
+    <div class="section">
+        <div class="section-title">
+            <h2>Club Performance</h2>
+        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Total Clubs</td>
+                    <td>{{ club_stats.total_clubs }}</td>
+                </tr>
+                <tr>
+                    <td>Average Members per Club</td>
+                    <td>{{ "%.2f"|format(club_stats.avg_members) }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {% if base64_club_chart %}
+        <div class="chart">
+            <h3>Most Active Clubs</h3>
+            <img src="{{ base64_club_chart }}" alt="Most Active Clubs Chart">
+        </div>
+        {% endif %}
+        {% if club_stats.most_active_clubs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Club</th>
+                    <th>Number of Events</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club, count in club_stats.most_active_clubs %}
+                <tr>
+                    <td>{{ club }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No club activity data available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Feedback Analysis Section -->
+    <div class="section">
+        <div class="section-title">
+            <h2>Feedback Analysis</h2>
+        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Average Rating</td>
+                    <td>{{ "%.2f"|format(feedback_stats.avg_rating) }}/5.00</td>
+                </tr>
+                <tr>
+                    <td>Average Feedback Volume per Event</td>
+                    <td>{{ "%.2f"|format(feedback_stats.average_feedback_volume) }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {% if base64_ratings_chart %}
+        <div class="chart">
+            <h3>Rating Distribution</h3>
+            <img src="{{ base64_ratings_chart }}" alt="Rating Distribution Chart">
+        </div>
+        {% endif %}
+
+        {% if feedback_stats.rating_distribution %}
+        <h3>Feedback Ratings Distribution</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rating</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rating, count in feedback_stats.rating_distribution %}
+                <tr>
+                    <td>{{ rating }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No feedback distribution data available.</p>
+        {% endif %}
+
+        {% if base64_feedback_histogram %}
+        <div class="chart">
+            <h3>Feedback Ratings Histogram</h3>
+            <img src="{{ base64_feedback_histogram }}" alt="Feedback Ratings Histogram">
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Most Popular Events Section -->
+    <div class="section">
+        <div class="section-title">
+            <h2>Most Popular Events</h2>
+        </div>
+        {% if sorted_by_popularity %}
+        <ol>
+            {% for event_title, count in sorted_by_popularity %}
+            <li>{{ event_title }} - {{ count }} participants</li>
+            {% endfor %}
+        </ol>
+        {% else %}
+        <p>No popular events data available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Feedback Data Section -->
+    <div class="section">
+        <div class="section-title">
+            <h2>Event Feedback (Average Rating)</h2>
+        </div>
         {% if feedback_data %}
-        <table class="table table-bordered table-striped">
+        <table>
             <thead>
                 <tr>
                     <th>Event</th>
@@ -83,111 +392,36 @@
             </tbody>
         </table>
         {% else %}
-        <div class="alert alert-secondary text-center">No feedback data available.</div>
+        <p>No feedback data available.</p>
         {% endif %}
-    </section>
+    </div>
 
-    <section class="mb-4">
-        <h3>Event Statistics</h3>
-        <table class="table table-bordered">
-            <tbody>
-                <tr>
-                    <td>Total Events:</td>
-                    <td>{{ event_stats.total_events }}</td>
-                </tr>
-                <tr>
-                    <td>Average Attendance:</td>
-                    <td>{{ "%.2f"|format(event_stats.average_attendance) }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Additional Insights Section -->
+    <div class="section">
+        <div class="section-title">
+            <h2>Additional Insights</h2>
+        </div>
+        <!-- Feedback Submission Trends Line Chart -->
+        {% if base64_feedback_trends %}
+        <div class="chart">
+            <h3>Feedback Submission Trends</h3>
+            <img src="{{ base64_feedback_trends }}" alt="Feedback Submission Trends Chart">
+        </div>
+        {% endif %}
 
-        <h4>Category Distribution</h4>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for category, count in event_stats.event_by_category %}
-                <tr>
-                    <td>{{ category }}</td>
-                    <td>{{ count }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-
-    <section class="mb-4">
-        <h3>User Statistics</h3>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Total Users</td>
-                    <td>{{ user_stats.total_users }}</td>
-                </tr>
-                <tr>
-                    <td>Active Users (30 days)</td>
-                    <td>{{ user_stats.active_users }}</td>
-                </tr>
-                <tr>
-                    <td>New Users (30 days)</td>
-                    <td>{{ user_stats.new_users }}</td>
-                </tr>
-                <tr>
-                    <td>Avg Events/User</td>
-                    <td>{{ "%.2f"|format(user_stats.average_events_per_user) }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <section class="mb-4">
-        <h3>Club Statistics</h3>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Total Clubs</td>
-                    <td>{{ club_stats.total_clubs }}</td>
-                </tr>
-                <tr>
-                    <td>Average Members</td>
-                    <td>{{ "%.2f"|format(club_stats.avg_members) }}</td>
-                </tr>
-                {% for club, count in club_stats.most_active_clubs %}
-                <tr>
-                    <td>Most Active: {{ club }}</td>
-                    <td>{{ count }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-
-    <section class="mb-5">
-        <h3>Feedback Analysis</h3>
-        <p>Average Rating: {{ "%.2f"|format(feedback_stats.avg_rating) }}/5.00</p>
-    </section>
+        <!-- User Registration Trends Line Chart -->
+        {% if base64_user_registration_trends %}
+        <div class="chart">
+            <h3>User Registration Trends</h3>
+            <img src="{{ base64_user_registration_trends }}" alt="User Registration Trends Chart">
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock content %}
 
 {% block footer %}
-<div class="text-center text-muted py-3">
+<div class="footer">
     <small>Generated by DETYS System - {{ current_date.strftime("%Y-%m-%d %H:%M:%S") }}</small>
 </div>
 {% endblock %}
