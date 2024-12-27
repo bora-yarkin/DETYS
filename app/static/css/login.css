@@ -6,8 +6,13 @@
     --transition: all 0.3s ease;
 }
 
+body {
+    color: #343a40;
+}
+
 .container {
-    min-height: calc(100vh - 120px); /* Account for navbar and footer */
+    min-height: calc(100vh - 120px);
+    /* Account for navbar and footer */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -178,7 +183,7 @@
         padding: 1rem;
         align-items: flex-start;
     }
-    
+
     .auth-container {
         height: 560px;
         margin: 0;
