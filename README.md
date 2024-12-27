@@ -40,7 +40,7 @@ venv\Scripts\activate
 
 ### 3. Install Dependencies
 
-Install the necessary packages listed in requirements.txt:
+Install the necessary packages listed in requirements.txt
 
 ```bash
 pip install -r requirements.txt
@@ -92,177 +92,136 @@ Start the Flask development server:
 flask run
 ```
 
-Navigate to http://127.0.0.1:5000/ in your browser to view the app.
+Navigate to [http://127.0.0.1:5000/](http://127.0.0.1:5000/) in your browser to view the app.
 
 ## Project Structure
 
 ```bash
 DETYS/
 ├── app/
-│ ├── __init__.py # Application factory
-│ ├── forms.py # All forms
-│ ├── models.py # Database Models
-│ ├── core/
-│ │ ├── decorators.py # Custom decorators
-│ │ ├── extensions.py # Flask extensions initialization
-│ ├── routes/
-│ │ ├── event_routes.py # Event-related routes
-│ │ ├── club_routes.py # Club-related routes
-│ │ ├── main_routes.py # Main application routes
-│ ├── static/
-│ │ ├── css/
-│ │ │ ├── styles.css # CSS styles
-│ │ ├── js/
-│ │ │ ├── jquery-3.6.0.min.js # jQuery library
-│ │ │ ├── socket.io.min.js # Socket.IO library
-│ │ │ ├── scripts.js # Custom scripts
-│ ├── templates/
-│ │ ├── auth/
-│ │ │ ├── login.html # Login template
-│ │ │ ├── register.html # Registration template
-│ │ ├── club/
-│ │ │ ├── club_detail.html # Club detail template
-│ │ │ ├── club_list.html # Club list template
-│ │ │ ├── create_club.html # Create club template
-│ │ │ ├── edit_club.html # Edit club template
-│ │ │ ├── manage_members.html # Manage club members template
-│ │ ├── event/
-│ │ │ ├── create_event.html # Create event template
-│ │ │ ├── event_detail.html # Event detail template
-│ │ │ ├── event_list.html # Event list template
-│ │ │ ├── manage_attendees.html # Manage event attendees template
-│ │ │ ├── submit_feedback.html # Submit event feedback template
-│ │ ├── main/
-│ │ │ ├── contact.html # Contact form template
-│ │ │ ├── create_post.html # Create post template
-│ │ │ ├── dashboard.html # User dashboard template
-│ │ │ ├── index.html # Home page template
-│ │ │ ├── view_post.html # View post template
-│ │ ├── base.html # Base template
+│   ├── __init__.py              # Application factory
+│   ├── forms.py                 # All forms
+│   ├── models.py                # Database Models
+│   ├── core/
+│   │   ├── analytics.py         # Analytics functions
+│   │   ├── config.py            # Configuration settings
+│   │   ├── data_processing.py   # Data processing functions
+│   │   ├── decorators.py        # Custom decorators
+│   │   ├── extensions.py        # Flask extensions initialization
+│   │   ├── notifications.py     # Notification functions
+│   │   ├── statistics.py        # Statistical functions
+│   │   ├── visualizations.py    # Visualization functions
+│   ├── routes/
+│   │   ├── __init__.py          # Route initialization
+│   │   ├── admin_routes.py      # Admin-related routes
+│   │   ├── auth_routes.py       # Authentication-related routes
+│   │   ├── bookmark_routes.py   # Bookmark-related routes
+│   │   ├── category_routes.py   # Category-related routes
+│   │   ├── club_routes.py       # Club-related routes
+│   │   ├── event_resource_routes.py # Event resource-related routes
+│   │   ├── event_routes.py      # Event-related routes
+│   │   ├── main_routes.py       # Main application routes
+│   │   ├── poll_routes.py       # Poll-related routes
+│   │   ├── post_routes.py       # Post-related routes
+│   │   ├── profile_routes.py    # Profile-related routes
+│   │   ├── report_routes.py     # Report-related routes
+│   │   ├── search_routes.py     # Search-related routes
+│   ├── static/
+│   │   ├── css/
+│   │   │   ├── error.css        # Error page styles
+│   │   │   ├── login.css        # Login page styles
+│   │   │   ├── navbar.css       # Navbar styles
+│   │   │   ├── styles.css       # General styles
+│   │   ├── event_resources/     # Event resource files
+│   │   ├── exports/             # Exported files
+│   │   ├── images/              # Image files
+│   │   ├── js/
+│   │   │   ├── jquery-3.6.0.min.js # jQuery library
+│   │   │   ├── socket.io.min.js # Socket.IO library
+│   │   │   ├── scripts.js       # Custom scripts
+│   │   ├── uploads/             # Uploaded files
+│   ├── templates/
+│   │   ├── admin/
+│   │   │   ├── user_edit.html   # Admin user edit template
+│   │   │   ├── user_list.html   # Admin user list template
+│   │   ├── auth/
+│   │   │   ├── login.html       # Login template
+│   │   ├── base.html            # Base template
+│   │   ├── category/
+│   │   │   ├── create_category.html # Create category template
+│   │   │   ├── edit_category.html   # Edit category template
+│   │   │   ├── list_categories.html # List categories template
+│   │   ├── club/
+│   │   │   ├── club_detail.html # Club detail template
+│   │   │   ├── club_list.html   # Club list template
+│   │   │   ├── create_club.html # Create club template
+│   │   │   ├── edit_club.html   # Edit club template
+│   │   │   ├── manage_members.html # Manage club members template
+│   │   ├── event/
+│   │   │   ├── create_event.html # Create event template
+│   │   │   ├── edit_event.html   # Edit event template
+│   │   │   ├── event_detail.html # Event detail template
+│   │   │   ├── event_list.html   # Event list template
+│   │   │   ├── manage_attendees.html # Manage event attendees template
+│   │   │   ├── submit_feedback.html # Submit event feedback template
+│   │   ├── main/
+│   │   │   ├── contact.html      # Contact form template
+│   │   │   ├── dashboard.html    # User dashboard template
+│   │   │   ├── error.html        # Error page template
+│   │   │   ├── index.html        # Home page template
+│   │   │   ├── navbar.html       # Navbar template
+│   │   │   ├── notifications.html # Notifications template
+│   │   ├── poll/
+│   │   │   ├── create_poll.html  # Create poll template
+│   │   │   ├── view_poll.html    # View poll template
+│   │   ├── post/
+│   │   │   ├── all_posts.html    # All posts template
+│   │   │   ├── create_post.html  # Create post template
+│   │   │   ├── edit_post.html    # Edit post template
+│   │   │   ├── view_post.html    # View post template
+│   │   ├── report/
+│   │   │   ├── pdf_template.html # PDF report template
+│   │   │   ├── report.html       # Report template
+│   │   ├── search/
+│   │   │   ├── results.html      # Search results template
+│   │   ├── user/
+│   │   │   ├── profile.html      # User profile template
 ├── instance/
-│ ├── __init__.py
-│ └── config.py # Configuration settings
+│   ├── __init__.py
+│   └── config.py                 # Configuration settings
 ├── migrations/
-│ ├── alembic.ini
-│ ├── env.py
-│ ├── script.py.mako
-│ └── versions/
-├── requirements.txt # List of dependencies
-├── run.py # Entry point to run the app
-└── .flaskenv # Environment variables
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+├── requirements.txt              # List of dependencies
+├── run.py                        # Entry point to run the app
+└── .flaskenv                     # Environment variables
 ```
 
 ## Common Commands
 
 ```bash
-flask run                       Run the application
-flask db init                   Initialize database migrations
-flask db migrate -m "Message"   Create a new migration
-flask db upgrade                Apply migrations to the database
+flask run                       # Run the application
+flask db init                   # Initialize database migrations
+flask db migrate -m "Message"   # Create a new migration
+flask db upgrade                # Apply migrations to the database
 ```
 
 ## Additional Notes
 
-- Database: The default database is SQLite (sqlite:///detys.db). Configure other databases in config.py.
-- Environment Variables: For production, set FLASK_ENV=production and adjust the configuration accordingly.
-- Deactivating the Virtual Environment: Run deactivate to exit the virtual environment.
+- **Database**: The default database is SQLite (`sqlite:///detys.db`). Configure other databases in `config.py`.
+- **Environment Variables**: For production, set `FLASK_ENV=production` and adjust the configuration accordingly.
+- **Deactivating the Virtual Environment**: Run `deactivate` to exit the virtual environment.
 
 ## Troubleshooting
 
-1. Flask Not Found: Ensure the virtual environment is activated (source venv/bin/activate).
-2. No db Command: Confirm that Flask-Migrate is installed and properly set up.
-3. Database Issues: Delete the migrations folder and detys.db, then re-run the migration steps.
+1. **Flask Not Found**: Ensure the virtual environment is activated (`source venv/bin/activate`).
+2. **No db Command**: Confirm that Flask-Migrate is installed and properly set up.
+3. **Database Issues**: Delete the
+
+migrations
+
+folder and `detys.db`, then re-run the migration steps.
 
 This README provides the essential steps to set up and run the DETYS application. For further development or deployment, consult Flask Documentation or reach out with specific questions.
-
-## Raw Project Roadmap
-
-```bash
-DETYS Project Roadmap
-	1.	Initiation: Project Definition and Planning
-	•	Define project requirements:
-	•	Identify user roles (student, club manager, main admin) and their permissions.
-	•	Outline the core system modules (User Management, Club/Event Management, Notifications, Reporting).
-	•	Select technology stack:
-	•	Backend: Flask or Django.
-	•	Database: PostgreSQL or MySQL.
-	•	Choose libraries for notifications and reporting.
-	•	Task allocation and timeline: Assign tasks to teams or individuals, and set completion timelines for each phase.
-	2.	User Management and Login Panel (Weeks 1-2)
-	•	Develop the user management module:
-	•	Create user login and registration API using Flask/Django.
-	•	Set up database tables to store user data (name, role, password).
-	•	Roles and Authorization System:
-	•	Develop authorization based on roles (student, club manager, main admin).
-	•	Design login and user panels:
-	•	Design different login screens for each role and create a simple user interface.
-	3.	Club and Membership Management (Weeks 3-4)
-	•	Club Information Module:
-	•	Set up database tables to store club information (name, description, president, contact details).
-	•	Membership Management:
-	•	Add membership processes for students to join clubs and for managers to approve/terminate members.
-	•	Provide membership approval notifications and a simple user interface.
-	•	Multithreading and Database Management:
-	•	Use multithreading for high-demand processes to ensure efficient database operations.
-	4.	Event Management Module (Weeks 5-6)
-	•	Event Creation and Editing:
-	•	Develop an API for club managers to create and update events.
-	•	Implement a waiting list system based on event capacity limits.
-	•	Event Details:
-	•	Create an event details page for students to access information like date, time, and location.
-	•	Use socket programming to send notifications to students on the waiting list.
-	•	Multithreading and Concurrency:
-	•	Improve performance with threading when event demand is high.
-	5.	Registration and Notification System (Weeks 7-8)
-	•	Registration and Waiting List Management:
-	•	Enable students to register for events and join the waiting list.
-	•	Notification System:
-	•	Send event reminders and status updates via email or SMS.
-	•	Create an asynchronous notification system using socket programming.
-	•	File Operations:
-	•	Store registration and waiting list data and generate data for notifications.
-	6.	Event Feedback and Evaluation (Weeks 9-10)
-	•	Evaluation Module:
-	•	Add a feedback module for students to complete short surveys or ratings after events.
-	•	Data Analysis:
-	•	Collect and report student feedback through data analysis.
-	•	File Operations and Data Manipulation:
-	•	Apply file structures and data manipulation techniques to store and process feedback.
-	7.	Reporting and Statistics Panel (Weeks 11-12)
-	•	Participation and Popularity Statistics:
-	•	Create reports for the main admin on student participation rates, most popular events, etc.
-	•	Graphs and Visualization:
-	•	Use Matplotlib or Plotly for graphical representation of statistical data.
-	•	Downloadable Reports:
-	•	Enable reports to be downloaded in PDF or HTML format.
-	8.	Testing and Final Touches (Week 13)
-	•	Module Testing:
-	•	Conduct functionality and security tests for each module.
-	•	Bug Fixing and Enhancements:
-	•	Make final adjustments based on user feedback and implement minor improvements.
-	•	Documentation:
-	•	Prepare a project report and include usage instructions and module descriptions.
-
-Nice-to-Have Features (Beyond Course Scope)
-	1.	Enhanced Notification and Reminder Features
-	•	Mobile Notifications:
-	•	Integrate push notifications using Firebase or a similar service.
-	•	Detailed Reminder Settings:
-	•	Allow users to set specific reminder frequencies for events.
-	2.	Advanced Algorithms for Event Evaluation
-	•	AI-Based Feedback Analysis:
-	•	A module to perform sentiment analysis on feedback.
-	•	Recommendation Systems:
-	•	Suggest events based on students’ past participation.
-	3.	Blockchain for Membership and Attendance Verification
-	•	Membership and Attendance Confirmation:
-	•	Use blockchain technology to verify membership and attendance records.
-	4.	Mobile Application Integration
-	•	Mobile App with React Native or Flutter:
-	•	Make DETYS accessible on mobile devices for a user-friendly experience.
-	5.	Cloud Integration
-	•	Use Cloud Storage for Database and File Management:
-	•	Integrate storage and management systems on AWS or Google Cloud.
-
-These additional features would make the project more comprehensive and suitable for real-world applications, requiring knowledge beyond the current course scope.
-```
