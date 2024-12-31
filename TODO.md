@@ -2,6 +2,8 @@
 2. Implement push notifications.
 3. Add notifications to other places such as replies, upvotes and downvotes in the forum and anywhere else that is applicable.
 4. Add threading support.
+
+Done:
 5. Add reminder notifications for close events.
 
 ###

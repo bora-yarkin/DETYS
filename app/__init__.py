@@ -2,6 +2,7 @@ from flask import Flask
 from app.core.config import Config
 from app.core.extensions import db, login_manager, migrate, mail, csrf
 from app.routes import register_routes
+from app.core.scheduler import scheduler
 from flask_wtf.csrf import generate_csrf
 
 
@@ -16,6 +17,9 @@ def create_app():
     migrate.init_app(app, db)
     mail.init_app(app)
     csrf.init_app(app)
+
+    scheduler.init_app(app)
+    scheduler.start()
 
     # Configure Flask-Login
     login_manager.login_view = "auth.login"
