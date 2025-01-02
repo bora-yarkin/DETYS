@@ -127,6 +127,10 @@ class EventAttendance(db.Model):
     status = db.Column(db.String(20), nullable=False, default="pending")
     registered_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    @property
+    def registration_date(self):
+        return self.registered_at
+
     # Relationships
     user = db.relationship("User", back_populates="event_attendances")
     event = db.relationship("Event", back_populates="attendees")

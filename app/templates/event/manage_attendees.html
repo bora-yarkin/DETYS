@@ -25,7 +25,7 @@
                                 <div>
                                     <h6 class="mb-0">{{ attendance.user.username }}</h6>
                                     <small class="text-muted">Joined: {{
-                                        attendance.registration_date.strftime('%Y-%m-%d') }}</small>
+                                        attendance.registered_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                 </div>
                                 <form
                                     action="{{ url_for('event.remove_attendee', event_id=event.id, user_id=attendance.user.id) }}"
@@ -60,7 +60,7 @@
                                 <div>
                                     <h6 class="mb-0">{{ attendance.user.username }}</h6>
                                     <small class="text-muted">Requested: {{
-                                        attendance.registration_date.strftime('%Y-%m-%d') }}</small>
+                                        attendance.registered_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                 </div>
                                 <div class="btn-group">
                                     <form

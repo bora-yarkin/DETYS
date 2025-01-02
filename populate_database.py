@@ -76,7 +76,7 @@ with app.app_context():
         users = User.query.all()
         events = Event.query.all()
         existing_attendances = set()
-        statuses = ["attended", "absent", "pending"]
+        statuses = ["confirmed", "waiting"]
 
         attempts = 0
         while len(existing_attendances) < n and attempts < n * 2:
@@ -86,7 +86,21 @@ with app.app_context():
 
             if attendance_key not in existing_attendances:
                 existing_attendances.add(attendance_key)
-                attendance = EventAttendance(user_id=user_id, event_id=event_id, status=random.choice(statuses), registered_at=fake.date_time_between(start_date="-1y", end_date="now"))
+                event = Event.query.get(event_id)
+                
+                confirmed_count = EventAttendance.query.filter_by(
+                    event_id=event_id, 
+                    status="confirmed"
+                ).count()
+                
+                status = "confirmed" if confirmed_count < event.capacity else "waiting"
+                
+                attendance = EventAttendance(
+                    user_id=user_id,
+                    event_id=event_id,
+                    status=status,
+                    registered_at=fake.date_time_between(start_date="-1y", end_date="now")
+                )
                 db.session.add(attendance)
 
             attempts += 1
@@ -171,7 +185,6 @@ with app.app_context():
         print(f"Added {n} club messages.")
 
     def main():
-        # Drop all tables and recreate them
         db.drop_all()
         db.create_all()
 
