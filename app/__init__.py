@@ -9,7 +9,6 @@ from flask_wtf.csrf import generate_csrf
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    # app.config["WTF_CSRF_ENABLED"] = False
 
     # Initialize Flask extensions
     db.init_app(app)
