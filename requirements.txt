@@ -10,3 +10,4 @@ werkzeug
 xhtml2pdf
 wtforms
 sqlalchemy
+email_validator
