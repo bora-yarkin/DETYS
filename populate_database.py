@@ -11,21 +11,21 @@ with app.app_context():
 
     fake = Faker()
 
-    def populate_users(n=100):
+    def populate_users(n=50):
         for _ in range(n):
             user = User(username=fake.user_name(), email=fake.email(), password_hash=generate_password_hash("password123"), role=random.choice(["student", "club_manager", "main_admin"]))
             db.session.add(user)
         db.session.commit()
         print(f"Added {n} users.")
 
-    def populate_categories(n=10):
+    def populate_categories(n=5):
         for _ in range(n):
             category = Category(name=fake.word().capitalize(), created_at=fake.date_time_between(start_date="-2y", end_date="now"))
             db.session.add(category)
         db.session.commit()
         print(f"Added {n} categories.")
 
-    def populate_clubs(n=50):
+    def populate_clubs(n=15):
         users = User.query.all()
         for _ in range(n):
             club = Club(name=fake.company(), description=fake.paragraph(nb_sentences=3), president_id=random.choice(users).id, contact_email=fake.company_email())
@@ -33,7 +33,7 @@ with app.app_context():
         db.session.commit()
         print(f"Added {n} clubs.")
 
-    def populate_memberships(n=200):
+    def populate_memberships(n=100):
         users = User.query.all()
         clubs = Club.query.all()
         existing_memberships = set()
@@ -55,7 +55,7 @@ with app.app_context():
         db.session.commit()
         print(f"Added {len(existing_memberships)} memberships.")
 
-    def populate_events(n=200):
+    def populate_events(n=40):
         clubs = Club.query.all()
         categories = Category.query.all()
         for _ in range(n):
@@ -72,7 +72,7 @@ with app.app_context():
         db.session.commit()
         print(f"Added {n} events.")
 
-    def populate_event_attendance(n=500):
+    def populate_event_attendance(n=150):
         users = User.query.all()
         events = Event.query.all()
         existing_attendances = set()
@@ -87,20 +87,12 @@ with app.app_context():
             if attendance_key not in existing_attendances:
                 existing_attendances.add(attendance_key)
                 event = Event.query.get(event_id)
-                
-                confirmed_count = EventAttendance.query.filter_by(
-                    event_id=event_id, 
-                    status="confirmed"
-                ).count()
-                
+
+                confirmed_count = EventAttendance.query.filter_by(event_id=event_id, status="confirmed").count()
+
                 status = "confirmed" if confirmed_count < event.capacity else "waiting"
-                
-                attendance = EventAttendance(
-                    user_id=user_id,
-                    event_id=event_id,
-                    status=status,
-                    registered_at=fake.date_time_between(start_date="-1y", end_date="now")
-                )
+
+                attendance = EventAttendance(user_id=user_id, event_id=event_id, status=status, registered_at=fake.date_time_between(start_date="-1y", end_date="now"))
                 db.session.add(attendance)
 
             attempts += 1
@@ -108,7 +100,7 @@ with app.app_context():
         db.session.commit()
         print(f"Added {len(existing_attendances)} event attendances.")
 
-    def populate_event_feedback(n=300):
+    def populate_event_feedback(n=100):
         users = User.query.all()
         events = Event.query.all()
         for _ in range(n):
@@ -117,7 +109,7 @@ with app.app_context():
         db.session.commit()
         print(f"Added {n} event feedbacks.")
 
-    def populate_posts(n=150):
+    def populate_posts(n=15):
         users = User.query.all()
         for _ in range(n):
             post = Post(title=fake.sentence(nb_words=6), content=fake.paragraph(nb_sentences=10), posted_at=fake.date_time_between(start_date="-2y", end_date="now"), author_id=random.choice(users).id)
@@ -125,7 +117,7 @@ with app.app_context():
         db.session.commit()
         print(f"Added {n} posts.")
 
-    def populate_notifications(n=200):
+    def populate_notifications(n=150):
         users = User.query.all()
         notification_types = ["info", "warning", "alert"]
         for _ in range(n):
@@ -134,14 +126,14 @@ with app.app_context():
         db.session.commit()
         print(f"Added {n} notifications.")
 
-    def populate_categories(n=10):
+    def populate_categories(n=5):
         for _ in range(n):
             category = Category(name=fake.word().capitalize(), created_at=fake.date_time_between(start_date="-2y", end_date="now"))
             db.session.add(category)
         db.session.commit()
         print(f"Added {n} categories.")
 
-    def populate_event_resources(n=300):
+    def populate_event_resources(n=100):
         events = Event.query.all()
         for _ in range(n):
             resource = EventResource(event_id=random.choice(events).id, filename=fake.file_name(extension="pdf"), upload_date=fake.date_time_between(start_date="-2y", end_date="now"), filepath=fake.file_path())
@@ -149,7 +141,7 @@ with app.app_context():
         db.session.commit()
         print(f"Added {n} event resources.")
 
-    def populate_polls(n=50):
+    def populate_polls(n=25):
         events = Event.query.all()
         for _ in range(n):
             poll = Poll(event_id=random.choice(events).id, question=fake.sentence(nb_words=10), created_at=fake.date_time_between(start_date="-2y", end_date="now"))
@@ -165,7 +157,7 @@ with app.app_context():
         db.session.commit()
         print(f"Added {n} poll choices.")
 
-    def populate_bookmarks(n=250):
+    def populate_bookmarks(n=40):
         users = User.query.all()
         events = Event.query.all()
         clubs = Club.query.all()
