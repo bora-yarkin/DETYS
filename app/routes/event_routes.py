@@ -206,3 +206,51 @@ def delete_event(event_id):
         flash(f"Error deleting event: {str(e)}", "danger")
 
     return redirect(url_for("event.event_list"))
+
+
+@event_bp.route("/<int:event_id>/attendee/<int:user_id>/remove", methods=["POST"])
+@login_required
+@admin_or_manager_required
+def remove_attendee(event_id, user_id):
+    event = Event.query.get_or_404(event_id)
+    attendance = EventAttendance.query.filter_by(
+        event_id=event_id,
+        user_id=user_id
+    ).first_or_404()
+    
+    db.session.delete(attendance)
+    db.session.commit()
+    
+    flash("Attendee has been removed.", "success")
+    return redirect(url_for("event.manage_attendees", event_id=event_id))
+
+
+@event_bp.route("/<int:event_id>/attendee/<int:user_id>/confirm", methods=["POST"])
+@login_required
+@admin_or_manager_required
+def confirm_attendee(event_id, user_id):
+    event = Event.query.get_or_404(event_id)
+    attendance = EventAttendance.query.filter_by(
+        event_id=event_id,
+        user_id=user_id
+    ).first_or_404()
+    
+    # Check if there's still capacity
+    confirmed_count = EventAttendance.query.filter_by(
+        event_id=event_id,
+        status="confirmed"
+    ).count()
+    
+    if confirmed_count >= event.capacity:
+        flash("Event is at full capacity.", "warning")
+        return redirect(url_for("event.manage_attendees", event_id=event_id))
+    
+    attendance.status = "confirmed"
+    db.session.commit()
+    
+    # Send notification to user
+    message = f"You have been confirmed for the event '{event.title}'."
+    send_notification(user_id=user_id, message=message, notification_type="success")
+    
+    flash("Attendee has been confirmed.", "success")
+    return redirect(url_for("event.manage_attendees", event_id=event_id))
