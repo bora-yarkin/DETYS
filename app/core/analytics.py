@@ -4,13 +4,19 @@ from app.core.extensions import db
 from app.models import Event, EventAttendance, EventFeedback, User, Club, Category, Membership
 
 
+# Bu sınıf sistemdeki temel metrikleri hesaplamak için kullanılıyor
+# Kullanıcı, etkinlik, kulüp ve geri bildirim istatistiklerini çıkartıyor
 class Analytics:
     @staticmethod
     def get_event_stats():
+        # Etkinliklere katılım sayılarını bulmak için subquery
+        # Her etkinlik için toplam katılımcı sayısını gruplayarak alıyoruz
         attendance_subquery = db.session.query(EventAttendance.event_id, func.count(EventAttendance.user_id).label("attendee_count")).group_by(EventAttendance.event_id).subquery()
 
+        # Ortalama katılımcı sayısını hesapla
         average_attendance = db.session.query(func.avg(attendance_subquery.c.attendee_count)).scalar() or 0
 
+        # Kapasite kullanım oranı - etkinlik kapasitesi/katılımcı sayısı
         capacity_utilization = db.session.query(func.avg(Event.capacity * 1.0 / func.coalesce(attendance_subquery.c.attendee_count, 1))).scalar() or 0
 
         return {
@@ -23,10 +29,13 @@ class Analytics:
 
     @staticmethod
     def get_user_stats():
+        # Son 30 günün tarihini hesapla
         thirty_days = datetime.utcnow() - timedelta(days=30)
 
+        # Kullanıcı başına katılınan etkinlik sayısını bul
         events_per_user = db.session.query(EventAttendance.user_id, func.count(EventAttendance.event_id).label("event_count")).group_by(EventAttendance.user_id).subquery()
 
+        # Kullanıcı başına düşen ortalama etkinlik sayısı
         avg_events = db.session.query(func.avg(events_per_user.c.event_count)).scalar() or 0
 
         return {
@@ -34,13 +43,15 @@ class Analytics:
             "active_users": db.session.query(func.count(distinct(EventAttendance.user_id))).filter(EventAttendance.registered_at >= thirty_days).scalar() or 0,
             "new_users": User.query.filter(User.created_at >= thirty_days).count(),
             "average_events_per_user": float(avg_events),
-            "total_memberships": Membership.query.count(),  # New Statistic
+            "total_memberships": Membership.query.count(),  # Toplam üyelik sayısı
         }
 
     @staticmethod
     def get_club_stats():
+        # Her kulübün üye sayısını hesapla
         members_subquery = db.session.query(Membership.club_id, func.count(Membership.user_id).label("member_count")).group_by(Membership.club_id).subquery()
 
+        # Kulüp başına ortalama üye sayısı
         average_members = db.session.query(func.avg(members_subquery.c.member_count)).scalar() or 0
 
         return {
@@ -51,13 +62,15 @@ class Analytics:
 
     @staticmethod
     def get_feedback_stats():
+        # Her etkinlik için geri bildirim sayısını hesapla
         feedback_count_subquery = db.session.query(EventFeedback.event_id, func.count(EventFeedback.id).label("feedback_count")).group_by(EventFeedback.event_id).subquery()
 
+        # Etkinlik başına ortalama geri bildirim sayısı
         average_feedback_volume = db.session.query(func.avg(feedback_count_subquery.c.feedback_count)).scalar() or 0
 
         return {
             "avg_rating": db.session.query(func.avg(EventFeedback.rating)).scalar() or 0,
             "rating_distribution": db.session.query(EventFeedback.rating, func.count(EventFeedback.event_id)).group_by(EventFeedback.rating).all(),
             "top_rated_events": db.session.query(Event.title, func.avg(EventFeedback.rating).label("avg_rating")).join(EventFeedback).group_by(Event.title).order_by(func.avg(EventFeedback.rating).desc()).limit(5).all(),
-            "average_feedback_volume": float(average_feedback_volume),  # New Statistic
+            "average_feedback_volume": float(average_feedback_volume),
         }

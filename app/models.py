@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 
+# Kullanıcı modelini tanımlar
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     __table_args__ = (
@@ -18,7 +19,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False, default="student")
 
-    # Relationships
+    # İlişkiler
     memberships = db.relationship("Membership", back_populates="user", cascade="all, delete-orphan")
     managed_clubs = db.relationship("Club", back_populates="president", foreign_keys="Club.president_id")
     event_attendances = db.relationship("EventAttendance", back_populates="user", cascade="all, delete-orphan")
@@ -26,30 +27,37 @@ class User(UserMixin, db.Model):
     posts = db.relationship("Post", back_populates="author", lazy="dynamic")
     notifications = db.relationship("Notification", back_populates="user", cascade="all, delete-orphan", lazy="dynamic")
 
+    # Şifreyi hash'ler ve kaydeder
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
+    # Şifreyi kontrol eder
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    # Kullanıcının öğrenci olup olmadığını kontrol eder
     @property
     def is_student(self):
         return self.role == "student"
 
+    # Kullanıcının kulüp yöneticisi olup olmadığını kontrol eder
     @property
     def is_club_manager(self):
         return self.role == "club_manager"
 
+    # Kullanıcının ana yönetici olup olmadığını kontrol eder
     @property
     def is_main_admin(self):
         return self.role == "main_admin"
 
+    # Kullanıcının yönettiği kulübün ID'sini döner
     @property
     def managed_club_id(self):
         if self.is_club_manager and self.managed_clubs:
             return self.managed_clubs[0].id
         return None
 
+    # Kullanıcının okunmamış bildirim sayısını döner
     @property
     def unread_notifications_count(self):
         return self.notifications.filter_by(is_read=False).count()
@@ -58,11 +66,13 @@ class User(UserMixin, db.Model):
         return f"<User {self.username}>"
 
 
+# Kullanıcıyı yükler
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# Kulüp modelini tanımlar
 class Club(db.Model):
     __tablename__ = "clubs"
 
@@ -72,7 +82,7 @@ class Club(db.Model):
     president_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     contact_email = db.Column(db.String(120), nullable=False)
 
-    # Relationships
+    # İlişkiler
     president = db.relationship("User", back_populates="managed_clubs", foreign_keys=[president_id])
     members = db.relationship("Membership", back_populates="club", cascade="all, delete-orphan")
     events = db.relationship("Event", back_populates="club", cascade="all, delete-orphan")
@@ -81,6 +91,7 @@ class Club(db.Model):
         return f"<Club {self.name}>"
 
 
+# Üyelik modelini tanımlar
 class Membership(db.Model):
     __tablename__ = "memberships"
 
@@ -89,7 +100,7 @@ class Membership(db.Model):
     is_approved = db.Column(db.Boolean, default=False)
     joined_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationships
+    # İlişkiler
     user = db.relationship("User", back_populates="memberships")
     club = db.relationship("Club", back_populates="members")
 
@@ -97,6 +108,7 @@ class Membership(db.Model):
         return f"<Membership User:{self.user_id} Club:{self.club_id}>"
 
 
+# Etkinlik modelini tanımlar
 class Event(db.Model):
     __tablename__ = "events"
 
@@ -109,7 +121,7 @@ class Event(db.Model):
     club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)
 
-    # Relationships
+    # İlişkiler
     club = db.relationship("Club", back_populates="events")
     attendees = db.relationship("EventAttendance", back_populates="event", cascade="all, delete-orphan")
     feedbacks = db.relationship("EventFeedback", back_populates="event", lazy="dynamic")
@@ -119,6 +131,7 @@ class Event(db.Model):
         return f"<Event {self.title}>"
 
 
+# Etkinlik katılım modelini tanımlar
 class EventAttendance(db.Model):
     __tablename__ = "event_attendance"
 
@@ -131,7 +144,7 @@ class EventAttendance(db.Model):
     def registration_date(self):
         return self.registered_at
 
-    # Relationships
+    # İlişkiler
     user = db.relationship("User", back_populates="event_attendances")
     event = db.relationship("Event", back_populates="attendees")
 
@@ -139,6 +152,7 @@ class EventAttendance(db.Model):
         return f"<EventAttendance User:{self.user_id} Event:{self.event_id}>"
 
 
+# Etkinlik geri bildirim modelini tanımlar
 class EventFeedback(db.Model):
     __tablename__ = "event_feedbacks"
 
@@ -149,7 +163,7 @@ class EventFeedback(db.Model):
     comment = db.Column(db.Text)
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationships
+    # İlişkiler
     user = db.relationship("User", back_populates="event_feedbacks")
     event = db.relationship("Event", back_populates="feedbacks")
 
@@ -157,6 +171,7 @@ class EventFeedback(db.Model):
         return f"<EventFeedback User:{self.user_id} Event:{self.event_id}>"
 
 
+# Gönderi modelini tanımlar
 class Post(db.Model):
     __tablename__ = "posts"
 
@@ -166,13 +181,14 @@ class Post(db.Model):
     posted_at = db.Column(db.DateTime, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    # Relationships
+    # İlişkiler
     author = db.relationship("User", back_populates="posts")
 
     def __repr__(self):
         return f"<Post '{self.title}'>"
 
 
+# İletişim mesajı modelini tanımlar
 class ContactMessage(db.Model):
     __tablename__ = "contact_messages"
 
@@ -186,6 +202,7 @@ class ContactMessage(db.Model):
         return f"<ContactMessage from {self.name}>"
 
 
+# Bildirim modelini tanımlar
 class Notification(db.Model):
     __tablename__ = "notifications"
     id = db.Column(db.Integer, primary_key=True)
@@ -195,9 +212,10 @@ class Notification(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_read = db.Column(db.Boolean, default=False)
 
-    # Explicit back_populates relationship
+    # İlişkiler
     user = db.relationship("User", back_populates="notifications")
 
+    # Bildirimi okundu olarak işaretler
     def mark_as_read(self):
         self.is_read = True
         db.session.commit()
@@ -206,6 +224,7 @@ class Notification(db.Model):
         return f"<Notification id={self.id}, user_id={self.user_id}, type={self.notification_type}, is_read={self.is_read}>"
 
 
+# Etkinlik kaynağı modelini tanımlar
 class EventResource(db.Model):
     __tablename__ = "event_resources"
 
@@ -215,9 +234,11 @@ class EventResource(db.Model):
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
     filepath = db.Column(db.String(255), nullable=False)
 
+    # İlişkiler
     event = db.relationship("Event", backref="resources")
 
 
+# Anket modelini tanımlar
 class Poll(db.Model):
     __tablename__ = "polls"
     id = db.Column(db.Integer, primary_key=True)
@@ -225,10 +246,12 @@ class Poll(db.Model):
     question = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # İlişkiler
     choices = db.relationship("PollChoice", backref="poll", cascade="all, delete-orphan")
     event = db.relationship("Event", backref="polls")
 
 
+# Anket seçeneği modelini tanımlar
 class PollChoice(db.Model):
     __tablename__ = "poll_choices"
     id = db.Column(db.Integer, primary_key=True)
@@ -237,6 +260,7 @@ class PollChoice(db.Model):
     votes = db.Column(db.Integer, default=0)
 
 
+# Yer imi modelini tanımlar
 class Bookmark(db.Model):
     __tablename__ = "bookmarks"
 
@@ -246,11 +270,13 @@ class Bookmark(db.Model):
     club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # İlişkiler
     user = db.relationship("User", backref="bookmarks")
     event = db.relationship("Event", backref="bookmarks")
     club = db.relationship("Club", backref="bookmarks")
 
 
+# Kategori modelini tanımlar
 class Category(db.Model):
     __tablename__ = "categories"
 
@@ -258,10 +284,11 @@ class Category(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship with Event
+    # İlişkiler
     events = db.relationship("Event", back_populates="category", cascade="all, delete-orphan")
 
 
+# Kulüp mesajı modelini tanımlar
 class ClubMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=False)
@@ -269,5 +296,6 @@ class ClubMessage(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
+    # İlişkiler
     club = db.relationship("Club", backref=db.backref("messages", lazy="dynamic"))
     user = db.relationship("User", backref=db.backref("club_messages", lazy="dynamic"))

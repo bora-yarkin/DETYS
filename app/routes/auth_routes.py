@@ -4,11 +4,14 @@ from app.models import User
 from app.forms import RegistrationForm, LoginForm
 from app.core.extensions import db
 
+# Auth blueprint'i oluşturur
 auth_bp = Blueprint("auth", __name__)
 
 
+# Kullanıcı giriş işlemi
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
+    # Kullanıcı zaten giriş yapmışsa dashboard'a yönlendirir
     if current_user.is_authenticated:
         return redirect(url_for("main.dashboard"))
 
@@ -17,6 +20,7 @@ def login():
 
     if request.method == "POST":
         action = request.form.get("action")
+        # Giriş işlemi
         if action == "login" and login_form.validate_on_submit():
             user = User.query.filter_by(username=login_form.username.data).first()
             if user and user.check_password(login_form.password.data):
@@ -26,6 +30,7 @@ def login():
                 return redirect(next_page or url_for("main.dashboard"))
             else:
                 flash("Wrong username or password.", "danger")
+        # Kayıt işlemi
         elif action == "register" and registration_form.validate_on_submit():
             user = User(username=registration_form.username.data, email=registration_form.email.data, role="student")
             user.set_password(registration_form.password.data)
@@ -41,6 +46,7 @@ def login():
     return render_template("auth/login.html", login_form=login_form, registration_form=registration_form)
 
 
+# Kullanıcı çıkış işlemi
 @auth_bp.route("/logout")
 @login_required
 def logout():

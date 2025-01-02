@@ -8,6 +8,7 @@ from app.core.decorators import main_admin_required
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
+# admin panelinde edit user ve delete user işlemleri yapılır
 @admin_bp.route("/users")
 @login_required
 @main_admin_required
@@ -16,6 +17,7 @@ def list_users():
     return render_template("admin/user_list.html", users=users)
 
 
+# admin panelinde user edit işlemi yapılır
 @admin_bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
 @login_required
 @main_admin_required
@@ -32,6 +34,7 @@ def edit_user(user_id):
     return render_template("admin/user_edit.html", form=form, user=user)
 
 
+# admin panelinde user delete işlemi yapılır
 @admin_bp.route("/users/<int:user_id>/delete", methods=["POST"])
 @login_required
 @main_admin_required
