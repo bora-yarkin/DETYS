@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: aeb51f6410d7
+Revision ID: 3906f57447df
 Revises: 
-Create Date: 2024-12-25 17:22:04.792837
+Create Date: 2025-01-03 18:20:18.950055
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'aeb51f6410d7'
+revision = '3906f57447df'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,6 +35,7 @@ def upgrade():
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('username', sa.String(length=64), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password_hash', sa.String(length=128), nullable=True),
@@ -74,6 +75,16 @@ def upgrade():
     sa.Column('posted_at', sa.DateTime(), nullable=True),
     sa.Column('author_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['author_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('club_message',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('club_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('timestamp', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['club_id'], ['clubs.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('events',
@@ -167,6 +178,7 @@ def downgrade():
     op.drop_table('bookmarks')
     op.drop_table('memberships')
     op.drop_table('events')
+    op.drop_table('club_message')
     op.drop_table('posts')
     op.drop_table('notifications')
     op.drop_table('clubs')
