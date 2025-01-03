@@ -12,3 +12,4 @@ wtforms
 sqlalchemy
 email_validator
 python-dotenv
+pytest
