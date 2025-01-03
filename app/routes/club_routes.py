@@ -36,9 +36,6 @@ def club_detail(club_id):
     form = ClubMessageForm()
     # Form gönderildiğinde ve doğrulama başarılı olduğunda
     if form.validate_on_submit():
-        # Kullanıcı kulüp başkanı değilse veya ana yönetici değilse 403 hatası döner
-        if club.president_id != current_user.id and not current_user.is_main_admin:
-            abort(403)
         # Yeni mesaj oluşturur ve veritabanına ekler
         message = ClubMessage(club_id=club.id, user_id=current_user.id, content=form.content.data)
         db.session.add(message)

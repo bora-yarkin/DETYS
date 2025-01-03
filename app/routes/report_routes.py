@@ -6,6 +6,7 @@ from flask import Blueprint, render_template, request, send_file, redirect, url_
 from flask_login import login_required, current_user
 from sqlalchemy import func
 from app.core.extensions import db
+from app.core.decorators import admin_or_manager_required
 from app.core.analytics import Analytics
 from app.models import Category, Event, EventAttendance, EventFeedback, Club, User
 from app.core.data_processing import export_event_feedback_to_csv, export_event_attendance_to_csv, export_event_stats_to_csv, export_user_stats_to_csv, export_club_stats_to_csv
@@ -35,6 +36,7 @@ def get_allowed_event_ids():
 
 @report_bp.route("/reports")
 @login_required
+@admin_or_manager_required
 def reports():
     # Kullanıcının erişimine izin verilen etkinlik ID'lerini alır
     allowed_event_ids = get_allowed_event_ids()
@@ -243,6 +245,7 @@ def reports():
 
 @report_bp.route("/reports/download_pdf")
 @login_required
+@admin_or_manager_required
 def download_pdf():
     # Kullanıcının erişimine izin verilen etkinlik ID'lerini alır
     allowed_event_ids = get_allowed_event_ids()
@@ -430,6 +433,7 @@ def download_pdf():
 
 @report_bp.route("/reports/export_feedback_csv")
 @login_required
+@admin_or_manager_required
 def export_feedback_csv():
     # Kullanıcının erişimine izin verilen etkinlik ID'lerini alır
     allowed_event_ids = get_allowed_event_ids()
@@ -461,6 +465,7 @@ def export_feedback_csv():
 
 @report_bp.route("/reports/export_attendance_csv")
 @login_required
+@admin_or_manager_required
 def export_attendance_csv():
     # Kullanıcının erişimine izin verilen etkinlik ID'lerini alır
     allowed_event_ids = get_allowed_event_ids()
@@ -492,6 +497,7 @@ def export_attendance_csv():
 
 @report_bp.route("/reports/export_stats_csv")
 @login_required
+@admin_or_manager_required
 def export_stats_csv():
     try:
         # Analiz istatistiklerini alır
