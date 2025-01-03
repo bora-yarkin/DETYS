@@ -7,18 +7,18 @@ from app.models import User, Club
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
-    password = PasswordField(
-        "Password",
-        validators=[DataRequired()],
-    )
+    # password = PasswordField(
+    #     "Password",
+    #     validators=[DataRequired()],
+    # )
     # # password = PasswordField(
     #     "Password",
     #     validators=[DataRequired(), EqualTo("confirm", message="Passwords must match")],
     # )
-    # password = PasswordField(
-    #     "Password",
-    #     validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)", message="Password must contain at least one uppercase letter, one lowercase letter, and one digit."), EqualTo("confirm", message="Passwords must match")],
-    # )
+    password = PasswordField(
+        "Password",
+        validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)", message="Password must contain at least one uppercase letter, one lowercase letter, and one digit."), EqualTo("confirm", message="Passwords must match")],
+    )
     confirm = PasswordField("Confirm Password")
     submit = SubmitField("Register")
 

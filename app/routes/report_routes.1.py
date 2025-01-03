@@ -38,31 +38,17 @@ def get_allowed_event_ids():
 @login_required
 @admin_or_manager_required
 def reports():
+    # Kullanıcının erişimine izin verilen etkinlik ID'lerini alır
     allowed_event_ids = get_allowed_event_ids()
 
-    # Filtre parametrelerini okur ve datetime nesnelerine dönüştürür
-    from_date_str = request.args.get("from_date")
-    to_date_str = request.args.get("to_date")
-
-    from_date_obj = None
-    to_date_obj = None
-
-    if from_date_str:
-        try:
-            from_date_obj = datetime.strptime(from_date_str, "%Y-%m-%d")
-        except ValueError:
-            pass
-
-    if to_date_str:
-        try:
-            to_date_obj = datetime.strptime(to_date_str, "%Y-%m-%d")
-        except ValueError:
-            pass
-
+    # Sorgudan filtre parametrelerini alır
+    from_date = request.args.get("from_date")
+    to_date = request.args.get("to_date")
     category_ids = request.args.getlist("category_ids", type=int)
     club_id = request.args.get("club_id", type=int)
     category_id = request.args.get("category_id", type=int)
 
+    # Etkinlik katılım verilerini sorgular
     participation_query = (
         db.session.query(
             Event.title,
@@ -74,17 +60,25 @@ def reports():
             Event.id.in_(allowed_event_ids),
         )
     )
-    if from_date_obj:
-        participation_query = participation_query.filter(Event.date >= from_date_obj)
-    if to_date_obj:
-        participation_query = participation_query.filter(Event.date <= to_date_obj)
+
+    # Belirtilen tarih aralığı filtrelerini uygular
+    if from_date:
+        participation_query = participation_query.filter(Event.date >= from_date)
+    if to_date:
+        participation_query = participation_query.filter(Event.date <= to_date)
+
+    # Kategori filtrelerini uygular
     if category_ids:
         participation_query = participation_query.filter(Event.category_id.in_(category_ids))
+
+    # Kulüp filtresini uygular
     if club_id:
         participation_query = participation_query.filter(Event.club_id == club_id)
 
+    # Etkinlik katılım verilerini gruplayarak alır
     participation_data = participation_query.group_by(Event.id, Event.title).all()
 
+    # En popüler 5 etkinliği sorgular
     popular_query = (
         db.session.query(
             Event.title,
@@ -96,23 +90,18 @@ def reports():
             Event.id.in_(allowed_event_ids),
         )
     )
-    if from_date_obj:
-        popular_query = popular_query.filter(Event.date >= from_date_obj)
-    if to_date_obj:
-        popular_query = popular_query.filter(Event.date <= to_date_obj)
-    if category_ids:
-        popular_query = popular_query.filter(Event.category_id.in_(category_ids))
-    if club_id:
-        popular_query = popular_query.filter(Event.club_id == club_id)
-
+    if category_id:
+        popular_query = popular_query.filter(Event.category_id == category_id)
     sorted_by_popularity = popular_query.group_by(Event.id, Event.title).order_by(func.count(EventAttendance.user_id).desc()).limit(5).all()
 
+    # Analiz istatistiklerini alır
     analytics = Analytics()
     event_stats = analytics.get_event_stats()
     user_stats = analytics.get_user_stats()
     club_stats = analytics.get_club_stats()
     feedback_stats = analytics.get_feedback_stats()
 
+    # Etkinlik katılım grafiğini oluşturur
     try:
         participation_chart = ChartGenerator.generate_bar_chart(
             labels=[item.title for item in participation_data],
@@ -126,9 +115,10 @@ def reports():
         participation_chart = None
         flash(f"Error generating participation chart: {e}", "danger")
 
+    # Kategorilere göre etkinlik dağılım grafiğini oluşturur
     try:
-        category_labels = [cat[0] for cat in event_stats["event_by_category"]]
-        category_values = [cat[1] for cat in event_stats["event_by_category"]]
+        category_labels = [category[0] for category in event_stats["event_by_category"]]
+        category_values = [category[1] for category in event_stats["event_by_category"]]
         categories_chart = ChartGenerator.generate_pie_chart(
             labels=category_labels,
             sizes=category_values,
@@ -138,9 +128,10 @@ def reports():
         categories_chart = None
         flash(f"Error generating categories chart: {e}", "danger")
 
+    # Geri bildirim puan dağılım grafiğini oluşturur
     try:
-        rating_labels = [str(r[0]) for r in feedback_stats["rating_distribution"]]
-        rating_values = [r[1] for r in feedback_stats["rating_distribution"]]
+        rating_labels = [str(rating[0]) for rating in feedback_stats["rating_distribution"]]
+        rating_values = [rating[1] for rating in feedback_stats["rating_distribution"]]
         ratings_chart = ChartGenerator.generate_bar_chart(
             labels=rating_labels,
             values=rating_values,
@@ -153,9 +144,10 @@ def reports():
         ratings_chart = None
         flash(f"Error generating ratings chart: {e}", "danger")
 
+    # En aktif kulüpler grafiğini oluşturur
     try:
-        club_labels = [c[0] for c in club_stats["most_active_clubs"]]
-        club_values = [c[1] for c in club_stats["most_active_clubs"]]
+        club_labels = [club[0] for club in club_stats["most_active_clubs"]]
+        club_values = [club[1] for club in club_stats["most_active_clubs"]]
         clubs_chart = ChartGenerator.generate_bar_chart(
             labels=club_labels,
             values=club_values,
@@ -168,6 +160,7 @@ def reports():
         clubs_chart = None
         flash(f"Error generating clubs chart: {e}", "danger")
 
+    # Kullanıcı etkileşim grafiğini oluşturur
     try:
         user_engagement_query = (
             db.session.query(
@@ -175,26 +168,12 @@ def reports():
                 func.count(EventAttendance.event_id).label("events_attended"),
             )
             .join(EventAttendance)
-            .join(Event)
-            .filter(
-                EventAttendance.status == "confirmed",
-                Event.id.in_(allowed_event_ids),
-            )
+            .group_by(User.username)
+            .all()
         )
-        if from_date_obj:
-            user_engagement_query = user_engagement_query.filter(Event.date >= from_date_obj)
-        if to_date_obj:
-            user_engagement_query = user_engagement_query.filter(Event.date <= to_date_obj)
-        if category_ids:
-            user_engagement_query = user_engagement_query.filter(Event.category_id.in_(category_ids))
-        if club_id:
-            user_engagement_query = user_engagement_query.filter(Event.club_id == club_id)
 
-        scatter_x, scatter_y = [], []
-        for user_data in user_engagement_query.group_by(User.username).all():
-            scatter_x.append(user_data.username)
-            scatter_y.append(user_data.events_attended)
-
+        scatter_x = [user.username for user in user_engagement_query]
+        scatter_y = [user.events_attended for user in user_engagement_query]
         user_engagement_chart = ChartGenerator.generate_scatter_plot(
             x=scatter_x,
             y=scatter_y,
@@ -206,18 +185,9 @@ def reports():
         user_engagement_chart = None
         flash(f"Error generating user engagement chart: {e}", "danger")
 
+    # Geri bildirim puan histogramını oluşturur
     try:
-        feedback_query = EventFeedback.query.join(Event).filter(Event.id.in_(allowed_event_ids))
-        if from_date_obj:
-            feedback_query = feedback_query.filter(Event.date >= from_date_obj)
-        if to_date_obj:
-            feedback_query = feedback_query.filter(Event.date <= to_date_obj)
-        if category_ids:
-            feedback_query = feedback_query.filter(Event.category_id.in_(category_ids))
-        if club_id:
-            feedback_query = feedback_query.filter(Event.club_id == club_id)
-
-        feedback_ratings = [fb.rating for fb in feedback_query.all()]
+        feedback_ratings = [fb.rating for fb in EventFeedback.query.all()]
         feedback_histogram = ChartGenerator.generate_histogram(
             data=feedback_ratings,
             bins=5,
@@ -229,6 +199,7 @@ def reports():
         feedback_histogram = None
         flash(f"Error generating feedback histogram: {e}", "danger")
 
+    # Oluşturulan tüm grafikleri bir sözlüğe ekler
     base64_charts = {
         "participation": participation_chart,
         "categories": categories_chart,
@@ -238,6 +209,7 @@ def reports():
         "feedback_histogram": feedback_histogram,
     }
 
+    # Her etkinliğin ortalama geri bildirim puanını sorgular
     feedback_data_query = (
         db.session.query(
             Event.title,
@@ -246,17 +218,11 @@ def reports():
         .join(EventFeedback)
         .filter(Event.id.in_(allowed_event_ids))
     )
-    if from_date_obj:
-        feedback_data_query = feedback_data_query.filter(Event.date >= from_date_obj)
-    if to_date_obj:
-        feedback_data_query = feedback_data_query.filter(Event.date <= to_date_obj)
-    if category_ids:
-        feedback_data_query = feedback_data_query.filter(Event.category_id.in_(category_ids))
-    if club_id:
-        feedback_data_query = feedback_data_query.filter(Event.club_id == club_id)
-
+    if category_id:
+        feedback_data_query = feedback_data_query.filter(Event.category_id == category_id)
     feedback_data = feedback_data_query.group_by(Event.id).all()
 
+    # Rapor şablonunu tüm veriler ve grafiklerle render eder
     return render_template(
         "report/report.html",
         participation_data=participation_data,
@@ -269,8 +235,8 @@ def reports():
         charts=base64_charts,
         categories=Category.query.order_by(Category.name.asc()).all(),
         selected_category_id=category_id,
-        from_date=from_date_str,
-        to_date=to_date_str,
+        from_date=from_date,
+        to_date=to_date,
         selected_categories=category_ids,
         selected_club=club_id,
         clubs=Club.query.order_by(Club.name.asc()).all(),
