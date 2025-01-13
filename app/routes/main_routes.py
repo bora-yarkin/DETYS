@@ -6,7 +6,6 @@ from app.models import Club, Event, EventAttendance, EventResource, Membership, 
 from app.forms import ContactForm, MarkAsReadForm, MarkAllNotificationsReadForm
 from app.core.extensions import db
 
-# Main blueprint'i oluşturur
 main_bp = Blueprint("main", __name__)
 
 

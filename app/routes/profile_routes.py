@@ -3,7 +3,6 @@ from flask_login import login_required, current_user, logout_user
 from app.forms import UserProfileForm
 from app.core.extensions import db
 
-# Profile blueprint'i oluşturur
 profile_bp = Blueprint("profile", __name__, url_prefix="/profile")
 
 

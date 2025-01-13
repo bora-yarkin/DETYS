@@ -6,7 +6,6 @@ from app.forms import PostForm
 from app.core.extensions import db, csrf
 from werkzeug.utils import secure_filename
 
-# Post blueprint'i oluşturur
 post_bp = Blueprint("post", __name__)
 
 UPLOAD_FOLDER = "app/static/uploads"

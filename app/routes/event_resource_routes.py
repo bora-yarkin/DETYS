@@ -5,7 +5,6 @@ from app.core.extensions import db
 from app.models import Event, EventResource
 from werkzeug.utils import secure_filename
 
-# Resource blueprint'i oluşturur
 resource_bp = Blueprint("resource", __name__)
 
 UPLOAD_FOLDER = "app/static/event_resources"

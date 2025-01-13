@@ -2,7 +2,6 @@ from flask import Blueprint, request, render_template
 from app.models import Club, Event, Post
 from app.core.extensions import db
 
-# Arama ile ilgili rotaları tanımlamak için Blueprint oluşturur
 search_bp = Blueprint("search", __name__)
 
 

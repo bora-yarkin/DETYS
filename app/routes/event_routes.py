@@ -7,7 +7,6 @@ from app.forms import EventForm, EventFeedbackForm
 from app.core.extensions import db
 from app.core.decorators import admin_or_manager_required
 
-# Event blueprint'i oluşturur
 event_bp = Blueprint("event", __name__)
 
 

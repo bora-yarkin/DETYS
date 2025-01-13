@@ -5,7 +5,6 @@ from app.core.extensions import db
 from app.models import Event, Poll, PollChoice
 from app.core.decorators import admin_or_manager_required
 
-# Poll blueprint'i oluşturur
 poll_bp = Blueprint("poll", __name__)
 
 

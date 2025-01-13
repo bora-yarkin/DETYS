@@ -31,21 +31,17 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
-    # Şifreyi kontrol eder
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # Kullanıcının öğrenci olup olmadığını kontrol eder
     @property
     def is_student(self):
         return self.role == "student"
 
-    # Kullanıcının kulüp yöneticisi olup olmadığını kontrol eder
     @property
     def is_club_manager(self):
         return self.role == "club_manager"
 
-    # Kullanıcının ana yönetici olup olmadığını kontrol eder
     @property
     def is_main_admin(self):
         return self.role == "main_admin"
@@ -66,7 +62,6 @@ class User(UserMixin, db.Model):
         return f"<User {self.username}>"
 
 
-# Kullanıcıyı yükler
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))

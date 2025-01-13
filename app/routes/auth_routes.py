@@ -4,7 +4,6 @@ from app.models import User
 from app.forms import RegistrationForm, LoginForm
 from app.core.extensions import db
 
-# Auth blueprint'i oluşturur
 auth_bp = Blueprint("auth", __name__)
 
 

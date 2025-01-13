@@ -15,10 +15,8 @@ from xhtml2pdf import pisa
 
 import matplotlib
 
-# 'Agg' backend'u, görüntü olmadan matplotlib kullanımı için gereklidir
 matplotlib.use("Agg")
 
-# Raporlarla ilgili rotaları tanımlamak için Blueprint oluşturur
 report_bp = Blueprint("report", __name__)
 
 

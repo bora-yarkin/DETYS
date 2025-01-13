@@ -24,7 +24,7 @@ def export_query_to_csv(filename_prefix, headers, query, row_formatter):
 
     data = query.all()
 
-    # CSV dosyasını oluştur ve verileri yaz
+    # CSV dosyasını oluştur ve verileri yazar
     with open(filepath, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)

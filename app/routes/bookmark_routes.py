@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 from app.core.extensions import db
 from app.models import Bookmark
 
-# Bookmark blueprint'i oluşturur
 bookmark_bp = Blueprint("bookmark", __name__)
 
 
@@ -23,10 +22,8 @@ def add_bookmark(user_id, club_id=None, event_id=None):
 
 # Kullanıcıya ait bir bookmark'ı kaldırır
 def remove_bookmark(user_id, club_id=None, event_id=None):
-    # Mevcut bookmark'ı bulur
     bm = Bookmark.query.filter_by(user_id=user_id, club_id=club_id, event_id=event_id).first()
     if bm:
-        # Bookmark'ı veritabanından siler
         db.session.delete(bm)
         db.session.commit()
         flash("Bookmark removed.", "success")

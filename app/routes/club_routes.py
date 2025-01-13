@@ -6,7 +6,6 @@ from app.core.extensions import db
 from app.core.decorators import admin_or_manager_required
 from app.core.notifications import send_notification
 
-# Club blueprint'i oluşturur
 club_bp = Blueprint("club", __name__)
 
 

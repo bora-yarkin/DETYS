@@ -4,7 +4,6 @@ from app.core.extensions import db
 from app.models import Category
 from app.core.decorators import main_admin_required
 
-# Category blueprint'i oluşturur
 category_bp = Blueprint("category", __name__)
 
 
@@ -15,7 +14,6 @@ category_bp = Blueprint("category", __name__)
 def list_categories():
     # Tüm kategorileri isimlerine göre sıralayarak sorgular
     categories = Category.query.order_by(Category.name.asc()).all()
-    # Kategori listesini category/list_categories.html şablonuna gönderir
     return render_template("category/list_categories.html", categories=categories)
 
 
@@ -45,7 +43,6 @@ def create_category():
         flash("Category created successfully!", "success")
         return redirect(url_for("category.list_categories"))
 
-    # Kategori oluşturma formunu category/create_category.html şablonuna gönderir
     return render_template("category/create_category.html")
 
 
@@ -54,12 +51,10 @@ def create_category():
 @login_required
 @main_admin_required
 def edit_category(category_id):
-    # Belirtilen ID'ye sahip kategoriyi veritabanından sorgular, yoksa 404 hatası döner
     cat = Category.query.get_or_404(category_id)
     if request.method == "POST":
         # Formdan kategori adını alır ve boşlukları temizler
         name = request.form.get("name", "").strip()
-        # Kategori adı boşsa hata mesajı gösterir
         if not name:
             flash("Category name is required.", "danger")
             return redirect(request.url)
@@ -76,7 +71,6 @@ def edit_category(category_id):
         flash("Category updated successfully!", "success")
         return redirect(url_for("category.list_categories"))
 
-    # Kategori düzenleme formunu category/edit_category.html şablonuna gönderir
     return render_template("category/edit_category.html", cat=cat)
 
 
@@ -85,12 +79,8 @@ def edit_category(category_id):
 @login_required
 @main_admin_required
 def delete_category(category_id):
-    # Belirtilen ID'ye sahip kategoriyi veritabanından sorgular, yoksa 404 hatası döner
     cat = Category.query.get_or_404(category_id)
-    # Kategoriyi veritabanından siler
     db.session.delete(cat)
-    # Değişiklikleri veritabanına kaydeder
     db.session.commit()
     flash("Category deleted.", "success")
-    # Kategori listesine yönlendirir
     return redirect(url_for("category.list_categories"))
